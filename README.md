@@ -14,7 +14,7 @@
 ![TDD](https://img.shields.io/badge/TDD-Test--Driven--Development-green.svg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-#### More information ➡️ [www.claude-code.pro](https://www.claude-code.pro)
+#### 🎬 Join the Upcoming Masterclass ➡️ [www.claude-code.pro](https://www.claude-code.pro)
 
 ---
 
