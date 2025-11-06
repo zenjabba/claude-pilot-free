@@ -4,13 +4,18 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
-# Find most recently modified file (within last minute, excluding cache/build dirs)
-files=$(find . -type f -mmin -1 -not -path '*/.ruff_cache/*' -not -path '*/__pycache__/*' -not -path '*/node_modules/*' -not -path '*/.venv/*' -not -path '*/dist/*' -not -path '*/build/*' -exec ls -t {} + 2>/dev/null | head -1)
+# Change to workspace root if not already there
+if [[ -d "/workspaces/claude-codepro" ]]; then
+  cd /workspaces/claude-codepro
+fi
+
+# Find most recently modified file (within last 2 minutes, excluding cache/build dirs)
+files=$(find . -type f -mmin -2 -not -path '*/.ruff_cache/*' -not -path '*/__pycache__/*' -not -path '*/node_modules/*' -not -path '*/.venv/*' -not -path '*/dist/*' -not -path '*/build/*' -not -path '*/.git/*' -exec ls -t {} + 2>/dev/null | head -1)
 
 # If no files found, still provide feedback
 if [[ -z "$files" ]]; then
-  echo "" >&2
-  echo -e "${GREEN}✅ No recently modified files to check${NC}" >&2
+  echo ""
+  echo -e "${GREEN}✅ No recently modified files to check${NC}"
   exit 0
 fi
 
@@ -19,8 +24,8 @@ file_abs_path=$(realpath "$files")
 
 # Skip checks for test files
 if [[ "$file_abs_path" == *test* ]] || [[ "$file_abs_path" == *spec* ]]; then
-  echo "" >&2
-  echo -e "${GREEN}✅ Test file - skipping checks${NC}" >&2
+  echo ""
+  echo -e "${GREEN}✅ Test file - skipping checks${NC}"
   exit 0
 fi
 
@@ -198,9 +203,9 @@ if [[ $has_issues == true ]]; then
   fi
 
   echo -e "${RED}Fix all issues above before continuing${NC}" >&2
-  exit 1 # Exit with error code when issues found
+  exit 2 # Exit code 2: stderr shown to BOTH user and Claude
 else
   echo "" >&2
   echo -e "${GREEN}✅ Code quality good. Continue${NC}" >&2
-  exit 0 # Exit successfully when no issues
+  exit 2 # Exit code 2 ensures Claude sees the success message too
 fi
