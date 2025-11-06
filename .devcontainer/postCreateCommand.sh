@@ -17,7 +17,12 @@ fi
 # Install uv venv for Python
 uv sync --frozen
 
-# Install qlty and initialize
+# Install qlty fresh and initialize
+if [ -d "/workspaces/claude-codepro/.qlty" ]; then
+    find /workspaces/claude-codepro/.qlty -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
+    find /workspaces/claude-codepro/.qlty -mindepth 1 -maxdepth 1 -type l -delete
+    find /workspaces/claude-codepro/.qlty -mindepth 1 -maxdepth 1 -type f ! -name 'qlty.toml' ! -name '.gitignore' -delete
+fi
 curl https://qlty.sh | sh
 echo -e "\nexport QLTY_INSTALL=\"$HOME/.qlty\"" >>~/.zshrc
 echo -e 'export PATH=$QLTY_INSTALL/bin:$PATH' >>~/.zshrc
