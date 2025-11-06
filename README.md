@@ -29,10 +29,10 @@
 - `/verify` - E2E spec verification → All tests, data integrity, quality checks (Sonnet 4.5)
 
 ### 🎨 Auto-Enforce Best Practices and Standards via Skills
-- **6 Testing Skills** - TDD, test writing, anti-patterns, debugging, verification, code review
-- **5 Global Skills** - Coding style, commenting, conventions, error handling, validation
-- **4 Backend Skills** - API design, models, queries, migrations
-- **4 Frontend Skills** - Components, CSS, accessibility, responsive design
+- **Testing Skills** - TDD, test writing, anti-patterns, debugging, verification, code review
+- **Global Skills** - Coding style, commenting, conventions, error handling, validation
+- **Backend Skills** - API design, models, queries, migrations
+- **Frontend Skills** - Components, CSS, accessibility, responsive design
 
 ### 🔌 Enhanced Context and Capabilities via MCP Servers
 - **Cipher** - Cross-session memory so context is never lost between /clear commands
@@ -49,10 +49,10 @@
 - **Ruff** - Fast Python linter and formatter
 
 ### 🐳 Automated Dev Container Setup (VS Code / Cursor / Windsurf)
-- **8 DevContainer Features** - Zsh, Node.js, Docker-in-Docker, uv, ruff, basedpyright, git, fzf
-- **27 VS Code Extensions** - Python, Docker, SQL, testing, formatting, and development tools
-- **6 CLI Tools** - qlty, Claude Code, Statusline, dotenvx, Cipher, Newman
-- **PostgreSQL Database** - Local instance on port 5433 for development and testing
+- **Integrated Features** - Zsh, Node.js, Docker-in-Docker, uv, ruff, basedpyright, git, fzf
+- **IDE Extensions** - Python, Docker, SQL, testing, formatting, and development tools
+- **CLI Tools** - qlty, Claude Code, Statusline, dotenvx, Cipher, Newman
+- **Local Database** - Local PostgreSQL instance on port 5433 for development and testing
 
 ---
 
