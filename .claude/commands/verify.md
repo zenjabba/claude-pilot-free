@@ -124,11 +124,25 @@ uv run python src/worker.py
 - [ ] Output data is correct (check DB, files, API responses)
 - [ ] No warnings or unexpected errors in logs
 
-**If program fails:**
-1. Read error message carefully
-2. Fix configuration/env vars/imports
-3. Re-run until successful
-4. Show actual output - never claim "should work"
+**If program reveals serious bugs (NOT simple fixes):**
+
+**When to go back to implementation:**
+- Multiple data validation errors
+- Schema/table structure issues
+- Business logic failures
+- Complex bugs requiring TDD approach
+
+**Process:**
+1. Store current findings: `mcp__cipher__ask_cipher("Found [N] bugs: [list]. Returning to implementation.")`
+2. Update plan: Add new task with bug details and fix steps
+3. Check context (see Context Management section): If ≥80%, run `/remember` first
+4. Tell user: "Found [N] bugs requiring implementation phase. Added Task X to plan. Run `/clear` → `/implement [plan]` to fix."
+5. STOP - do not attempt complex fixes in verify mode
+
+**If simple configuration/import fixes:**
+1. Fix directly
+2. Re-run program
+3. Continue verification
 
 ### Step 5: Run & Fix Coverage Issues
 

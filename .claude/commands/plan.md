@@ -377,18 +377,18 @@ Go backward when: New constraints revealed, validation gaps found, approach ques
 
 ## Key Principles
 
-| Principle                | Application                              |
-| ------------------------ | ---------------------------------------- |
-| **Research first**       | Always Cipher + codebase before planning |
-| **One question/time**    | Single question per message              |
-| **Structured choices**   | AskUserQuestion for 2-4 options          |
-| **YAGNI/DRY**            | No speculation or repetition             |
-| **Explore alternatives** | Always 2-3 approaches                    |
-| **Task limit**           | Maximum 10-12 tasks (split if more)      |
-| **Zero-context**         | Assume implementer knows nothing         |
+| Principle                | Application                                   |
+| ------------------------ | --------------------------------------------- |
+| **Research first**       | Always Cipher + codebase before planning      |
+| **One question/time**    | Single question per message                   |
+| **Structured choices**   | AskUserQuestion for 2-4 options               |
+| **YAGNI/DRY**            | No speculation or repetition                  |
+| **Explore alternatives** | Always 2-3 approaches                         |
+| **Task limit**           | Maximum 10-12 tasks (split if more)           |
+| **Zero-context**         | Assume implementer knows nothing              |
 | **Bite-sized steps**     | 4-step flow: test, implement, verify, execute |
-| **Selective code**       | Examples only for complex patterns       |
-| **Fresh context**        | Start with /clear                        |
+| **Selective code**       | Examples only for complex patterns            |
+| **Fresh context**        | Start with /clear                             |
 
 **For Extensions:** Preserve history, mark [NEW], group logically, update metadata, store in Cipher
 

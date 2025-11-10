@@ -161,6 +161,9 @@ Run: `newman run postman/collections/feature.json -e postman/environments/dev.js
 5. Implement minimal code to pass test
 6. Run `mcp__ide__getDiagnostics()` again to verify no errors
 7. **RUN ACTUAL PROGRAM** (if applicable - MANDATORY):
+   - ETL: `uv run python src/main.py` → Verify logs show extraction/loading, check DB records
+   - API: `curl localhost:8000/endpoint` → Verify response data is correct
+   - CLI: `uv run python src/cli.py` → Verify output matches expected behavior
    - **Show actual output - never claim "should work"**
    - Skip only if task has no runnable code (e.g., model-only changes)
 8. Mark task as `completed` in TodoWrite ONLY if tests pass AND program runs successfully

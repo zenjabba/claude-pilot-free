@@ -5,7 +5,8 @@
 **Git:** READ-ONLY - `git status/diff/log/show/branch` ✅ | `git add/commit/push` ❌
 **Python:** `uv` not pip | One-line docstrings | No inline comments | Edit > Create
 **Standards:** TDD mandatory | DRY/YAGNI | Clean imports | Check diagnostics before/after
-**Evidence:** Show actual output, never claim "should work" | Tests must pass AND code must execute
+**Evidence:** ⚠️ **CRITICAL** - Tests passing ≠ working! MUST run actual program
+**Execution:** Show real output (logs, DB records, API responses) - never claim "should work"
 
 ## Development Workflow
 
@@ -32,7 +33,8 @@
 - [ ] Test written and initially FAILED (RED phase)
 - [ ] Implementation code written
 - [ ] Test now PASSES (GREEN phase)
-- [ ] Actual code executed and output verified (not just "should work")
+- [ ] ⚠️ **ACTUAL PROGRAM EXECUTED** - Run main entry point, API server, CLI, etc.
+- [ ] **OUTPUT VERIFIED** - Check logs, DB records, API responses (not just "should work")
 - [ ] No diagnostics errors (`mcp__ide__getDiagnostics()` clean)
 - [ ] Learnings stored in Cipher for future reference
 
