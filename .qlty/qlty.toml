@@ -53,35 +53,19 @@ name = "default"
 default = true
 
 [[plugin]]
-name = "bandit"
-
-[[plugin]]
-name = "black"
-mode = "monitor"
-
-[[plugin]]
 name = "dockerfmt"
 
 [[plugin]]
 name = "hadolint"
 
 [[plugin]]
-name = "mypy"
-mode = "monitor"
-
-[[plugin]]
-name = "osv-scanner"
-
-[[plugin]]
-name = "radarlint-python"
-mode = "monitor"
-
-[[plugin]]
 name = "ripgrep"
-mode = "monitor"
 
 [[plugin]]
-name = "ruff"
+name = "radarlint-js"
+
+[[plugin]]
+name = "prettier"
 
 [[plugin]]
 name = "shellcheck"
@@ -90,46 +74,4 @@ name = "shellcheck"
 name = "shfmt"
 
 [[plugin]]
-name = "trufflehog"
-
-[[plugin]]
 name = "yamllint"
-
-[[plugin]]
-name = "eslint"
-version = "8.57.0"
-extra_packages = [
-  "eslint-plugin-react@7.33.2",
-  "eslint-plugin-jest@27.6.0"
-]
-
-[[exclude]]
-plugins = ["bandit"]
-file_patterns = ["**/test_*.py", "**/tests/**/*.py"]
-
-[[triage]]
-match.rules = ["bandit:assert_used"]
-set.ignored = true
-
-[[triage]]
-match.rules = ["ruff:S101"]
-set.ignored = true
-
-[[triage]]
-match.rules = ["black:*"]
-set.mode = "monitor"
-
-[[triage]]
-match.plugins = ["ruff"]
-match.rules = [
-  "ruff:E501",
-  "ruff:F401",
-  "ruff:F403",
-  "ruff:S602",
-  "ruff:S603",
-  "ruff:D100",
-  "ruff:D101",
-  "ruff:D102",
-  "ruff:D103",
-]
-set.ignored = true

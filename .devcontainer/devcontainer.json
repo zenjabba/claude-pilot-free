@@ -35,6 +35,7 @@
         "postman.postman-for-vscode",
         "redhat.vscode-xml",
         "redhat.vscode-yaml",
+        "tamasfe.even-better-toml",
         "yzhang.markdown-all-in-one",
         "zilliz.semanticcodesearch"
       ]

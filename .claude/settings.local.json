@@ -53,8 +53,11 @@
       "mcp__context7__get-library-docs",
       "mcp__dbhub-postgres__execute_sql",
       "mcp__mcp-funnel__load_toolset",
-      "SlashCommand(/remember)",
-      "SlashCommand(/verify)"
+      "SlashCommand(/remember:*)",
+      "SlashCommand(/implement:*)",
+      "SlashCommand(/plan:*)",
+      "SlashCommand(/verify:*)",
+      "SlashCommand(/quick:*)"
     ],
     "deny": []
   },
@@ -74,7 +77,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/workspaces/claude-codepro/.claude/hooks/file-checker.sh"
+            "command": "/workspaces/claude-codepro/.claude/hooks/file_checker_qlty.sh"
+          },
+          {
+            "type": "command",
+            "command": "/workspaces/claude-codepro/.claude/hooks/file_checker_python.sh"
           }
         ]
       }

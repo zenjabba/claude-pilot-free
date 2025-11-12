@@ -1,6 +1,16 @@
 {
-  "servers": {},
+  "servers": {
+    "firecrawl-mcp": {
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"]
+    }
+  },
   "exposeTools": [],
   "alwaysVisibleTools": [],
-  "exposeCoreTools": ["discover_*", "get_tool_schema", "load_toolset", "bridge_tool_request"]
+  "exposeCoreTools": [
+    "discover_*",
+    "get_tool_schema",
+    "load_toolset",
+    "bridge_tool_request"
+  ]
 }

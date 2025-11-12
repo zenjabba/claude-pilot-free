@@ -1,10 +1,10 @@
+<div align="center">
+
 <img src="docs/img/logo.png" alt="Claude CodePro" width="400">
 
-### ⚙️💻 Claude CodePro is a Professional System for Building Quality Code
+### A Professional System for Building Quality Code
 
-**🛠️ A structured approach to software development with Specs, Tests, and Professional Workflows.**
-
-**</> Stop vibe coding, start shipping systematically with Spec-Driven Development, TDD, and much more!**
+Stop vibe coding, start shipping systematically with Spec-Driven Development, TDD, and automated workflows.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Optimized-blue)](https://claude.ai)
@@ -12,9 +12,18 @@
 ![TDD](https://img.shields.io/badge/TDD-Test--Driven--Development-green.svg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-**🌟 Please star this Repository if it helps you ship better Code!**
+---
 
-**🎓 Join the upcoming Academy to learn more ➡️ [www.claude-code.pro](https://www.claude-code.pro)**
+#### 🆕 What's New in v2.1.0
+
+- **Automated Rules Builder** - Modular system that auto-generates Slash Commands and Skills from markdown rules
+- **`/quick` Command** - Alternative to spec-driven workflow for fast fixes and refactoring without enforced TDD
+
+---
+
+#### [⭐ Star this repo](https://github.com/maxritter/claude-codepro) • [🚀 Releases](https://github.com/maxritter/claude-codepro/releases) • [🎓 Join the Academy](https://www.claude-code.pro)
+
+</div>
 
 ---
 
@@ -22,17 +31,23 @@
 
 <img src="docs/img/ide-screenshot.png" alt="IDE Screenshot" width="600">
 
-### 📋 Token-Optimized Spec-Driven Workflow via Slash Commands
+### 📋 Flexible Development Workflows via Slash Commands
+
+**Quick Development** (For fast fixes, refactoring, experiments):
+- `/quick` - Fast, focused development without spec-driven overhead → No mandatory TDD (Sonnet 4.5)
+
+**Spec-Driven Workflow** (For complex features requiring planning and testing):
 - `/plan` - Based on your input asks the right questions → Detailed spec with exact code (Opus 4.1)
 - `/implement` - Execute spec with mandatory TDD → Auto-manages context when full (Sonnet 4.5)
 - `/remember` - Stores learnings in cross-session memory → Continue after /clear (Sonnet 4.5)
 - `/verify` - E2E spec verification with CodeRabbit AI review → All tests, quality, security (Sonnet 4.5)
 
-### 💡 Auto-Enforce Best Practices and Standards via Skills
-- **Testing Skills** - TDD, test writing, anti-patterns, debugging, verification, code review
-- **Global Skills** - Coding style, commenting, conventions, error handling, validation
-- **Backend Skills** - API design, models, queries, migrations
-- **Frontend Skills** - Components, CSS, accessibility, responsive design
+### 💡 Modular Rules System with Auto-Generated Commands & Skills
+- **Rules Builder** - Automatically assembles commands and skills from markdown rules on every `cc` startup
+- **Core Rules** - Coding standards, TDD enforcement, error handling, validation, context management
+- **Extended Rules** - Domain-specific rules auto-converted to skills (@backend-api, @frontend-components, etc.)
+- **Workflow Rules** - Command-specific behavior for /plan, /implement, /verify, /quick, /remember
+- **Flexible Customization** - Edit `.claude/rules/config.yaml` to adjust which rules apply to which commands
 
 ### 🔌 Enhanced Context and Capabilities via MCP Servers
 - **Cipher & Claude Context** - Cross-session memory and semantic code search for optimal context
@@ -66,15 +81,14 @@
 ### 📥 Installation
 
 1. Clone this repository: `git clone https://github.com/maxritter/claude-codepro.git`
-2. Open in VS Code, click on the button on the bottom-left: `Reopen in Container` or open the command pallette via `Ctrl + Shift + P` and then use `> Dev Containers: Reopen in Container`
-3. Wait for automatic build to finish, this can take a couple of minutes (feel free to watch the logs in `Terminal`)
-<img src="docs/img/ide-setup-finish.png" alt="Setup finish Screenshot" width="600">
-
-4. Copy `.env.example` to `.env` and add your credentials and API keys
+2. Copy `.env.example` to `.env` and add your credentials and API keys
 ```bash
 cp .env.example .env
 vim .env
 ```
+3. Open folder in VS Code, click on the button on the bottom-left: `Reopen in Container` or open the command pallette via `Ctrl + Shift + P` and then use `> Dev Containers: Reopen in Container`
+4. Wait for automatic build to finish, this can take a couple of minutes (feel free to watch the logs in `Terminal`)
+<img src="docs/img/ide-setup-finish.png" alt="Setup finish Screenshot" width="600">
 5. Run `cc` (which is an alias we created) in the Terminal to finish CC Setup, `cr` to finish CodeRabbit setup
 ```bash
 # alias to spawn claude code with loaded environment varaibles
@@ -105,14 +119,30 @@ cr
 
 ### 👣 First Steps
 
+**For Quick Changes:**
+- Use `/quick` - Fast development for fixes, refactoring, or experiments without spec overhead
+- TDD not enforced, but best practices still apply via core rules and auto-injected skills
+
+**For Complex Features (Spec-Driven & TDD):**
 - Start with `/plan` - Provide your input and it will ask clarifying questions to create a spec
 - Use `/implement` to execute the spec with automatic TDD, best practices and context management
 - When context fills, `/remember` automatically updates your plan and stores learnings
 - After spec completion, run `/verify` to run CodeRabbit AI review, all tests, and quality checks
 
+### 🎯 Rules Builder
+The system uses a modular rules-based architecture that automatically generates slash commands and skills:
+
+- `.claude/rules/core/` - Fundamental rules injected into all commands
+- `.claude/rules/workflow/` - Command-specific behavior (plan.md, implement.md, verify.md, quick.md, remember.md)
+- `.claude/rules/extended/` - Domain-specific rules auto-converted to individual skills
+- `.claude/rules/config.yaml` - Defines which rules are included in which commands
+- `.claude/rules/builder.py` - Assembles markdown rules into commands and skills
+
+**Auto-Rebuild:** Commands and skills are automatically regenerated on every `cc` startup, making customization seamless.
+
 ## ⚖️ What Makes This Different
 
-**Compared to Other Spec-Driven Frameworks (OpenSpec, SpecKit, AgentOS):**
+**Compared to Other Spec-Driven Frameworks (SpecKit, AgentOS, OpenSpec):**
 
 - 💾 **Persistent Memory** - Cross-session memory maintains knowledge between resets
 - ⚡ **Token-Optimized** - No tokens wasted during too complex planning, just works

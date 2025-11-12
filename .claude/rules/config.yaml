@@ -1,0 +1,74 @@
+---
+# Rule Configuration
+# Defines which rules are included in which commands
+# Commands: Assembled from workflow/ and core/ rules
+# Skills: Auto-generated from extended/ rules (one file = one skill)
+
+commands:
+  plan:
+    description: Create structured implementation plans
+    model: opus
+    inject_skills: true
+    rules:
+      - plan
+      - git-operations
+      - project-conventions
+      - context-management
+      - mcp-tools
+
+  implement:
+    description: Execute implementation plans in batches
+    model: sonnet
+    inject_skills: true
+    rules:
+      - implement
+      - tdd-enforcement
+      - git-operations
+      - python-tooling
+      - coding-standards
+      - project-conventions
+      - error-handling
+      - validation
+      - execution-verification
+      - testing-strategies
+      - context-management
+      - mcp-tools
+
+  verify:
+    description: Run tests and fix issues end-to-end
+    model: sonnet
+    inject_skills: true
+    rules:
+      - verify
+      - git-operations
+      - python-tooling
+      - code-review
+      - execution-verification
+      - testing-strategies
+      - coding-standards
+      - error-handling
+      - validation
+      - context-management
+      - mcp-tools
+
+  quick:
+    description: Fast, focused development without spec-driven workflow overhead
+    model: sonnet
+    inject_skills: true
+    rules:
+      - quick
+      - git-operations
+      - python-tooling
+      - coding-standards
+      - project-conventions
+      - error-handling
+      - validation
+      - execution-verification
+      - context-management
+      - mcp-tools
+
+  remember:
+    description: Store learnings before clearing context
+    model: sonnet
+    rules:
+      - remember

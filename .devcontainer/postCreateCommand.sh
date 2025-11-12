@@ -14,8 +14,9 @@ if ! grep -q "plugins=.*dotenv" ~/.zshrc; then
     echo 'export ZSH_DOTENV_PROMPT=false' >>~/.zshrc
 fi
 
-# Install uv venv for Python
+# Install uv venv for Python and sync Commands and Skills
 uv sync --frozen
+uv run /workspaces/claude-codepro/.claude/rules/builder.py
 
 # Install qlty fresh and initialize
 if [ -d "/workspaces/claude-codepro/.qlty" ]; then
@@ -46,20 +47,16 @@ npm install -g @byterover/cipher
 # Install Newman
 npm install -g newman
 
-# Install Python Tools
-uv tool install mypy
-uv tool install ruff
-uv tool install basedpyright
-uv tool install pytest
-
 # Start Local Postgres with Docker Compose on Port 5433
 docker-compose -f .devcontainer/docker-compose.yml up -d
 
-# Add cc alias for quick Claude Code access
-echo -e "\n# Claude Code quick alias" >>~/.bashrc
-echo 'alias cc="cd /workspaces/claude-codepro/ && clear && dotenvx run claude"' >>~/.bashrc
-echo -e "\n# Claude Code quick alias" >>~/.zshrc
-echo 'alias cc="cd /workspaces/claude-codepro/ && clear && dotenvx run claude"' >>~/.zshrc
+# Add cc alias for Claude Code with rule builder
+# Runs rule_builder.py before starting Claude Code to ensure commands/skills are up-to-date
+{
+    echo ""
+    echo "# Claude Code quick alias"
+    echo 'alias cc="cd /workspaces/claude-codepro && uv run .claude/rules/builder.py && clear && dotenvx run claude"'
+} | tee -a ~/.bashrc ~/.zshrc >/dev/null
 
 # Print finish message
 echo ""
@@ -83,9 +80,10 @@ echo "   - Run /ide to connect to VS Code diagnostics"
 echo "   - Run /mcp to verify all MCP servers are online"
 echo ""
 echo "4. Start coding:"
+echo "   - Use /quick to implement small tasks quickly"
 echo "   - Use /plan to create a spec with clarifying questions"
 echo "   - Use /implement to execute with automatic TDD"
-echo "   - Use /verify to run CodeRabbit review and quality checks"
+echo "   - Use /verify to run AI code review and quality checks"
 echo ""
 echo "📚 For more details, see the README.md"
 echo "======================================================================"
