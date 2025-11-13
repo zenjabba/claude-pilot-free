@@ -4,7 +4,7 @@
 
 ### A Professional System for Building Quality Code
 
-Stop vibe coding, start shipping systematically with Spec-Driven Development, TDD, and automated workflows.
+Stop vibe coding, start shipping systematically with Spec-Driven Development, TDD, and automated workflows with Claude Code (CC)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Optimized-blue)](https://claude.ai)
@@ -93,12 +93,10 @@ vim .env
 4. Wait for automatic build to finish, this can take a couple of minutes (feel free to watch the logs in `Terminal`)
 <img src="docs/img/ide-setup-finish.png" alt="Setup finish Screenshot" width="600">
 
-5. Run `cc` (which is an alias we created) in the Terminal to finish CC Setup, and `cr` to finish CodeRabbit setup
+5. Run `cr` to finish CodeRabbit setup, and `cc` (which is an alias we created) in the Terminal to finish the CC setup
 ```bash
-# alias to spawn claude code with loaded environment variables
-cc
-# code rabbit cmd line tool and setup
-cr
+cr # coderabbit cmd line tool and setup. After sign in close with CTRL + C
+cc # alias to spawn claude code with loaded environment variables
 ```
 
 ---
