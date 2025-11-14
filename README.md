@@ -74,7 +74,7 @@ Start shipping systematically with Spec-Driven Development, Skills, TDD, Semanti
 
 ### 📥 Installation
 
-Run this one-liner in any existing project directory:
+Run this one-liner in any existing project directory that you want to enable Claude CodePro in:
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/maxritter/claude-codepro/main/scripts/install.sh | bash
