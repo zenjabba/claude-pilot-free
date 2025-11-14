@@ -2,9 +2,9 @@
 
 <img src="docs/img/logo.png" alt="Claude CodePro" width="400">
 
-### A Professional System for Building Quality Code
+### A Professional System for Building Quality Code with Claude Code (CC)
 
-Start shipping systematically with Spec-Driven Development, TDD, and automated workflows with Claude Code
+Start shipping systematically with Spec-Driven Development, Skills, TDD, Semantic Search, Persistent Memory, Context Management, Quality Hooks, Modular Rules System, and much more 🚀
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Optimized-blue)](https://claude.ai)
@@ -16,12 +16,12 @@ Start shipping systematically with Spec-Driven Development, TDD, and automated w
 
 #### 🆕 What's New in v2.1.0
 
-- **Automated Rules Builder** - Modular system that auto-generates Slash Commands and Skills
+- **Modular Rules System** - Configurable rules builder system for Slash Commands and Skills
 - **`/quick` Command** - Alternative to spec-driven workflow for fast fixes and refactoring
 
 ---
 
-#### [⭐ Star this repo](https://github.com/maxritter/claude-codepro) • [🚀 Releases](https://github.com/maxritter/claude-codepro/releases) • [🎓 Join the Academy](https://www.claude-code.pro)
+#### [⭐ Star this repo](https://github.com/maxritter/claude-codepro) • [📦 Releases](https://github.com/maxritter/claude-codepro/releases) • [🎓 Join the Academy](https://www.claude-code.pro)
 
 </div>
 
