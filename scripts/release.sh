@@ -97,10 +97,10 @@ echo "  New version: $VERSION"
 # macOS (BSD) sed requires a backup extension or '', Linux (GNU) sed differs
 if sed --version 2>&1 | grep -q GNU; then
   # GNU sed (Linux)
-  sed -i "s|claude-codepro/v[0-9]\+\.[0-9]\+\.[0-9]\+/scripts/install\.sh|claude-codepro/$VERSION/scripts/install.sh|g" README.md
+  sed -i -E "s|claude-codepro/v[0-9]+\.[0-9]+\.[0-9]+/scripts/install\.sh|claude-codepro/$VERSION/scripts/install.sh|g" README.md
 else
   # BSD sed (macOS)
-  sed -i '' "s|claude-codepro/v[0-9]\+\.[0-9]\+\.[0-9]\+/scripts/install\.sh|claude-codepro/$VERSION/scripts/install.sh|g" README.md
+  sed -i '' -E "s|claude-codepro/v[0-9]+\.[0-9]+\.[0-9]+/scripts/install\.sh|claude-codepro/$VERSION/scripts/install.sh|g" README.md
 fi
 
 # Verify the change
