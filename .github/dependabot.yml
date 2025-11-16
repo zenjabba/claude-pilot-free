@@ -14,6 +14,11 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+      - "auto-approve"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
 
   # npm dependencies (for Node.js tools)
   - package-ecosystem: "npm"
@@ -28,6 +33,11 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+      - "auto-approve"
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
     ignore:
       # Ignore major version updates for stability
       - dependency-name: "*"
