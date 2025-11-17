@@ -71,6 +71,10 @@ load_rules() {
     local standard_count=0
     local custom_count=0
 
+    # Create subdirectories for standard and custom rules
+    mkdir -p "$TEMP_RULES_DIR/standard"
+    mkdir -p "$TEMP_RULES_DIR/custom"
+
     # Load from both standard and custom rules
     for source in standard custom; do
         local source_loaded=false
@@ -94,8 +98,8 @@ load_rules() {
                 local rule_id
                 rule_id=$(basename "$md_file" .md)
 
-                # Custom rules override standard rules (loaded second)
-                cat "$md_file" > "$TEMP_RULES_DIR/$rule_id"
+                # Store in source-specific subdirectory
+                cat "$md_file" > "$TEMP_RULES_DIR/$source/$rule_id"
                 log_success "    $category/$(basename "$md_file")"
                 ((rule_count++)) || true
 
@@ -289,7 +293,16 @@ parse_yaml_commands() {
             elif [[ "$line" =~ ^-[[:space:]]*(.+)$ ]]; then
                 # Accept rules from both standard and custom sections, or old flat format
                 if [[ "$in_rules" == true ]]; then
-                    rules_list+=("${BASH_REMATCH[1]}")
+                    local rule_name="${BASH_REMATCH[1]}"
+                    # Prefix with source to track where to look for the rule
+                    if [[ "$in_standard" == true ]]; then
+                        rules_list+=("standard:$rule_name")
+                    elif [[ "$in_custom" == true ]]; then
+                        rules_list+=("custom:$rule_name")
+                    else
+                        # Old format without standard/custom sections - default to standard
+                        rules_list+=("standard:$rule_name")
+                    fi
                 fi
             fi
         fi
@@ -325,12 +338,17 @@ build_commands() {
         } > "$command_file"
 
         # Add rules content
-        for rule_id in $rules_list; do
-            if [[ -f "$TEMP_RULES_DIR/$rule_id" ]]; then
-                cat "$TEMP_RULES_DIR/$rule_id" >> "$command_file"
+        for rule_spec in $rules_list; do
+            # Parse source:rule_id format
+            local source="${rule_spec%%:*}"
+            local rule_id="${rule_spec#*:}"
+            local rule_path="$TEMP_RULES_DIR/$source/$rule_id"
+
+            if [[ -f "$rule_path" ]]; then
+                cat "$rule_path" >> "$command_file"
                 echo "" >> "$command_file"
             else
-                log_warning "Rule '$rule_id' not found"
+                log_warning "Rule '$rule_id' not found in $source/"
             fi
         done
 
@@ -372,13 +390,14 @@ build_skills() {
             local rule_id
             rule_id=$(basename "$md_file" .md)
 
-            [[ ! -f "$TEMP_RULES_DIR/$rule_id" ]] && continue
+            local rule_path="$TEMP_RULES_DIR/$source/$rule_id"
+            [[ ! -f "$rule_path" ]] && continue
 
             local skill_dir="$SKILLS_DIR/$rule_id"
             mkdir -p "$skill_dir"
 
             local skill_file="$skill_dir/SKILL.md"
-            cat "$TEMP_RULES_DIR/$rule_id" > "$skill_file"
+            cat "$rule_path" > "$skill_file"
 
             log_success "Generated $rule_id/SKILL.md"
             ((skill_count++)) || true

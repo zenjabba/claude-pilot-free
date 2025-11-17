@@ -172,11 +172,11 @@ EOF
 }
 
 # =============================================================================
-# Test: Rule Builder with Custom Rules Override
+# Test: Rule Builder with Explicit Custom Rule Selection
 # =============================================================================
 
-test_build_rules_custom_override() {
-	print_section "Test: Rule Builder with Custom Rules Override"
+test_build_rules_custom_explicit() {
+	print_section "Test: Rule Builder with Explicit Custom Rule Selection"
 
 	local test_dir="$TEST_DIR/test-custom"
 	mkdir -p "$test_dir/.claude/rules/standard/core"
@@ -188,44 +188,126 @@ test_build_rules_custom_override() {
 	chmod +x "$test_dir/scripts/build-rules.sh"
 
 	# Create standard rule
-	cat >"$test_dir/.claude/rules/standard/core/override-test.md" <<'EOF'
+	cat >"$test_dir/.claude/rules/standard/core/explicit-test.md" <<'EOF'
 # Standard Version
 This is the standard rule.
 EOF
 
-	# Create custom rule with same name (should override)
-	cat >"$test_dir/.claude/rules/custom/core/override-test.md" <<'EOF'
+	# Create custom rule with same name
+	cat >"$test_dir/.claude/rules/custom/core/explicit-test.md" <<'EOF'
 # Custom Version
-This is the custom rule that overrides standard.
+This is the custom rule.
 EOF
 
-	# Create config.yaml
+	# Create config.yaml that explicitly requests custom version
+	cat >"$test_dir/.claude/rules/config.yaml" <<'EOF'
+commands:
+  test:
+    description: Test command
+    rules:
+      standard: []
+      custom:
+        - explicit-test
+EOF
+
+	print_test "Running build with explicit custom rule selection"
+	cd "$test_dir"
+	bash scripts/build-rules.sh >/dev/null 2>&1
+
+	# Verify custom rule is used (because we explicitly requested it)
+	print_test "Verifying custom rule is used when explicitly selected"
+	if grep -q "Custom Version" "$test_dir/.claude/commands/test.md" &&
+		! grep -q "Standard Version" "$test_dir/.claude/commands/test.md"; then
+		print_success "Custom rule correctly used when explicitly selected"
+	else
+		print_error "Custom rule not used when explicitly selected"
+		cat "$test_dir/.claude/commands/test.md"
+		return 1
+	fi
+
+	print_success "Explicit custom rule selection test passed"
+}
+
+# =============================================================================
+# Test: Standard and Custom Rules with Same Name
+# =============================================================================
+
+test_build_rules_standard_and_custom_separate() {
+	print_section "Test: Standard and Custom Rules with Same Name (Separate)"
+
+	local test_dir="$TEST_DIR/test-separate"
+	mkdir -p "$test_dir/.claude/rules/standard/core"
+	mkdir -p "$test_dir/.claude/rules/custom/core"
+	mkdir -p "$test_dir/scripts"
+
+	# Copy build-rules.sh script
+	cp "$PROJECT_ROOT/scripts/build-rules.sh" "$test_dir/scripts/"
+	chmod +x "$test_dir/scripts/build-rules.sh"
+
+	# Create standard version
+	cat >"$test_dir/.claude/rules/standard/core/mcp-tools.md" <<'EOF'
+# Standard MCP Tools
+This is the standard MCP tools rule.
+Standard content here.
+EOF
+
+	# Create custom version with same name
+	cat >"$test_dir/.claude/rules/custom/core/mcp-tools.md" <<'EOF'
+# Custom MCP Tools
+This is the custom MCP tools rule.
+Custom content here.
+EOF
+
+	# Create config.yaml that references BOTH standard and custom versions
 	cat >"$test_dir/.claude/rules/config.yaml" <<'EOF'
 commands:
   test:
     description: Test command
     rules:
       standard:
-        - override-test
-      custom: []
+        - mcp-tools
+      custom:
+        - mcp-tools
 EOF
 
-	print_test "Running build with custom override"
+	print_test "Running build with both standard and custom mcp-tools"
 	cd "$test_dir"
 	bash scripts/build-rules.sh >/dev/null 2>&1
 
-	# Verify custom rule overrode standard
-	print_test "Verifying custom rule overrides standard"
-	if grep -q "Custom Version" "$test_dir/.claude/commands/test.md" &&
-		! grep -q "Standard Version" "$test_dir/.claude/commands/test.md"; then
-		print_success "Custom rule correctly overrides standard rule"
+	# Verify BOTH versions are included (not duplicated)
+	print_test "Verifying both standard and custom versions are included"
+	local command_file="$test_dir/.claude/commands/test.md"
+
+	local standard_count
+	standard_count=$(grep -c "Standard MCP Tools" "$command_file" || true)
+	local custom_count
+	custom_count=$(grep -c "Custom MCP Tools" "$command_file" || true)
+	local standard_content_count
+	standard_content_count=$(grep -c "Standard content here" "$command_file" || true)
+	local custom_content_count
+	custom_content_count=$(grep -c "Custom content here" "$command_file" || true)
+
+	if [[ $standard_count -eq 1 && $custom_count -eq 1 &&
+	      $standard_content_count -eq 1 && $custom_content_count -eq 1 ]]; then
+		print_success "Both standard and custom versions included exactly once each"
 	else
-		print_error "Custom rule did not override standard"
-		cat "$test_dir/.claude/commands/test.md"
+		print_error "Rules not included correctly (standard: $standard_count, custom: $custom_count)"
+		echo "Command file contents:"
+		cat "$command_file"
 		return 1
 	fi
 
-	print_success "Custom override test passed"
+	# Verify no duplication of custom version
+	print_test "Verifying custom version is not duplicated"
+	if [[ $custom_count -eq 1 ]]; then
+		print_success "Custom version appears exactly once (not duplicated)"
+	else
+		print_error "Custom version appears $custom_count times (should be 1)"
+		cat "$command_file"
+		return 1
+	fi
+
+	print_success "Standard and custom separate rules test passed"
 }
 
 # =============================================================================
@@ -241,7 +323,8 @@ main() {
 
 	# Run all tests
 	test_build_rules_standard || true
-	test_build_rules_custom_override || true
+	test_build_rules_custom_explicit || true
+	test_build_rules_standard_and_custom_separate || true
 
 	# Print summary
 	print_section "Test Summary"
