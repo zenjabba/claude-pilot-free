@@ -126,7 +126,8 @@ download_lib_modules() {
 }
 
 # Download library modules if they don't exist or if running via curl | bash
-if [[ ! -f "$PROJECT_DIR/scripts/lib/ui.sh" ]] || [[ ! -f "$PROJECT_DIR/scripts/lib/utils.sh" ]]; then
+# Check for essential modules (ui.sh, utils.sh) and new modules (migration.sh)
+if [[ ! -f "$PROJECT_DIR/scripts/lib/ui.sh" ]] || [[ ! -f "$PROJECT_DIR/scripts/lib/utils.sh" ]] || [[ ! -f "$PROJECT_DIR/scripts/lib/migration.sh" ]]; then
 	download_lib_modules
 fi
 
