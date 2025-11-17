@@ -42,12 +42,18 @@ jobs:
       - name: Make test scripts executable
         run: |
           chmod +x tests/e2e/test-install.sh
+          chmod +x tests/e2e/test-migration.sh
           chmod +x scripts/install.sh
 
       - name: Run E2E installation tests
         run: |
           cd tests/e2e
           bash test-install.sh
+
+      - name: Run E2E migration tests
+        run: |
+          cd tests/e2e
+          bash test-migration.sh
 
       - name: Upload test logs on failure
         if: failure()

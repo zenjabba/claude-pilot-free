@@ -8,7 +8,8 @@
 
 set -e
 
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# This script is in scripts/lib/, so go up two levels to get project root
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 # Color codes
 BLUE='\033[0;36m'
@@ -38,6 +39,24 @@ print_warning() {
 
 key_exists() {
 	grep -q "^${1}=" "$2" 2>/dev/null
+}
+
+# Check if key exists in .env file OR is already set as environment variable
+key_is_set() {
+	local key=$1
+	local env_file=$2
+
+	# Check if set as environment variable
+	if [[ -n "${!key}" ]]; then
+		return 0  # Already set in environment
+	fi
+
+	# Check if exists in .env file
+	if key_exists "$key" "$env_file"; then
+		return 0  # Exists in .env file
+	fi
+
+	return 1  # Not set anywhere
 }
 
 add_env_key() {
@@ -103,7 +122,7 @@ setup_env_file() {
 	fi
 
 	# Zilliz Cloud (Milvus)
-	if ! $APPEND_MODE || ! key_exists "MILVUS_TOKEN" "$ENV_FILE"; then
+	if ! $APPEND_MODE || ! key_is_set "MILVUS_TOKEN" "$ENV_FILE"; then
 		prompt_api_key "1. Zilliz Cloud - Free Vector DB for Semantic Search & Memory" \
 			"MILVUS_TOKEN" \
 			"Persistent memory across CC sessions & semantic code search" \
@@ -120,13 +139,13 @@ setup_env_file() {
 		read -r -p "   Enter VECTOR_STORE_PASSWORD: " VECTOR_STORE_PASSWORD </dev/tty
 		echo ""
 	else
-		print_success "Zilliz Cloud configuration already exists, skipping"
+		print_success "Zilliz Cloud configuration already set (found in environment or .env file), skipping"
 		echo ""
 	fi
 
 	# OpenAI, Context7, Ref, Firecrawl
 	for key in OPENAI_API_KEY CONTEXT7_API_KEY REF_API_KEY FIRECRAWL_API_KEY; do
-		if ! $APPEND_MODE || ! key_exists "$key" "$ENV_FILE"; then
+		if ! $APPEND_MODE || ! key_is_set "$key" "$ENV_FILE"; then
 			local config_data
 			config_data=$(get_api_config "$key")
 			IFS='|' read -r title description url <<<"$config_data"
@@ -135,7 +154,7 @@ setup_env_file() {
 			eval "$key=\"\$value\""
 			echo ""
 		else
-			print_success "$key already exists, skipping"
+			print_success "$key already set (found in environment or .env file), skipping"
 			echo ""
 		fi
 	done
