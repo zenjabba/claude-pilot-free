@@ -109,16 +109,13 @@ test_non_interactive_install() {
 	mkdir -p "$test_dir"
 	cd "$test_dir"
 
-	print_test "Running install.sh with --non-interactive flag"
+	print_test "Running install.sh with --non-interactive --local flags"
 
-	# Copy install script
-	cp "$PROJECT_ROOT/scripts/install.sh" "$test_dir/"
-
-	# Run installation in non-interactive mode
+	# Run installation in non-interactive mode using local files
 	export INSTALL_PYTHON=Y
 	export OVERWRITE_SETTINGS=N
 
-	if bash install.sh --non-interactive --skip-env 2>&1 | tee install.log; then
+	if bash "$PROJECT_ROOT/scripts/install.sh" --local --non-interactive --skip-env 2>&1 | tee install.log; then
 		print_success "Installation completed without errors"
 	else
 		print_error "Installation failed with exit code $?"
@@ -156,7 +153,8 @@ test_non_interactive_install() {
 	assert_file_exists "$test_dir/.mcp-funnel.json" "MCP Funnel config" || return 1
 
 	assert_dir_exists "$test_dir/scripts" "Scripts directory" || return 1
-	assert_file_exists "$test_dir/scripts/setup-env.sh" "Setup env script" || return 1
+	assert_dir_exists "$test_dir/scripts/lib" "Scripts lib directory" || return 1
+	assert_file_exists "$test_dir/scripts/lib/setup-env.sh" "Setup env script" || return 1
 	assert_file_exists "$test_dir/scripts/build-rules.sh" "Build rules script" || return 1
 
 	# Verify .nvmrc content
@@ -192,14 +190,12 @@ test_python_support_flag() {
 	mkdir -p "$test_dir"
 	cd "$test_dir"
 
-	print_test "Running install.sh with INSTALL_PYTHON=N"
-
-	cp "$PROJECT_ROOT/scripts/install.sh" "$test_dir/"
+	print_test "Running install.sh with INSTALL_PYTHON=N and --local"
 
 	export INSTALL_PYTHON=N
 	export OVERWRITE_SETTINGS=N
 
-	if bash install.sh --non-interactive --skip-env 2>&1 | tee install.log; then
+	if bash "$PROJECT_ROOT/scripts/install.sh" --local --non-interactive --skip-env 2>&1 | tee install.log; then
 		print_success "Installation completed without errors"
 	else
 		print_error "Installation failed with exit code $?"
@@ -238,11 +234,9 @@ test_help_flag() {
 	mkdir -p "$test_dir"
 	cd "$test_dir"
 
-	cp "$PROJECT_ROOT/scripts/install.sh" "$test_dir/"
-
 	print_test "Running install.sh --help"
 
-	if bash install.sh --help | grep -q "non-interactive"; then
+	if bash "$PROJECT_ROOT/scripts/install.sh" --help | grep -q "non-interactive"; then
 		print_success "Help text displayed correctly"
 	else
 		print_error "Help flag did not display expected content"
@@ -261,13 +255,11 @@ test_idempotency() {
 	mkdir -p "$test_dir"
 	cd "$test_dir"
 
-	cp "$PROJECT_ROOT/scripts/install.sh" "$test_dir/"
-
 	export INSTALL_PYTHON=Y
 	export OVERWRITE_SETTINGS=N
 
 	print_test "First installation run"
-	if ! bash install.sh --non-interactive --skip-env 2>&1 | tee first-install.log >/dev/null; then
+	if ! bash "$PROJECT_ROOT/scripts/install.sh" --local --non-interactive --skip-env 2>&1 | tee first-install.log >/dev/null; then
 		print_error "First installation run failed"
 		cat first-install.log
 		return 1
@@ -284,7 +276,7 @@ test_idempotency() {
 	echo "# Test marker" >>"$test_dir/.claude/settings.local.json"
 
 	print_test "Second installation run (should be idempotent)"
-	if ! bash install.sh --non-interactive --skip-env 2>&1 | tee second-install.log >/dev/null; then
+	if ! bash "$PROJECT_ROOT/scripts/install.sh" --local --non-interactive --skip-env 2>&1 | tee second-install.log >/dev/null; then
 		print_error "Second installation run failed"
 		cat second-install.log
 		return 1
@@ -314,11 +306,9 @@ test_invalid_arguments() {
 	mkdir -p "$test_dir"
 	cd "$test_dir"
 
-	cp "$PROJECT_ROOT/scripts/install.sh" "$test_dir/"
-
 	print_test "Running install.sh with invalid argument"
 
-	if bash install.sh --invalid-flag 2>&1 | grep -q "Unknown option"; then
+	if bash "$PROJECT_ROOT/scripts/install.sh" --invalid-flag 2>&1 | grep -q "Unknown option"; then
 		print_success "Invalid argument correctly rejected"
 	else
 		print_error "Invalid argument should have been rejected"

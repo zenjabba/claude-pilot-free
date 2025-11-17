@@ -14,6 +14,8 @@ set -e
 
 NON_INTERACTIVE=false
 SKIP_ENV_SETUP=false
+LOCAL_MODE=false
+LOCAL_REPO_DIR=""
 
 while [[ $# -gt 0 ]]; do
 	case $1 in
@@ -25,17 +27,28 @@ while [[ $# -gt 0 ]]; do
 		SKIP_ENV_SETUP=true
 		shift
 		;;
+	--local)
+		LOCAL_MODE=true
+		# Detect local repo directory (script location)
+		SCRIPT_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+		LOCAL_REPO_DIR="$(cd "$SCRIPT_LOCATION/.." && pwd)"
+		shift
+		;;
 	--help)
 		echo "Usage: $0 [OPTIONS]"
 		echo ""
 		echo "Options:"
 		echo "  --non-interactive  Run without interactive prompts (use env vars)"
 		echo "  --skip-env        Skip environment setup (API keys)"
+		echo "  --local           Use local files instead of downloading from GitHub"
 		echo "  --help            Show this help message"
 		echo ""
 		echo "Environment Variables for Non-Interactive Mode:"
 		echo "  INSTALL_PYTHON=Y|N  Install Python support (default: Y)"
 		echo "  OVERWRITE_SETTINGS=Y|N  Overwrite settings.local.json if exists (default: N)"
+		echo ""
+		echo "Local Testing:"
+		echo "  --local --non-interactive --skip-env"
 		exit 0
 		;;
 	*)
@@ -66,14 +79,26 @@ TEMP_DIR=$(mktemp -d)
 _bootstrap_download() {
 	local repo_path=$1
 	local dest_path=$2
-	local file_url="${REPO_URL}/raw/${REPO_BRANCH}/${repo_path}"
 
 	mkdir -p "$(dirname "$dest_path")"
 
-	if curl -sL --fail "$file_url" -o "$dest_path" 2>/dev/null; then
-		return 0
+	# Use local files if in local mode
+	if [[ "$LOCAL_MODE" == "true" ]]; then
+		local source_file="$LOCAL_REPO_DIR/$repo_path"
+		if [[ -f "$source_file" ]]; then
+			cp "$source_file" "$dest_path"
+			return 0
+		else
+			return 1
+		fi
 	else
-		return 1
+		# Download from GitHub
+		local file_url="${REPO_URL}/raw/${REPO_BRANCH}/${repo_path}"
+		if curl -sL --fail "$file_url" -o "$dest_path" 2>/dev/null; then
+			return 0
+		else
+			return 1
+		fi
 	fi
 }
 
