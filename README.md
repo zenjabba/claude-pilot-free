@@ -12,16 +12,6 @@ Start shipping systematically with Spec-Driven Development, Skills, TDD, Semanti
 ![TDD](https://img.shields.io/badge/TDD-Test--Driven--Development-green.svg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)](http://makeapullrequest.com)
 
----
-
-#### 🆕 What's New in v2.1.x
-
-- **One-Line Installation** - Install into any existing project with a single curl command
-- **Modular Rules System** - Configurable rules builder system for Slash Commands and Skills
-- **`/quick` Command** - Alternative to spec-driven workflow for fast fixes and refactoring
-
----
-
 #### [⭐ Star this repo](https://github.com/maxritter/claude-codepro) • [🎓 Join the Academy](https://www.claude-code.pro) • [📦 Releases](https://github.com/maxritter/claude-codepro/releases)
 
 </div>
