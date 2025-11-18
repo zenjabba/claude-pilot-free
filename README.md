@@ -194,3 +194,4 @@ Contributions welcome: custom skills, MCP integrations, workflow improvements, b
 Made with ❤️ by [Max Ritter](https://www.maxritter.net) and [Manuel Vogel](https://manuel-vogel.de)
 
 [🌐 claude-code.pro](https://www.claude-code.pro)
+
