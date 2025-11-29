@@ -16,7 +16,6 @@ PRODUCT_ID = "c3Sr8oRvWIimCH1zf5I02w=="
 
 # GitHub releases URL for premium binaries
 GITHUB_REPO = "maxritter/claude-codepro"
-PREMIUM_RELEASE_TAG = "premium-latest"
 
 
 def get_platform_binary_name() -> str:
@@ -83,7 +82,7 @@ def validate_license_key(license_key: str) -> tuple[bool, str]:
         return False, f"Validation error: {e}"
 
 
-def download_premium_binary(dest_dir: Path) -> tuple[bool, str]:
+def download_premium_binary(dest_dir: Path, version: str) -> tuple[bool, str]:
     """Download premium binary from GitHub releases."""
     binary_name = get_platform_binary_name()
     dest_path = dest_dir / "ccp-premium"
@@ -92,9 +91,8 @@ def download_premium_binary(dest_dir: Path) -> tuple[bool, str]:
     if platform.system().lower() == "windows":
         dest_path = dest_dir / "ccp-premium.exe"
 
-    # GitHub releases download URL
-    url = f"https://github.com/{GITHUB_REPO}/releases/download/"
-    url += f"{PREMIUM_RELEASE_TAG}/{binary_name}"
+    # GitHub releases download URL (uses version tag, e.g., v2.5.11)
+    url = f"https://github.com/{GITHUB_REPO}/releases/download/{version}/{binary_name}"
 
     try:
         request = urllib.request.Request(
@@ -197,7 +195,7 @@ def prompt_for_premium(non_interactive: bool) -> str | None:
     return license_key
 
 
-def install_premium_features(project_dir: Path, non_interactive: bool) -> bool:
+def install_premium_features(project_dir: Path, non_interactive: bool, version: str) -> bool:
     """Main entry point for premium installation."""
     from lib import ui
 
@@ -220,9 +218,9 @@ def install_premium_features(project_dir: Path, non_interactive: bool) -> bool:
     ui.print_success("Saved license key to .env")
 
     # Download binary from GitHub releases
-    ui.print_status("Downloading premium binary from GitHub...")
+    ui.print_status(f"Downloading premium binary ({version})...")
     bin_dir = project_dir / ".claude" / "bin"
-    success, result = download_premium_binary(bin_dir)
+    success, result = download_premium_binary(bin_dir, version)
 
     if not success:
         ui.print_error(f"Download failed: {result}")
