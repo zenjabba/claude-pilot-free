@@ -336,7 +336,6 @@ def main() -> None:
             install_python = input("Install Python support? (Y/n): ").strip() or "Y"
             print("")
 
-        # Check for premium license early (before settings generation)
         premium_license_key = premium.prompt_for_premium(args.non_interactive, project_dir)
         print("")
 
@@ -424,7 +423,6 @@ def main() -> None:
             dependencies.install_python_tools()
             print("")
 
-        # Git must be configured before qlty (qlty requires git)
         if not git_setup.setup_git(project_dir, args.non_interactive):
             ui.print_error("Git setup failed. Qlty requires git to be configured.")
             sys.exit(1)
@@ -482,13 +480,13 @@ def main() -> None:
                 local_mode,
                 local_repo_dir,
                 skip_validation=True,  # Already validated in prompt_for_premium
+                non_interactive=args.non_interactive,
             )
         else:
             is_premium = False
             ui.print_status("Skipping premium features")
         if not is_premium:
-            # Remove premium hook from settings (it's in template but user is not premium)
-            premium.remove_premium_hook_from_settings(settings_file)
+            premium.remove_premium_hooks_from_settings(settings_file)
         print("")
 
         ui.print_section("Configuring Shell")

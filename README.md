@@ -13,7 +13,7 @@ Start shipping systematically with Spec-Driven Development, Skills, TDD, Semanti
 ![TDD](https://img.shields.io/badge/TDD-Test--Driven--Development-green.svg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-#### [⭐ Star this repo](https://github.com/maxritter/claude-codepro) • [🎓 Join the Academy](https://www.claude-code.pro) • [📦 Releases](https://github.com/maxritter/claude-codepro/releases)
+#### [⭐ Star this repo](https://github.com/maxritter/claude-codepro) • [💎 Premium Features (Coming Soon!)](https://www.claude-code.pro)
 
 </div>
 
@@ -107,35 +107,25 @@ The installer will guide you through the setup process with interactive prompts.
 
 Add custom rules by creating `.md` files in `.claude/rules/custom/` - they'll be included automatically on next `ccp` start.
 
-## ⚖️ What Makes This Different
-
-**Compared to Other Spec-Driven Frameworks (SpecKit, AgentOS, OpenSpec):**
-
-- 📦 **One-Line Installation** - No containers, no complex setup, just one curl command
-- 🤓 **Language Agnostic** - Works with Python, Node.js, Go, Rust, or any language
-- 💾 **Persistent Memory** - Cross-session memory maintains knowledge between resets
-- ⚡ **Token-Optimized** - No tokens wasted during too complex planning, just works
-- ✅ **Production-Grade** - Actively used in client and enterprise projects
-- 📝 **Enforced TDD** - Code written before tests gets deleted automatically
-- 💯 **Real Verification** - Must show actual outputs based on tests, not assumptions
-- 🛠️ **Complete Ecosystem** - Skills, MCP servers, testing tools are integrated and configured
-
 ---
 
-## 👥 Who This Is For
+## 💎 Premium Features (Coming Soon!)
 
-- **Professional Developers** - Shipping to production with quality standards
-- **Solo Builders** - Managing complex features without losing context
-- **Engineering Teams** - Ensuring consistent TDD and code quality
-- **Frustrated Coders** - Tired of half-tested, "should work" implementations
+Take your Claude Code workflow to the next level with these powerful premium features:
 
----
+### 🔍 AI Rules Supervisor
 
-## 🎓 Claude CodePro Academy Coming Soon!
+AI-powered session analysis using Gemini 3.0 Pro that checks your entire coding session against project rules. When violations are found, Claude Code is automatically instructed to fix them - ensuring full compliance before you finish.
 
-If you want to dive deeper into the setup and advanced usage of Claude CodePro, check out the upcoming academy that starts with 10 comprehensive modules where we do a deep-dive into all important topics:
+### 🧪 Automated TDD Enforcer
 
-➡️ **[www.claude-code.pro](https://www.claude-code.pro)**
+Automatically enforces Test-Driven Development by blocking code edits when no failing tests exist. Ensures you always write tests first, with a smart override mechanism for edge cases.
+
+### 📊 Intelligent Context Monitor
+
+Automatic context management that kicks in when you reach 100% context usage. Claude CodePro automatically stores learnings in cross-session memory and updates the plan file, so you can seamlessly continue after `/clear` without losing progress.
+
+➡️ **[Coming soon at www.claude-code.pro](https://www.claude-code.pro)**
 
 ---
 

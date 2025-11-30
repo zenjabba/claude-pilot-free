@@ -131,4 +131,15 @@ newman run postman/collections/api-tests.json \
 - Code review checklist complete
 - No breaking changes in call chains
 
+### Step 10: Update Plan Status
+
+**When all verification passes:**
+
+1. **MANDATORY: Update plan status to VERIFIED**
+   ```
+   Edit the plan file and change the Status line:
+   Status: REVIEWED  →  Status: VERIFIED
+   ```
+2. Inform user: "✅ Verification complete. Plan status updated to VERIFIED."
+
 **Fix immediately | Test after each fix | No "should work" - verify it works | Keep fixing until green**

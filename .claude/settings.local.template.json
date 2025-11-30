@@ -61,6 +61,17 @@
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": ["exa", "claude-context", "cipher", "mcp-funnel"],
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "{{PROJECT_DIR}}/.claude/bin/ccp-premium tdd-enforcer"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Write|Edit|MultiEdit",
@@ -81,6 +92,17 @@
           {
             "type": "command",
             "command": "{{PROJECT_DIR}}/.claude/bin/ccp-premium context-monitor"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "{{PROJECT_DIR}}/.claude/bin/ccp-premium rules-supervisor-hook"
           }
         ]
       }

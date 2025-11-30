@@ -26,12 +26,10 @@ def add_shell_alias(
     marker = "# Claude CodePro alias"
     alias_pattern = re.compile(rf"^alias {alias_name}=", re.MULTILINE)
 
-    # Remove old marker format with project path if present
     old_marker_pattern = re.compile(r"# Claude CodePro alias - .*\n")
     content = old_marker_pattern.sub("", content)
 
     if marker in content:
-        # Update existing marker section
         lines = content.split("\n")
         new_lines = []
         skip_next_alias = False
@@ -51,7 +49,6 @@ def add_shell_alias(
         ui.print_success(f"Updated alias '{alias_name}' in {shell_name}")
 
     elif alias_pattern.search(content):
-        # Replace existing alias without marker
         lines = content.split("\n")
         new_lines = []
 
@@ -66,7 +63,6 @@ def add_shell_alias(
         ui.print_success(f"Updated existing alias '{alias_name}' in {shell_name}")
 
     else:
-        # Add new alias
         with open(shell_file, "a") as f:
             f.write(f"\n{marker}\n{alias_cmd}\n")
         ui.print_success(f"Added alias '{alias_name}' to {shell_name}")
@@ -85,8 +81,6 @@ def add_cc_alias() -> None:
     ui.print_status(f"Configuring shell for NVM and '{alias_name}' alias...")
     home = Path.home()
 
-    # Bash/Zsh: Single-line alias to avoid multi-line parsing issues
-    # Uses semicolons to chain commands within the alias
     bash_alias = (
         f"alias {alias_name}='"
         "if [ -f .claude/rules/build.py ]; then "
@@ -103,7 +97,6 @@ def add_cc_alias() -> None:
     add_shell_alias(home / ".bashrc", bash_alias, ".bashrc", alias_name)
     add_shell_alias(home / ".zshrc", bash_alias, ".zshrc", alias_name)
 
-    # Fish: Different syntax for conditionals (single line)
     fish_config = home / ".config" / "fish" / "config.fish"
     fish_alias = (
         f"alias {alias_name}='"

@@ -14,7 +14,6 @@ from pathlib import Path
 GUMROAD_VERIFY_URL = "https://api.gumroad.com/v2/licenses/verify"
 PRODUCT_ID = "c3Sr8oRvWIimCH1zf5I02w=="
 
-# GitHub releases URL for premium binaries
 GITHUB_REPO = "maxritter/claude-codepro"
 
 
@@ -23,7 +22,6 @@ def get_platform_binary_name() -> str:
     system = platform.system().lower()
     machine = platform.machine().lower()
 
-    # Normalize architecture
     if machine in ("x86_64", "amd64"):
         arch = "x86_64"
     elif machine in ("arm64", "aarch64"):
@@ -31,7 +29,6 @@ def get_platform_binary_name() -> str:
     else:
         arch = machine
 
-    # Map to binary names
     if system == "darwin":
         return f"ccp-premium-darwin-{arch}"
     elif system == "linux":
@@ -49,7 +46,7 @@ def validate_license_key(license_key: str) -> tuple[bool, str]:
             {
                 "product_id": PRODUCT_ID,
                 "license_key": license_key,
-                "increment_uses_count": "true",  # Track activations
+                "increment_uses_count": "false",
             }
         ).encode()
 
@@ -98,7 +95,6 @@ def download_premium_binary(
     binary_name = get_platform_binary_name()
     dest_path = dest_dir / "ccp-premium"
 
-    # Local mode: copy from premium/dist/ instead of downloading
     if local_mode and local_repo_dir:
         source_path = local_repo_dir / "premium" / "dist" / binary_name
         if not source_path.exists():
@@ -108,14 +104,12 @@ def download_premium_binary(
             dest_dir.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source_path, dest_path)
 
-            # Make executable on Unix
             dest_path.chmod(dest_path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
             return True, str(dest_path)
         except Exception as e:
             return False, f"Copy error: {e}"
 
-    # Network mode: download from GitHub releases
     url = f"https://github.com/{GITHUB_REPO}/releases/download/{version}/{binary_name}"
 
     try:
@@ -128,7 +122,6 @@ def download_premium_binary(
             dest_dir.mkdir(parents=True, exist_ok=True)
             dest_path.write_bytes(response.read())
 
-            # Make executable on Unix
             dest_path.chmod(dest_path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
             return True, str(dest_path)
@@ -145,38 +138,61 @@ def download_premium_binary(
 
 def save_license_to_env(project_dir: Path, license_key: str) -> None:
     """Save license key to .env file."""
+    _save_env_var(project_dir, "CCP_LICENSE_KEY", license_key)
+
+
+def save_gemini_key_to_env(project_dir: Path, gemini_key: str) -> None:
+    """Save Gemini API key to .env file."""
+    _save_env_var(project_dir, "GEMINI_API_KEY", gemini_key)
+
+
+def _save_env_var(project_dir: Path, var_name: str, value: str) -> None:
+    """Save an environment variable to .env file."""
     env_file = project_dir / ".env"
 
-    # Read existing .env content
     existing_lines: list[str] = []
     if env_file.exists():
         existing_lines = env_file.read_text().splitlines()
 
-    # Remove any existing CCP_LICENSE_KEY line
-    filtered_lines = [line for line in existing_lines if not line.startswith("CCP_LICENSE_KEY=")]
+    filtered_lines = [line for line in existing_lines if not line.startswith(f"{var_name}=")]
 
-    # Add the new license key
-    filtered_lines.append(f"CCP_LICENSE_KEY={license_key}")
+    filtered_lines.append(f"{var_name}={value}")
 
-    # Write back
     env_file.write_text("\n".join(filtered_lines) + "\n")
 
 
-def remove_premium_hook_from_settings(settings_file: Path) -> bool:
-    """Remove context-monitor hook from settings.local.json for non-premium users."""
+def remove_premium_hooks_from_settings(settings_file: Path) -> bool:
+    """Remove all premium hooks from settings.local.json for non-premium users.
+
+    Removes ccp-premium hooks from:
+    - PreToolUse (tdd-enforcer)
+    - PostToolUse (context-monitor)
+    - Stop (rules-hook)
+    """
     if not settings_file.exists():
         return False
 
     try:
         settings = json.loads(settings_file.read_text())
 
-        if "hooks" in settings and "PostToolUse" in settings["hooks"]:
-            # Filter out hook groups that contain ccp-premium
-            settings["hooks"]["PostToolUse"] = [
-                hook_group
-                for hook_group in settings["hooks"]["PostToolUse"]
-                if not any("ccp-premium" in h.get("command", "") for h in hook_group.get("hooks", []))
-            ]
+        if "hooks" not in settings:
+            return True
+
+        # Remove premium hooks from all hook types
+        for hook_type in ["PreToolUse", "PostToolUse", "Stop"]:
+            if hook_type in settings["hooks"]:
+                settings["hooks"][hook_type] = [
+                    hook_group
+                    for hook_group in settings["hooks"][hook_type]
+                    if not any("ccp-premium" in h.get("command", "") for h in hook_group.get("hooks", []))
+                ]
+                # Remove empty hook arrays
+                if not settings["hooks"][hook_type]:
+                    del settings["hooks"][hook_type]
+
+        # Remove hooks key if empty
+        if not settings["hooks"]:
+            del settings["hooks"]
 
         settings_file.write_text(json.dumps(settings, indent=2) + "\n")
         return True
@@ -188,13 +204,11 @@ def prompt_for_premium(non_interactive: bool, project_dir: Path | None = None) -
     """Prompt user for premium license key."""
     from lib import ui
 
-    # Check environment variable first (works in both modes)
     license_key = os.getenv("CCP_LICENSE_KEY")
     if license_key:
         ui.print_status("Found license key in CCP_LICENSE_KEY environment variable")
         return license_key
 
-    # Check .env file if project_dir provided
     if project_dir:
         env_file = project_dir / ".env"
         if env_file.exists():
@@ -223,7 +237,6 @@ def prompt_for_premium(non_interactive: bool, project_dir: Path | None = None) -
     if has_license.lower() not in ["y", "yes"]:
         return None
 
-    # Allow up to 3 attempts to enter a valid license key
     for attempt in range(3):
         license_key = input("Enter your license key: ").strip()
         if not license_key:
@@ -245,6 +258,55 @@ def prompt_for_premium(non_interactive: bool, project_dir: Path | None = None) -
     return None
 
 
+def prompt_for_gemini_key(non_interactive: bool, project_dir: Path | None = None) -> str | None:
+    """Prompt user for Gemini API key for Rules Supervisor feature."""
+    from lib import ui
+
+    # Check environment variable first
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    if gemini_key:
+        ui.print_status("Found Gemini API key in GEMINI_API_KEY environment variable")
+        return gemini_key
+
+    # Check .env file
+    if project_dir:
+        env_file = project_dir / ".env"
+        if env_file.exists():
+            for line in env_file.read_text().splitlines():
+                if line.startswith("GEMINI_API_KEY="):
+                    gemini_key = line.split("=", 1)[1].strip()
+                    if gemini_key:
+                        ui.print_status("Found Gemini API key in .env file")
+                        return gemini_key
+
+    if non_interactive:
+        return None
+
+    print("")
+    print(f"{ui.BLUE}━━━ Rules Supervisor (Gemini API) ━━━{ui.NC}")
+    print("")
+    print("The Rules Supervisor uses Gemini 3.0 Pro to analyze your coding sessions")
+    print("against project rules. This feature requires a Gemini API key.")
+    print("")
+    print("  • Cost: Very low (~$0.01 per session analysis)")
+    print("  • Model: Gemini 3.0 Pro (fast, accurate)")
+    print("")
+    print(f"Get your API key at: {ui.BLUE}https://aistudio.google.com/apikey{ui.NC}")
+    print("")
+
+    setup_gemini = input("Do you want to configure the Gemini API key? (y/N): ").strip()
+    if setup_gemini.lower() not in ["y", "yes"]:
+        ui.print_warning("Rules Supervisor will be disabled without Gemini API key")
+        return None
+
+    gemini_key = input("Enter your Gemini API key: ").strip()
+    if not gemini_key:
+        ui.print_warning("No key entered. Rules Supervisor will be disabled.")
+        return None
+
+    return gemini_key
+
+
 def install_premium_with_key(
     project_dir: Path,
     license_key: str,
@@ -252,6 +314,7 @@ def install_premium_with_key(
     local_mode: bool = False,
     local_repo_dir: Path | None = None,
     skip_validation: bool = False,
+    non_interactive: bool = False,
 ) -> bool:
     """Install premium features with a pre-validated license key."""
     from lib import ui
@@ -266,11 +329,9 @@ def install_premium_with_key(
 
         ui.print_success(message)
 
-    # Save license key to .env file
     save_license_to_env(project_dir, license_key)
     ui.print_success("Saved license key to .env")
 
-    # Download or copy binary
     if local_mode:
         ui.print_status("Copying premium binary from local dist...")
     else:
@@ -286,6 +347,13 @@ def install_premium_with_key(
 
     binary_path = Path(result)
     ui.print_success(f"Installed premium binary to {binary_path}")
-    ui.print_success("Context monitor hook enabled (from template)")
+
+    # Prompt for Gemini API key for Rules Supervisor
+    gemini_key = prompt_for_gemini_key(non_interactive, project_dir)
+    if gemini_key:
+        save_gemini_key_to_env(project_dir, gemini_key)
+        ui.print_success("Saved Gemini API key to .env")
+
+    ui.print_success("Premium hooks enabled (from template)")
 
     return True

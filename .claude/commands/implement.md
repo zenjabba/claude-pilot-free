@@ -6,6 +6,13 @@ model: opus
 
 **Execute ALL tasks continuously. NO stopping unless context manager says context is full.**
 
+## CRITICAL: No Sub-Agents During Implementation
+
+**NEVER use the Task tool or spawn sub-agents during implementation.** Sub-agents slow down execution and waste context. Instead:
+- Use direct tools: Read, Grep, Glob, Bash, Write, Edit
+- Use MCP tools directly: Exa, Cipher, Claude Context
+- If you need external docs, use `mcp__exa__get_code_context_exa()` directly
+
 ## MCP Servers - Use Throughout Implementation
 
 | Server | Purpose | When to Use |
@@ -34,6 +41,19 @@ model: opus
    - Claude Context: Related patterns and components
    - Exa: External documentation if needed
 
+## TDD is MANDATORY
+
+**No production code without a failing test first.** Follow the TDD rules in your context.
+
+| Requires TDD | Skip TDD |
+|--------------|----------|
+| New functions/methods | Documentation changes |
+| API endpoints | Config file updates |
+| Business logic | IaC code (CDK, Terraform, Pulumi) |
+| Bug fixes | Formatting/style changes |
+
+**The TDD enforcer hook will warn you if you skip this.**
+
 ## Per-Task Execution Flow
 
 **For EVERY task, follow this exact sequence:**
@@ -45,16 +65,16 @@ model: opus
    - **Side Effects:** Check for database, cache, external system impacts
 3. **Mark task as in_progress** in TodoWrite
 4. **Check diagnostics** - `mcp__ide__getDiagnostics()`
-5. **Execute TDD Flow:**
-   - Write failing test first (RED phase)
-   - Implement minimal code to pass (GREEN phase)
-   - Refactor if needed (REFACTOR phase)
+5. **Execute TDD Flow (RED → GREEN → REFACTOR):**
+   - Write failing test first, **verify it fails**
+   - Implement minimal code to pass
+   - Refactor if needed (keep tests green)
 6. **Verify tests pass** - `uv run pytest tests/path/to/test.py -v`
 7. **Run actual program** - Show real output with sample data
 8. **Check diagnostics again** - Must be zero errors
 9. **Validate Definition of Done** - Check all criteria from plan
 10. **Mark task completed** in TodoWrite
-11. **Update plan file** - Change `[ ]` to `[x]`
+11. **Update plan's Progress Tracking** - Change `[ ]` to `[x]`, update Completed/Remaining counts
 12. **Check context usage**
 
 ## Critical Task Rules
@@ -76,7 +96,15 @@ Before marking complete:
 
 ## When All Tasks Complete
 
+**⚠️ CRITICAL: Follow these steps exactly:**
+
 1. Quick verification: `mcp__ide__getDiagnostics()` and `uv run pytest`
 2. Store learnings in Cipher
-3. Inform user: "✅ All tasks complete. Run `/verify`"
-4. DO NOT run /verify yourself
+3. **MANDATORY: Update plan status to COMPLETE**
+   ```
+   Edit the plan file and change the Status line:
+   Status: PENDING  →  Status: COMPLETE
+   ```
+   This triggers the Rules Supervisor on your next response.
+4. Inform user: "✅ All tasks complete. Run `/verify`"
+5. DO NOT run /verify yourself

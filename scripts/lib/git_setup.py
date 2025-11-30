@@ -66,7 +66,6 @@ def has_commits(project_dir: Path) -> bool:
 def create_initial_commit(project_dir: Path) -> bool:
     """Create an initial commit with any existing files."""
     try:
-        # Stage all files
         subprocess.run(
             ["git", "add", "."],
             check=True,
@@ -74,7 +73,6 @@ def create_initial_commit(project_dir: Path) -> bool:
             cwd=project_dir,
         )
 
-        # Create initial commit
         subprocess.run(
             ["git", "commit", "-m", "Initial commit"],
             check=True,
@@ -105,14 +103,12 @@ def setup_git(project_dir: Path, non_interactive: bool = False) -> bool:
     """
     ui.print_section("Git Configuration")
 
-    # Check if git is installed
     try:
         subprocess.run(["git", "--version"], capture_output=True, check=True)
     except Exception:
         ui.print_error("Git is not installed. Please install git first.")
         return False
 
-    # Initialize git if needed
     if not is_git_initialized(project_dir):
         ui.print_status("Initializing git repository...")
         try:
@@ -129,7 +125,6 @@ def setup_git(project_dir: Path, non_interactive: bool = False) -> bool:
     else:
         ui.print_success("Git repository already initialized")
 
-    # Check and configure user.name
     user_name = get_git_config("user.name")
     if not user_name:
         if non_interactive:
@@ -154,7 +149,6 @@ def setup_git(project_dir: Path, non_interactive: bool = False) -> bool:
     else:
         ui.print_success(f"Git user.name: {user_name}")
 
-    # Check and configure user.email
     user_email = get_git_config("user.email")
     if not user_email:
         if non_interactive:
@@ -179,39 +173,37 @@ def setup_git(project_dir: Path, non_interactive: bool = False) -> bool:
     else:
         ui.print_success(f"Git user.email: {user_email}")
 
-    # Check for initial commit
     if not has_commits(project_dir):
         ui.print_status("Creating initial commit...")
 
-        # Create a .gitignore if it doesn't exist
         gitignore = project_dir / ".gitignore"
         if not gitignore.exists():
             gitignore.write_text("""# Environment
-.env
-.env.local
-.env.*.local
+                                    .env
+                                    .env.local
+                                    .env.*.local
 
-# Dependencies
-node_modules/
-__pycache__/
-*.pyc
-.venv/
-venv/
+                                    # Dependencies
+                                    node_modules/
+                                    __pycache__/
+                                    *.pyc
+                                    .venv/
+                                    venv/
 
-# IDE
-.idea/
-*.swp
-*.swo
+                                    # IDE
+                                    .idea/
+                                    *.swp
+                                    *.swo
 
-# Build
-dist/
-build/
-*.egg-info/
+                                    # Build
+                                    dist/
+                                    build/
+                                    *.egg-info/
 
-# Data
-data/
-*.db
-""")
+                                    # Data
+                                    data/
+                                    *.db
+                                """)
             ui.print_success("Created .gitignore")
 
         if create_initial_commit(project_dir):

@@ -223,7 +223,12 @@ Questions:
 > **IMPORTANT:** Start with fresh context. Run `/clear` before `/implement`.
 
 Created: [Date]
-Status: PENDING APPROVAL
+Status: PENDING
+
+> **Status Lifecycle:** PENDING → COMPLETE → VERIFIED
+> - PENDING: Initial state, awaiting implementation
+> - COMPLETE: All tasks implemented (set by /implement)
+> - VERIFIED: Rules supervisor passed (set automatically)
 
 ## Summary
 **Goal:** [One sentence describing what this builds]
@@ -253,10 +258,14 @@ Status: PENDING APPROVAL
 - [Integration points or dependencies]
 
 ## Progress Tracking
+
+**MANDATORY: Update this checklist as tasks complete. Change `[ ]` to `[x]`.**
+
 - [ ] Task 1: [Brief summary]
 - [ ] Task 2: [Brief summary]
+- [ ] ...
 
-**Total Tasks:** [Number] (Max: 12)
+**Total Tasks:** [Number] | **Completed:** 0 | **Remaining:** [Number]
 
 ## Implementation Tasks
 
