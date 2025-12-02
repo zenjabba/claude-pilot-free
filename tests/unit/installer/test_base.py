@@ -17,10 +17,14 @@ class TestStepProtocol:
         """Step protocol must define check, run, rollback methods."""
         from installer.steps.base import Step
 
-        # Check protocol annotations define required methods
-        assert "check" in Step.__protocol_attrs__
-        assert "run" in Step.__protocol_attrs__
-        assert "rollback" in Step.__protocol_attrs__
+        # Check protocol defines required methods (compatible with Python 3.10+)
+        # Use annotations or __dict__ to check for method definitions
+        protocol_methods = set(Step.__annotations__.keys()) | set(
+            k for k in dir(Step) if not k.startswith("_") and callable(getattr(Step, k, None))
+        )
+        assert "check" in protocol_methods
+        assert "run" in protocol_methods
+        assert "rollback" in protocol_methods
 
     def test_base_step_is_instance_of_step_protocol(self):
         """BaseStep instance must satisfy Step protocol."""

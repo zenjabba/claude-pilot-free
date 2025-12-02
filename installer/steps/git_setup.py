@@ -18,9 +18,22 @@ def is_git_initialized(project_dir: Path) -> bool:
     return (project_dir / ".git").is_dir()
 
 
-def get_git_config(key: str) -> str | None:
-    """Get a git config value."""
+def get_git_config(key: str, project_dir: Path | None = None) -> str | None:
+    """Get a git config value (checks local repo config first, then global)."""
     try:
+        # If project_dir is provided, check local config first
+        if project_dir is not None:
+            result = subprocess.run(
+                ["git", "config", key],
+                capture_output=True,
+                text=True,
+                check=False,
+                cwd=project_dir,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return result.stdout.strip()
+
+        # Fall back to global config
         result = subprocess.run(
             ["git", "config", "--global", key],
             capture_output=True,
@@ -94,10 +107,10 @@ class GitSetupStep(BaseStep):
         if not is_git_initialized(ctx.project_dir):
             return False
 
-        # Check if user config exists
-        if not get_git_config("user.name"):
+        # Check if user config exists (local or global)
+        if not get_git_config("user.name", ctx.project_dir):
             return False
-        if not get_git_config("user.email"):
+        if not get_git_config("user.email", ctx.project_dir):
             return False
 
         # Check if repo has commits

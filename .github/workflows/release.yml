@@ -31,7 +31,7 @@ jobs:
           "$HOME/.qlty/bin/qlty" check
 
   build-installer-linux:
-    name: Build Installer Linux
+    name: Build Installer Linux ${{ matrix.arch }}
     runs-on: ubuntu-latest
     needs: quality
     strategy:
@@ -51,8 +51,9 @@ jobs:
         if: matrix.arch == 'arm64'
         uses: docker/setup-qemu-action@v3
 
-      - name: Build in Docker (GLIBC 2.31 compatible)
+      - name: Build binary
         run: |
+          # Build in Docker with Ubuntu 20.04 for GLIBC 2.31 compatibility
           docker run --rm \
             --platform linux/${{ matrix.arch }} \
             -v ${{ github.workspace }}:/workspace \
@@ -114,7 +115,7 @@ jobs:
           retention-days: 7
 
   build-premium-linux:
-    name: Build Premium Linux
+    name: Build Premium Linux ${{ matrix.arch }}
     runs-on: ubuntu-latest
     needs: quality
     strategy:
@@ -146,8 +147,9 @@ jobs:
           git-crypt unlock /tmp/git-crypt.key
           rm /tmp/git-crypt.key
 
-      - name: Build in Docker (GLIBC 2.31 compatible)
+      - name: Build binary
         run: |
+          # Build in Docker with Ubuntu 20.04 for GLIBC 2.31 compatibility
           docker run --rm \
             --platform linux/${{ matrix.arch }} \
             -v ${{ github.workspace }}:/workspace \

@@ -66,17 +66,62 @@ class Console:
         return self._non_interactive
 
     def banner(self) -> None:
-        """Print the Claude CodePro banner."""
-        banner_text = Text()
-        banner_text.append("╔═══════════════════════════════════════════════════════════╗\n", style="cyan")
-        banner_text.append("║  ", style="cyan")
-        banner_text.append("🚀 Claude CodePro Installer", style="bold white")
-        banner_text.append("                              ║\n", style="cyan")
-        banner_text.append("║  ", style="cyan")
-        banner_text.append("Professional development environment for Claude Code", style="dim white")
-        banner_text.append("  ║\n", style="cyan")
-        banner_text.append("╚═══════════════════════════════════════════════════════════╝", style="cyan")
-        self._console.print(banner_text)
+        """Print the Claude CodePro banner with feature highlights."""
+        # ASCII art logo
+        logo = """
+[bold cyan]   _____ _                 _        _____          _      _____
+  / ____| |               | |      / ____|        | |    |  __ \\
+ | |    | | __ _ _   _  __| | ___ | |     ___   __| | ___| |__) | __ ___
+ | |    | |/ _` | | | |/ _` |/ _ \\| |    / _ \\ / _` |/ _ \\  ___/ '__/ _ \\
+ | |____| | (_| | |_| | (_| |  __/| |___| (_) | (_| |  __/ |   | | | (_) |
+  \\_____|_|\\__,_|\\__,_|\\__,_|\\___| \\_____\\___/ \\__,_|\\___|_|   |_|  \\___/[/bold cyan]
+"""
+        self._console.print(logo)
+
+        # Tagline
+        tagline = Text()
+        tagline.append("  ✨ ", style="yellow")
+        tagline.append("Professional Development Environment for Claude Code", style="bold white")
+        tagline.append(" ✨", style="yellow")
+        self._console.print(tagline, justify="center")
+        self._console.print()
+
+        # Feature highlights in a styled panel
+        features = Text()
+        features.append("  📋 ", style="yellow")
+        features.append("Spec-Driven Workflow", style="bold green")
+        features.append(" — /plan, /implement, /verify, /remember commands\n", style="white")
+        features.append("  💡 ", style="yellow")
+        features.append("Context-Loaded Rules", style="bold green")
+        features.append(" — Auto-generated standards + custom project rules\n", style="white")
+        features.append("  🔌 ", style="yellow")
+        features.append("MCP Servers", style="bold green")
+        features.append(" — Semantic search, persistent memory, web search\n", style="white")
+        features.append("  🛠️ ", style="yellow")
+        features.append("Quality Automation", style="bold green")
+        features.append(" — Post-edit hooks, linting, type checking\n", style="white")
+        features.append("  🏗️ ", style="yellow")
+        features.append("Dev Container", style="bold green")
+        features.append(" — Isolated environment with pre-configured tools\n", style="white")
+        features.append("  💎 ", style="yellow")
+        features.append("Premium Features", style="bold magenta")
+        features.append(" — AI Rules Supervisor, TDD Enforcer, Context Monitor", style="white")
+
+        panel = Panel(
+            features,
+            border_style="cyan",
+            padding=(1, 2),
+            title="[bold white]What You're Getting[/bold white]",
+            title_align="left",
+        )
+        self._console.print(panel)
+
+        # Premium callout
+        premium_text = Text()
+        premium_text.append("  💎 ", style="magenta")
+        premium_text.append("Unlock premium features with a license key from ", style="dim white")
+        premium_text.append("www.claude-code.pro", style="bold cyan underline")
+        self._console.print(premium_text)
         self._console.print()
 
     def set_total_steps(self, total: int) -> None:

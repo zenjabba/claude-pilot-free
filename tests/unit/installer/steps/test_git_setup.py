@@ -34,6 +34,8 @@ class TestGitSetupStep:
             subprocess.run(["git", "init"], cwd=project_dir, capture_output=True)
             subprocess.run(["git", "config", "user.name", "Test"], cwd=project_dir, capture_output=True)
             subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=project_dir, capture_output=True)
+            # Disable commit signing for test environments
+            subprocess.run(["git", "config", "commit.gpgsign", "false"], cwd=project_dir, capture_output=True)
 
             # Create a commit
             (project_dir / ".gitignore").write_text("*.tmp\n")
@@ -105,6 +107,8 @@ class TestGitHelpers:
             subprocess.run(["git", "init"], cwd=project_dir, capture_output=True)
             subprocess.run(["git", "config", "user.name", "Test"], cwd=project_dir, capture_output=True)
             subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=project_dir, capture_output=True)
+            # Disable commit signing for test environments
+            subprocess.run(["git", "config", "commit.gpgsign", "false"], cwd=project_dir, capture_output=True)
             (project_dir / "test.txt").write_text("test")
             subprocess.run(["git", "add", "."], cwd=project_dir, capture_output=True)
             subprocess.run(["git", "commit", "-m", "Initial"], cwd=project_dir, capture_output=True)
@@ -150,6 +154,8 @@ class TestGitSetupRun:
             subprocess.run(["git", "init"], cwd=project_dir, capture_output=True)
             subprocess.run(["git", "config", "user.name", "Existing"], cwd=project_dir, capture_output=True)
             subprocess.run(["git", "config", "user.email", "existing@test.com"], cwd=project_dir, capture_output=True)
+            # Disable commit signing for test environments
+            subprocess.run(["git", "config", "commit.gpgsign", "false"], cwd=project_dir, capture_output=True)
             (project_dir / ".gitignore").write_text("*.tmp\n")
             subprocess.run(["git", "add", "."], cwd=project_dir, capture_output=True)
             subprocess.run(["git", "commit", "-m", "Initial"], cwd=project_dir, capture_output=True)
