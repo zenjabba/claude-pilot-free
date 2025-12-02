@@ -5,11 +5,10 @@ from __future__ import annotations
 import json
 import platform
 import stat
-import urllib.error
-import urllib.parse
-import urllib.request
 from pathlib import Path
 from typing import TYPE_CHECKING
+
+import httpx
 
 from installer.steps.base import BaseStep
 
@@ -46,40 +45,36 @@ def get_platform_binary_name() -> str:
 def validate_license_key(license_key: str) -> tuple[bool, str]:
     """Validate license key with Gumroad API."""
     try:
-        data = urllib.parse.urlencode(
-            {
+        response = httpx.post(
+            GUMROAD_VERIFY_URL,
+            data={
                 "product_id": PRODUCT_ID,
                 "license_key": license_key,
                 "increment_uses_count": "false",
-            }
-        ).encode()
-
-        request = urllib.request.Request(
-            GUMROAD_VERIFY_URL,
-            data=data,
-            method="POST",
+            },
+            timeout=15,
         )
 
-        with urllib.request.urlopen(request, timeout=15) as response:
-            result = json.loads(response.read().decode())
-
-            if result.get("success"):
-                purchase = result.get("purchase", {})
-                if purchase.get("refunded"):
-                    return False, "License has been refunded"
-                if purchase.get("disputed"):
-                    return False, "License is disputed"
-
-                return True, "License valid"
-
-            return False, result.get("message", "Invalid license key")
-
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
+        if response.status_code == 404:
             return False, "Invalid license key"
-        return False, f"License server error: HTTP {e.code}"
-    except urllib.error.URLError as e:
-        return False, f"Network error: {e.reason}"
+
+        result = response.json()
+
+        if result.get("success"):
+            purchase = result.get("purchase", {})
+            if purchase.get("refunded"):
+                return False, "License has been refunded"
+            if purchase.get("disputed"):
+                return False, "License is disputed"
+
+            return True, "License valid"
+
+        return False, result.get("message", "Invalid license key")
+
+    except httpx.HTTPStatusError as e:
+        return False, f"License server error: HTTP {e.response.status_code}"
+    except httpx.RequestError as e:
+        return False, f"Network error: {e}"
     except json.JSONDecodeError:
         return False, "Invalid response from license server"
     except Exception as e:
@@ -120,22 +115,24 @@ def download_premium_binary(
         url = f"https://github.com/{GITHUB_REPO}/releases/download/{version}/{binary_name}"
 
     try:
-        request = urllib.request.Request(
-            url,
-            headers={"User-Agent": "claude-codepro-installer/1.0"},
-        )
+        with httpx.stream("GET", url, follow_redirects=True, timeout=120) as response:
+            if response.status_code == 404:
+                return False, "Premium binary not found (release may not exist yet)"
+            response.raise_for_status()
 
-        with urllib.request.urlopen(request, timeout=120) as response:
             dest_dir.mkdir(parents=True, exist_ok=True)
-            dest_path.write_bytes(response.read())
+            with open(dest_path, "wb") as f:
+                for chunk in response.iter_bytes():
+                    f.write(chunk)
+
             dest_path.chmod(dest_path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
             return True, str(dest_path)
 
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
+    except httpx.HTTPStatusError as e:
+        if e.response.status_code == 404:
             return False, "Premium binary not found (release may not exist yet)"
-        return False, f"Download failed: HTTP {e.code}"
-    except urllib.error.URLError as e:
+        return False, f"Download failed: HTTP {e.response.status_code}"
+    except httpx.RequestError as e:
         return False, f"Network error: {e}"
     except Exception as e:
         return False, f"Download error: {e}"

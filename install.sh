@@ -49,7 +49,16 @@ else
     exit 1
 fi
 
-# Make executable and run with 'install' command
-# Redirect stdin from /dev/tty to allow interactive input when piped
+# Make executable and remove quarantine on macOS
 chmod +x "$INSTALL_PATH"
-exec "$INSTALL_PATH" install "$@" < /dev/tty
+if [ "$OS" = "darwin" ] && command -v xattr &> /dev/null; then
+    xattr -d com.apple.quarantine "$INSTALL_PATH" 2>/dev/null || true
+fi
+
+# Redirect stdin from /dev/tty to allow interactive input when piped
+# Fall back to non-interactive mode if /dev/tty is not available
+if [ -e /dev/tty ]; then
+    exec "$INSTALL_PATH" install "$@" < /dev/tty
+else
+    exec "$INSTALL_PATH" install --non-interactive "$@"
+fi

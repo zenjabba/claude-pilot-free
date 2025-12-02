@@ -101,6 +101,9 @@ jobs:
           python -m pip install typer platformdirs
           python build.py
 
+      - name: Ad-hoc code sign
+        run: codesign --force --deep -s - installer/dist/${{ matrix.artifact }}
+
       - name: Upload artifact
         uses: actions/upload-artifact@v5
         with:
@@ -201,6 +204,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pyinstaller
           python build.py
+
+      - name: Ad-hoc code sign
+        run: codesign --force --deep -s - premium/dist/${{ matrix.artifact }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v5

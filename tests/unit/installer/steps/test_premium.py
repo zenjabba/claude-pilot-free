@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import tempfile
 from pathlib import Path
 from unittest.mock import patch
@@ -233,7 +234,9 @@ class TestPremiumRun:
                 ui=Console(non_interactive=True),
             )
 
-            step.run(ctx)
+            # Clear env var to ensure no license key is found
+            with patch.dict(os.environ, {"CCP_LICENSE_KEY": ""}, clear=False):
+                step.run(ctx)
 
             # Check hooks were removed
             updated = json.loads(settings_file.read_text())
