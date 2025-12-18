@@ -198,11 +198,17 @@ If not indexed, run: `mcp__claude-context__index_codebase(path="...")`
 3. **Dependencies** - Imports, modules, what will be impacted
 4. **Tests** - Test infrastructure, existing patterns, available fixtures
 
+**⚠️ CRITICAL: NO SUB-AGENTS DURING PLANNING**
+- **DO NOT use the Task tool with any subagent_type** during planning
+- Perform ALL exploration yourself using direct tool calls (Read, Grep, Glob, MCP tools)
+- Sub-agents lose context and make planning inconsistent
+- You must maintain full context throughout the planning process
+
 **For each area:**
 - Use `mcp__claude-context__search_code` for semantic searches like "authentication middleware" or "database connection handling"
 - Use `mcp__Ref__ref_search_documentation` when you need library/framework API details
 - Use `mcp__tavily__tavily-search` for researching patterns, best practices, or unfamiliar technologies
-- Use Task tool with `subagent_type='Explore'` for complex multi-step exploration
+- Use `Read`, `Grep`, `Glob` tools directly for file exploration
 - Document hypotheses (not conclusions)
 - Note full file paths for relevant code
 - Track questions that remain unanswered
@@ -407,14 +413,15 @@ Status: PENDING
 
 These rules are non-negotiable:
 
-1. **USE AskUserQuestion when uncertain** - Don't guess, ask the user
-2. **Batch questions together** - Don't interrupt user with scattered questions
-3. **Run explorations sequentially** - One at a time, never in parallel
-4. **NEVER write implementation code during planning** - Planning and implementing are separate
-5. **NEVER assume - verify by reading files** - Hypotheses must be confirmed
-6. **ALWAYS get user confirmation before implementing** - User owns the decision
-7. **ALWAYS re-read the plan after user confirms** - They may have edited it
-8. **The plan must be detailed enough that another developer could follow it**
-9. **NEVER use built-in ExitPlanMode or EnterPlanMode tools** - This project uses custom `/plan`, `/implement`, `/verify` slash commands. The built-in plan mode tools are incompatible with this workflow.
-10. **FOR MIGRATIONS: Create Feature Inventory BEFORE tasks** - List every file, function, and class being replaced. Map each to a task. No unmapped features allowed.
-11. **"Out of Scope" ≠ "Don't implement"** - "Out of Scope: Changes to X" means migrate X as-is (still needs a task). Only "Out of Scope: Remove X" means no task needed (requires user confirmation).
+1. **NEVER use sub-agents (Task tool) during planning** - Perform all exploration yourself with direct tool calls
+2. **USE AskUserQuestion when uncertain** - Don't guess, ask the user
+3. **Batch questions together** - Don't interrupt user with scattered questions
+4. **Run explorations sequentially** - One at a time, never in parallel
+5. **NEVER write implementation code during planning** - Planning and implementing are separate
+6. **NEVER assume - verify by reading files** - Hypotheses must be confirmed
+7. **ALWAYS get user confirmation before implementing** - User owns the decision
+8. **ALWAYS re-read the plan after user confirms** - They may have edited it
+9. **The plan must be detailed enough that another developer could follow it**
+10. **NEVER use built-in ExitPlanMode or EnterPlanMode tools** - This project uses custom `/plan`, `/implement`, `/verify` slash commands. The built-in plan mode tools are incompatible with this workflow.
+11. **FOR MIGRATIONS: Create Feature Inventory BEFORE tasks** - List every file, function, and class being replaced. Map each to a task. No unmapped features allowed.
+12. **"Out of Scope" ≠ "Don't implement"** - "Out of Scope: Changes to X" means migrate X as-is (still needs a task). Only "Out of Scope: Remove X" means no task needed (requires user confirmation).
