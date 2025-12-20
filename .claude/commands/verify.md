@@ -10,7 +10,7 @@ model: opus
 
 ## The Process
 
-Tests → Program execution → Call chain analysis → Coverage → Quality checks → Code review → E2E → Final verification
+Tests → Program execution → **Rules compliance audit** → Call chain analysis → Coverage → Quality checks → Code review → E2E → Final verification
 
 Active verification with comprehensive code review that immediately fixes issues as discovered, ensuring all tests pass, code quality is high, and system works end-to-end.
 
@@ -86,7 +86,64 @@ This is a serious issue - the implementation is incomplete.
 
 4. **STOP** - Do not continue verification
 
-### Step 4: Call Chain Analysis
+### Step 4: Rules Compliance Audit
+
+**MANDATORY: Verify work complies with ALL project rules before proceeding.**
+
+#### Process
+
+1. **Discover all rules:**
+   ```
+   Glob(".claude/rules/standard/*.md") → Read each file
+   Glob(".claude/rules/custom/*.md") → Read each file
+   ```
+
+2. **For each rule file:**
+   - Read the entire file
+   - Extract the key requirements and constraints
+   - Check if each requirement was followed during implementation
+   - Note any violations
+
+3. **Classify violations:**
+   - **Fixable Now:** Can be remediated immediately (run missing commands, apply fixes)
+   - **Structural:** Cannot be fixed retroactively (missed TDD cycle, architectural issues)
+
+4. **Remediate:** Execute fixes for all fixable violations before continuing
+
+#### Output Format
+
+```
+## Rules Compliance Audit
+
+### Rules Checked
+- `.claude/rules/standard/[filename].md` - [Brief description]
+- `.claude/rules/custom/[filename].md` - [Brief description]
+- ...
+
+### ✅ Compliant
+- [Rule file]: [Requirements that were followed]
+
+### ⚠️ Violations Found (Fixable)
+- [Rule file]: [Violation] → [Fix action to execute now]
+
+### ❌ Violations Found (Structural)
+- [Rule file]: [Violation] → [What should have been done differently]
+
+### Remediation
+[Execute each fix action listed above]
+[Show output/evidence of fixes applied]
+```
+
+#### Completion Gate
+
+**DO NOT proceed to Step 5 until:**
+- All rule files have been read and checked
+- All fixable violations have been remediated
+- Structural violations have been documented
+
+**If serious structural violations exist:** Consider whether to continue or restart implementation.
+
+### Step 5: Call Chain Analysis
 
 **Perform deep impact analysis for all changes:**
 
@@ -106,17 +163,17 @@ This is a serious issue - the implementation is incomplete.
    - External system impacts
    - Global state modifications
 
-### Step 5: Check Coverage
+### Step 6: Check Coverage
 
 Verify test coverage meets requirements.
 
 **If insufficient:** Identify uncovered lines → Write tests for critical paths → Verify improvement
 
-### Step 6: Run Quality Checks
+### Step 7: Run Quality Checks
 
 Run automated quality tools and fix any issues found.
 
-### Step 7: Code Review Simulation
+### Step 8: Code Review Simulation
 
 **Perform self-review using code review checklist:**
 
@@ -130,7 +187,7 @@ Run automated quality tools and fix any issues found.
 
 **If issues found:** Document and fix immediately
 
-### Step 8: E2E Verification (if applicable)
+### Step 9: E2E Verification (if applicable)
 
 Run end-to-end tests as appropriate for the application type.
 
@@ -159,7 +216,7 @@ curl -X DELETE http://localhost:8000/api/resource/1
 
 **If failures:** Analyze failure → Check API endpoint → Fix implementation → Re-run → Continue until all pass
 
-### Step 9: Final Verification
+### Step 10: Final Verification
 
 **Run everything one more time:**
 - All tests
@@ -176,11 +233,11 @@ curl -X DELETE http://localhost:8000/api/resource/1
 - Code review checklist complete
 - No breaking changes in call chains
 
-### Step 10: Update Plan Status
+### Step 11: Update Plan Status
 
 **Status Lifecycle:** `PENDING` → `COMPLETE` → `VERIFIED`
 
-**When ALL verification passes (no missing features, no bugs):**
+**When ALL verification passes (no missing features, no bugs, rules compliant):**
 
 1. **MANDATORY: Update plan status to VERIFIED**
    ```
@@ -189,7 +246,7 @@ curl -X DELETE http://localhost:8000/api/resource/1
    ```
 2. Inform user: "✅ Verification complete. Plan status updated to VERIFIED."
 
-**When verification FAILS (missing features or serious bugs):**
+**When verification FAILS (missing features, serious bugs, or unfixed rule violations):**
 
 1. Add new tasks to the plan for missing features/bugs
 2. **Set status back to PENDING:**
