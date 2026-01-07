@@ -43,14 +43,14 @@ Update counts:
    - Diagnostics: `mcp__ide__getDiagnostics()`
    - Plan progress: Check for `[x]` completed tasks
 
-### 🔧 MCP Tools for Implementation
+### 🔧 Tools for Implementation
 
-**Use these MCP servers throughout implementation:**
+**Use these tools throughout implementation:**
 
 | Tool | When to Use | Example |
 |------|-------------|---------|
-| **Ref** | Library API lookup | `mcp__Ref__ref_search_documentation` - "pytest fixtures" |
-| **tavily** | Research solutions | `mcp__tavily__tavily-search` - Debug errors, find examples |
+| **Context7** | Library API lookup | Use `resolve-library-id` then `query-docs` - "pytest fixtures" |
+| **WebSearch** | Research solutions | Use WebSearch tool - Debug errors, find examples |
 
 **Before starting, verify Vexor is available for semantic search:**
 ```bash
@@ -59,8 +59,8 @@ vexor --version
 
 **During implementation:**
 - Use `vexor search "query" --mode code` to find similar implementations and patterns
-- Use `mcp__Ref__ref_search_documentation` when unsure about library/framework APIs
-- Use `mcp__tavily__tavily-search` to research error messages or find solutions
+- Use Context7 (`resolve-library-id` then `query-docs`) when unsure about library/framework APIs
+- Use WebSearch to research error messages or find solutions
 
 ## ⚠️ CRITICAL: Migration/Refactoring Tasks
 

@@ -360,6 +360,11 @@ def install_claude_mem() -> bool:
     return True
 
 
+def install_context7() -> bool:
+    """Install context7 plugin via claude plugin."""
+    return _run_bash_with_retry("claude plugin install context7")
+
+
 def _install_with_spinner(ui: Any, name: str, install_fn: Any, *args: Any) -> bool:
     """Run an installation function with a spinner."""
     if ui:
@@ -423,6 +428,9 @@ class DependenciesStep(BaseStep):
 
         if _install_with_spinner(ui, "claude-mem plugin", install_claude_mem):
             installed.append("claude_mem")
+
+        if _install_with_spinner(ui, "Context7 plugin", install_context7):
+            installed.append("context7")
 
         if _install_with_spinner(ui, "Vexor semantic search", install_vexor):
             installed.append("vexor")

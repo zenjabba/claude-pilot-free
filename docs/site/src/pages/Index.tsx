@@ -56,10 +56,10 @@ const Index = () => {
       },
       {
         "@type": "Question",
-        "name": "What MCP servers are included?",
+        "name": "What plugins are included?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Claude CodePro includes Claude Mem, Vexor, Tavily, Ref, and MCP Lazy Loading - all pre-configured and ready to use."
+          "text": "Claude CodePro includes Claude Mem (persistent memory), Vexor (semantic search), Context7 (library docs), and LSP servers (Python/TypeScript) - all pre-configured."
         }
       }
     ]

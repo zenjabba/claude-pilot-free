@@ -37,13 +37,12 @@ const insideItems: InsideItem[] = [
   },
   {
     icon: Plug2,
-    title: "MCP Servers",
+    title: "Plugins",
     items: [
       "Claude Mem - Cross-session persistent memory",
       "Vexor - Local semantic code search",
-      "Tavily - Web search and mapping",
-      "Ref - AI-powered code context retrieval",
-      "MCP Lazy Loading - Reduces MCP context usage",
+      "Context7 - Library documentation lookup",
+      "LSP Servers - Python (Pyright) & TypeScript",
     ],
   },
   {

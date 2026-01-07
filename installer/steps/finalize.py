@@ -69,7 +69,6 @@ class FinalizeStep(BaseStep):
             [
                 "Claude CodePro rules",
                 "Shell alias (ccp)",
-                "MCP configuration",
             ]
         )
 
@@ -95,7 +94,6 @@ class FinalizeStep(BaseStep):
                     "View claude-mem Memory UI",
                     "Open http://localhost:37777/ to see the Memory Web UI",
                 ),
-                ("Verify MCP servers", "Run: /mcp → If any fail, click on the server and select 'Reconnect'"),
                 ("Connect IDE", "Run: /ide → Enables real-time diagnostics"),
                 ("Initialize project", "Run: /setup → Scans and indexes codebase"),
                 ("Start building!", "/plan → /implement → /verify"),

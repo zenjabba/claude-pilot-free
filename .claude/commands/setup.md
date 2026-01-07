@@ -4,98 +4,11 @@ model: opus
 ---
 # SETUP MODE: Project Initialization and Context Building
 
-**Purpose:** Scan project structure, create project documentation, initialize semantic search, configure MCP tools documentation, and store project knowledge in persistent memory.
+**Purpose:** Scan project structure, create project documentation, initialize semantic search, and store project knowledge in persistent memory.
 
 ---
 
 ## Execution Sequence
-
-### Phase 0: Custom MCP Servers Configuration
-
-**Purpose:** Document any custom MCP servers the user has added beyond the standard ones (tavily, Ref).
-
-1. **Ask user about custom MCP servers:**
-
-   Use AskUserQuestion:
-   ```
-   Question: "Do you have custom MCP servers to add to this project?"
-   Options:
-   - "Yes, let me add them now" - User will edit .mcp.json
-   - "No, skip this step" - Proceed without custom servers
-   ```
-
-2. **If user selects "Yes":**
-
-   Display instructions:
-   ```
-   Please add your custom MCP servers to .mcp.json now.
-
-   The file is located at: [project_dir]/.mcp.json
-
-   Example format:
-   {
-     "mcpServers": {
-       "your-server-name": {
-         "command": "npx",
-         "args": ["-y", "your-mcp-package"]
-       }
-     }
-   }
-
-   Note: tavily and Ref are already configured.
-   ```
-
-   Then ask for confirmation:
-   ```
-   Question: "Have you finished adding your MCP servers?"
-   Options:
-   - "Yes, I've added them" - Proceed to create documentation
-   - "Skip for now" - Continue without documenting custom servers
-   ```
-
-3. **Read .mcp.json and identify custom servers:**
-
-   ```python
-   Read(file_path=".mcp.json")
-   ```
-
-   Parse the JSON and filter out standard servers:
-   - Exclude: `tavily`, `Ref`
-   - Keep: All other servers as "custom"
-
-4. **If custom servers found, create `.claude/rules/custom/mcp-tools.md`:**
-
-   Generate content with this structure:
-
-   ```markdown
-   ## Custom MCP Servers
-
-   This project uses the following custom MCP servers in addition to the standard ones (tavily, Ref).
-
-   ### [Server Name]
-
-   **Command:** `[command from config]`
-   **Args:** `[args from config]`
-
-   **When to use:**
-   - [Brief description - ask user or infer from server name]
-
-   **Example usage:**
-   ```
-   mcp__[server-name]__[tool_name](param="value")
-   ```
-
-   [Repeat for each custom server]
-   ```
-
-5. **Write the custom MCP tools rule:**
-   ```python
-   Write(file_path=".claude/rules/custom/mcp-tools.md", content=generated_content)
-   ```
-
-   If no custom servers found, skip creating this file.
-
----
 
 ### Phase 1: Project Discovery
 
@@ -188,47 +101,29 @@ model: opus
 
 ### Phase 3: Initialize Semantic Search with Vexor
 
-1. **Get current working directory as absolute path:**
-   ```bash
-   pwd
-   ```
-
-2. **Check if Vexor is available:**
+1. **Check if Vexor is available:**
    ```bash
    vexor --version
    ```
 
-   If not installed, inform user:
-   ```
-   Vexor CLI is not installed. Please install it to enable semantic code search.
-   See: https://github.com/anthropics/vexor for installation instructions.
-   ```
+   If not installed, inform user and provide installation link.
 
-3. **Run initial indexing with a test search:**
+2. **Build the index:**
    ```bash
-   vexor search "main entry point" --path /absolute/path/to/project --mode code --top 3
+   vexor index --path /absolute/path/to/project
    ```
 
-   Note: First search will trigger indexing automatically (may take a minute for large codebases).
+   Note: Index respects `.gitignore` automatically. Exclude patterns passed to `vexor index` or `vexor search` are applied as filters at search time (not persisted in index).
 
-   Common exclusion patterns are respected via `.gitignore`. For additional exclusions:
+3. **Verify with a test search:**
    ```bash
-   vexor search "query" --exclude-pattern "tests/**" --exclude-pattern ".js"
+   vexor search "main entry point" --top 3
    ```
 
-4. **Verify indexing with a broader search:**
+4. **Check index metadata:**
    ```bash
-   vexor search "configuration loading" --path /absolute/path/to/project --mode code --top 5
+   vexor index --show
    ```
-
-5. **Document available search modes for the project:**
-
-   | Mode | Best For | Example |
-   |------|----------|---------|
-   | `code` | Python, JS, TS source files | `vexor search "API handler" --mode code` |
-   | `outline` | Markdown documentation | `vexor search "authentication" --mode outline --ext .md` |
-   | `name` | Finding files by name | `vexor search "config" --mode name` |
-   | `auto` | Mixed content (default) | `vexor search "database connection"` |
 
 ### Phase 4: Completion Summary
 
@@ -240,16 +135,16 @@ Display a summary like:
 ├─────────────────────────────────────────────────────────────┤
 │ Created:                                                    │
 │   ✓ .claude/rules/custom/project.md                        │
-│   ✓ .claude/rules/custom/mcp-tools.md (if custom servers)  │
 │                                                             │
 │ Semantic Search (Vexor):                                    │
 │   ✓ Vexor CLI available                                    │
 │   ✓ Initial index built (respects .gitignore)              │
 │   ✓ Test search successful                                 │
 │                                                             │
-│ MCP Servers:                                                │
-│   ✓ Standard: tavily, Ref                                  │
-│   ✓ Custom: [list custom server names or "none"]           │
+│ Plugins Available:                                          │
+│   ✓ Context7 - Library documentation lookup                │
+│   ✓ Claude Mem - Persistent memory                         │
+│   ✓ LSP Servers - Python (Pyright) & TypeScript            │
 ├─────────────────────────────────────────────────────────────┤
 │ Next Steps:                                                 │
 │   1. Run 'ccp' to reload with new rules in context         │
@@ -279,34 +174,8 @@ Display a summary like:
 - Focus on information that helps Claude understand how to work with this codebase
 - Vexor respects `.gitignore` by default - use `--no-respect-gitignore` to include ignored files
 
-## Indexing Exclusion Patterns
+## Indexing Notes
 
-Vexor respects `.gitignore` by default, so common patterns like `node_modules/`, `__pycache__/`, `.venv/`, etc. are automatically excluded if they're in your `.gitignore`.
-
-**For additional exclusions during search, use `--exclude-pattern`:**
-
-```bash
-# Exclude test files
-vexor search "database" --exclude-pattern "tests/**"
-
-# Exclude specific extensions
-vexor search "config" --exclude-pattern ".js" --exclude-pattern ".css"
-
-# Multiple exclusions
-vexor search "handler" --exclude-pattern "vendor/**" --exclude-pattern "*.min.js"
-```
-
-**Common patterns typically in `.gitignore`:**
-
-| Pattern | Reason |
-|---------|--------|
-| `node_modules/` | NPM dependencies |
-| `__pycache__/`, `*.pyc` | Python bytecode |
-| `.venv/`, `venv/` | Python virtual environments |
-| `dist/`, `build/` | Build outputs |
-| `.mypy_cache/`, `.pytest_cache/` | Tool caches |
-| `coverage/` | Test coverage data |
-| `.next/` | Next.js build output |
-
-**To include ignored files:** Use `--no-respect-gitignore`
-**To include hidden files:** Use `--include-hidden`
+- Vexor respects `.gitignore` by default - no need for manual exclusions
+- `--exclude-pattern` flags filter results at search time (not persisted in index)
+- Use `--no-respect-gitignore` to include ignored files, `--include-hidden` for dotfiles

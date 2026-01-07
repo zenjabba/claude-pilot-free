@@ -48,7 +48,7 @@ curl -fsSL https://raw.githubusercontent.com/maxritter/claude-codepro/v3.5.1/ins
 
 ## 📦 What's Inside
 
-### 📋 Spec-Driven Workflow via Slash Commands
+### 📋 Spec-Driven Workflow
 
 - `/setup` - Initialize project context, semantic search indexing, and persistent memory
 - `/plan` - Based on your input asks the right questions → Detailed spec with exact code
@@ -63,15 +63,15 @@ curl -fsSL https://raw.githubusercontent.com/maxritter/claude-codepro/v3.5.1/ins
 - **Commands** - Workflow-specific modes: /plan, /implement, /verify, /setup
 - **Skills** - Domain-specific @-referenceable guides (e.g., @backend-python-standards)
 
-### 🔌 Enhanced Context and Capabilities via MCP Servers
+### 🔌 Enhanced Context Capabilities
 
 - **Claude Mem** - Cross-session persistent memory system that automatically ingest context
 - **Vexor** - Local vector store based semantic code search for token-efficient retrieval
-- **Tavily** - Real-time web search capabilities and powerful web mapping tool
-- **Ref** - AI-powered code context retrieval, similar to Context7 but uses less context
-- **MCP Lazy Loading** - Intelligently reduces context usage by lazy loading MCP servers
+- **Context7** - AI-powered code context retrieval installed as a plugin with wide support
+- **LSP Servers** - Python and TypeScript CC Language Servers for extended code intelligence
+- **MCP Lazy Loading** - Intelligently reduces context usage by lazy loading MCP servers via MCP CLI
 
-### 🛠️ Intelligent Hooks for Quality, Standards and Context
+### 🛠️ Intelligent Hook Automation
 
 - **Python Quality** - Post-edit hook for ruff, mypy, basedpyright linting and type checking (optional)
 - **TypeScript Quality** - Post-edit hook for eslint, tsc, prettier checks (optional)
@@ -79,11 +79,11 @@ curl -fsSL https://raw.githubusercontent.com/maxritter/claude-codepro/v3.5.1/ins
 - **TDD Enforcer** - Pre-edit hook that warns when modifying code without failing tests first
 - **Context Monitor** - Post-tool hook that warns CC automatically at 85%/95% context usage
 
-### 🏗️ One-Command Installation
+### 🏗️ One Command Installation
 
-- **LSP Servers** - Python and TypeScript CC Language Servers for extended code intelligence
 - **Dev Container Required** - Isolated Linux environment with pre-configured tools and extensions
-- **Automated Setup Script** - Installs and configures everything in one command
+- **Extended Language Support** - Optionally install extended support for Python & TypeScript
+- **Automated Setup Script** - Installs and configures everything in one installation command
 - **Shell Integration** - Auto-configures bash, fish and zsh with `ccp` alias
 - **IDE Compatible** - Works with VS Code, Cursor, Windsurf or Antigravity
 
@@ -132,16 +132,13 @@ paths: src/**/*.py
 
 ## 🙏 Acknowledgments
 
-- **[qltysh/qlty](https://github.com/qltysh/qlty)** - Code quality automation
-- **[obra/superpowers](https://github.com/obra/superpowers)** - CC Skills inspiration
-- **[buildermethods/agent-os](https://github.com/buildermethods/agent-os)** - CC Spec-Driven inspiration
 - **[thedotmack/claude-mem](https://github.com/thedotmack/claude-mem)** - CC Persistent Memory system
-- **[scarletkc/vexor](https://github.com/scarletkc/vexor)** - CC Semantic code search
 - **[sirmalloc/ccstatusline](https://github.com/sirmalloc/ccstatusline)** - CC Status line integration
 - **[Piebald-AI/tweakcc](https://github.com/Piebald-AI/tweakcc)** - CC Customizations and tweaks for LSP
-- **[tavily-ai/tavily-mcp](https://github.com/tavily-ai/tavily-mcp)** - Web search and mapping capabilities
-- **[ref-tools/ref-tools-mcp](https://github.com/ref-tools/ref-tools-mcp)** - Library code context retrieval
+- **[scarletkc/vexor](https://github.com/scarletkc/vexor)** - CC Semantic code search
+- **[upstash/context7](https://github.com/upstash/context7)** - Library code context retrieval
 - **[astral-sh/uv](https://github.com/astral-sh/uv)** - Fast Python package manager
 - **[astral-sh/ruff](https://github.com/astral-sh/ruff)** - Fast Python linter and formatter
+- **[qltysh/qlty](https://github.com/qltysh/qlty)** - Code quality automation
 - **[DetachHead/basedpyright](https://github.com/DetachHead/basedpyright)** - Enhanced Python type checker
 - **[dotenvx/dotenvx](https://github.com/dotenvx/dotenvx)** - Automatic .env loading for Claude Code

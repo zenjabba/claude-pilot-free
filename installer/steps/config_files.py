@@ -1,47 +1,14 @@
-"""Config files step - installs MCP and other config files."""
+"""Config files step - installs config files."""
 
 from __future__ import annotations
 
-import json
-import tempfile
-from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-from installer.downloads import DownloadConfig, download_directory, download_file
+from installer.downloads import DownloadConfig, download_directory
 from installer.steps.base import BaseStep
 
 if TYPE_CHECKING:
     from installer.context import InstallContext
-
-REQUIRED_MCP_SERVERS = {"tavily", "Ref"}
-
-
-def merge_mcp_config(config_file: Path, new_config: dict[str, Any]) -> int:
-    """Merge required MCP servers into existing config, preserving user servers.
-
-    Returns the number of servers added.
-    """
-    existing_config: dict[str, Any] = {"mcpServers": {}}
-
-    if config_file.exists():
-        try:
-            existing_config = json.loads(config_file.read_text())
-        except json.JSONDecodeError:
-            existing_config = {"mcpServers": {}}
-
-    if "mcpServers" not in existing_config:
-        existing_config["mcpServers"] = {}
-
-    new_servers = new_config.get("mcpServers", {})
-    added_count = 0
-
-    for server_key in REQUIRED_MCP_SERVERS:
-        if server_key in new_servers and server_key not in existing_config["mcpServers"]:
-            existing_config["mcpServers"][server_key] = new_servers[server_key]
-            added_count += 1
-
-    config_file.write_text(json.dumps(existing_config, indent=2) + "\n")
-    return added_count
 
 
 class ConfigFilesStep(BaseStep):
@@ -54,7 +21,7 @@ class ConfigFilesStep(BaseStep):
         return False
 
     def run(self, ctx: InstallContext) -> None:
-        """Install MCP and other config files."""
+        """Install config files."""
         ui = ctx.ui
 
         config = DownloadConfig(
@@ -77,29 +44,6 @@ class ConfigFilesStep(BaseStep):
                 ui.success(f"Installed .qlty directory ({count} files)")
             else:
                 download_directory(".qlty", qlty_dir, config)
-
-        mcp_file = ctx.project_dir / ".mcp.json"
-        added_count = 0
-        if ui:
-            with ui.spinner("Configuring MCP servers..."):
-                with tempfile.TemporaryDirectory() as tmpdir:
-                    temp_mcp = Path(tmpdir) / ".mcp.json"
-                    if download_file(".mcp.json", temp_mcp, config):
-                        try:
-                            new_config = json.loads(temp_mcp.read_text())
-                            added_count = merge_mcp_config(mcp_file, new_config)
-                        except json.JSONDecodeError as e:
-                            ui.warning(f"Failed to parse .mcp.json: {e}")
-            if added_count > 0:
-                ui.success(f"Added {added_count} MCP server(s) to .mcp.json")
-            else:
-                ui.success("MCP servers already configured")
-        else:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                temp_mcp = Path(tmpdir) / ".mcp.json"
-                if download_file(".mcp.json", temp_mcp, config):
-                    new_config = json.loads(temp_mcp.read_text())
-                    merge_mcp_config(mcp_file, new_config)
 
     def rollback(self, ctx: InstallContext) -> None:
         """Remove generated config files."""

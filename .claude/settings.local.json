@@ -6,8 +6,7 @@
     "MAX_MCP_OUTPUT_TOKENS": "10000",
     "MAX_THINKING_TOKENS": "31999",
     "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "true",
-    "DISABLE_TELEMETRY": "true",
-    "CUSTOM_IGNORE_PATTERNS": "**/node_modules/**,**/cdk.out/**,**/__pycache__/**,**/.venv/**,**/venv/**,**/.uv/**,**/.git/**,**/dist/**,**/build/**,**/.mypy_cache/**,**/.pytest_cache/**,**/.ruff_cache/**,**/coverage/**,**/.coverage/**,**/*.egg-info/**,**/.next/**,**/.tox/**,**/.cache/**,**/*.pyc,**/*.pyo,**/.terraform/**,**/vendor/**,**/target/**,**/.idea/**,**/test-reports/**,**/*.lock,**/yarn.lock,**/uv.lock,**/package-lock.json,**/.DS_Store,**/Thumbs.db,**/*.log,**/htmlcov/**,**/.hypothesis/**,**/.ipynb_checkpoints/**,**/wheels/**,**/*.egg,**/.eggs/**,**/downloads/**,**/sdist/**,**/*.whl"
+    "DISABLE_TELEMETRY": "true"
   },
   "permissions": {
     "allow": [
@@ -42,12 +41,6 @@
       "WebSearch",
       "Write",
       "mcp__ide__getDiagnostics",
-      "mcp__Ref__ref_search_documentation",
-      "mcp__Ref__ref_read_url",
-      "mcp__tavily__tavily-search",
-      "mcp__tavily__tavily-extract",
-      "mcp__tavily__tavily-map",
-      "mcp__tavily__tavily-crawl",
       "SlashCommand(/implement:*)",
       "SlashCommand(/plan:*)",
       "SlashCommand(/verify:*)",
@@ -59,10 +52,6 @@
   },
   "model": "opus",
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "tavily",
-    "Ref"
-  ],
   "hooks": {
     "PreToolUse": [
       {

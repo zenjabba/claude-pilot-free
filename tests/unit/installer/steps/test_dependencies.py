@@ -38,6 +38,7 @@ class TestDependenciesStep:
     @patch("installer.steps.dependencies.run_qlty_check")
     @patch("installer.steps.dependencies.install_qlty")
     @patch("installer.steps.dependencies.install_vexor")
+    @patch("installer.steps.dependencies.install_context7")
     @patch("installer.steps.dependencies.install_claude_mem")
     @patch("installer.steps.dependencies.install_typescript_lsp")
     @patch("installer.steps.dependencies.run_tweakcc")
@@ -50,6 +51,7 @@ class TestDependenciesStep:
         mock_tweakcc,
         mock_typescript_lsp,
         mock_claude_mem,
+        mock_context7,
         mock_vexor,
         mock_qlty,
         mock_qlty_check,
@@ -66,6 +68,7 @@ class TestDependenciesStep:
         mock_tweakcc.return_value = True
         mock_typescript_lsp.return_value = True
         mock_claude_mem.return_value = True
+        mock_context7.return_value = True
         mock_vexor.return_value = True
         mock_qlty.return_value = (True, False)
         mock_dotenvx.return_value = True
@@ -90,6 +93,7 @@ class TestDependenciesStep:
     @patch("installer.steps.dependencies.run_qlty_check")
     @patch("installer.steps.dependencies.install_qlty")
     @patch("installer.steps.dependencies.install_vexor")
+    @patch("installer.steps.dependencies.install_context7")
     @patch("installer.steps.dependencies.install_claude_mem")
     @patch("installer.steps.dependencies.install_pyright_lsp")
     @patch("installer.steps.dependencies.install_typescript_lsp")
@@ -108,6 +112,7 @@ class TestDependenciesStep:
         mock_typescript_lsp,
         mock_pyright_lsp,
         mock_claude_mem,
+        mock_context7,
         mock_vexor,
         mock_qlty,
         mock_qlty_check,
@@ -127,6 +132,7 @@ class TestDependenciesStep:
         mock_typescript_lsp.return_value = True
         mock_pyright_lsp.return_value = True
         mock_claude_mem.return_value = True
+        mock_context7.return_value = True
         mock_vexor.return_value = True
         mock_qlty.return_value = (True, False)
         mock_dotenvx.return_value = True
@@ -442,6 +448,30 @@ class TestClaudeMemInstall:
         result = install_claude_mem()
 
         assert result is True
+
+
+class TestContext7Install:
+    """Test Context7 plugin installation."""
+
+    def test_install_context7_exists(self):
+        """install_context7 function exists."""
+        from installer.steps.dependencies import install_context7
+
+        assert callable(install_context7)
+
+    @patch("subprocess.run")
+    def test_install_context7_calls_plugin_install(self, mock_run):
+        """install_context7 calls claude plugin install context7."""
+        from installer.steps.dependencies import install_context7
+
+        mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+
+        result = install_context7()
+
+        assert result is True
+        mock_run.assert_called()
+        call_args = mock_run.call_args[0][0]
+        assert "claude plugin install context7" in call_args[2]
 
 
 class TestVexorInstall:

@@ -127,13 +127,11 @@ class EnvironmentStep(BaseStep):
                 ui.print()
 
         openai_api_key = ""
-        tavily_api_key = ""
-        ref_api_key = ""
 
         if not key_is_set("OPENAI_API_KEY", env_file):
             if ui:
                 ui.print()
-                ui.rule("1. OpenAI API Key - Semantic Code Search")
+                ui.rule("OpenAI API Key - Semantic Code Search")
                 ui.print()
                 ui.print("  [bold]Used for:[/bold] Generating embeddings for Vexor semantic search (cheap)")
                 ui.print("  [bold]Why:[/bold] Powers fast, intelligent code search across your codebase")
@@ -145,39 +143,7 @@ class EnvironmentStep(BaseStep):
             if ui:
                 ui.success("OPENAI_API_KEY already set, skipping")
 
-        if not key_is_set("TAVILY_API_KEY", env_file):
-            if ui:
-                ui.print()
-                ui.rule("2. Tavily API Key - AI-Powered Web Search")
-                ui.print()
-                ui.print(
-                    "  [bold]Used for:[/bold] Web search, code examples, documentation lookup, and URL content extraction"
-                )
-                ui.print("  [bold]Create at:[/bold] [cyan]https://app.tavily.com/home[/cyan]")
-                ui.print()
-
-                tavily_api_key = ui.input("TAVILY_API_KEY", default="")
-        else:
-            if ui:
-                ui.success("TAVILY_API_KEY already set, skipping")
-
-        if not key_is_set("REF_API_KEY", env_file):
-            if ui:
-                ui.print()
-                ui.rule("3. Ref.Tools API Key - Library Documentation Search")
-                ui.print()
-                ui.print("  [bold]Used for:[/bold] Searching library and framework documentation")
-                ui.print("  [bold]Create at:[/bold] [cyan]https://ref.tools/dashboard[/cyan]")
-                ui.print()
-
-                ref_api_key = ui.input("REF_API_KEY", default="")
-        else:
-            if ui:
-                ui.success("REF_API_KEY already set, skipping")
-
         add_env_key("OPENAI_API_KEY", openai_api_key, env_file)
-        add_env_key("TAVILY_API_KEY", tavily_api_key, env_file)
-        add_env_key("REF_API_KEY", ref_api_key, env_file)
 
         if ui:
             if append_mode:

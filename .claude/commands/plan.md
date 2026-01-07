@@ -174,14 +174,14 @@ Questions:
 
 **Explore the codebase systematically.** Run explorations **one at a time** (sequentially, not in parallel).
 
-#### 🔧 MCP Tools for Exploration
+#### 🔧 Tools for Exploration
 
-**Use these MCP servers to gather context efficiently:**
+**Use these tools to gather context efficiently:**
 
 | Tool | When to Use | Example |
 |------|-------------|---------|
-| **Ref** | Library/framework docs | `mcp__Ref__ref_search_documentation` - Look up API usage |
-| **tavily** | External research | `mcp__tavily__tavily-search` - Research best practices |
+| **Context7** | Library/framework docs | Use `resolve-library-id` then `query-docs` to look up API usage |
+| **WebSearch** | External research | Use WebSearch tool for researching patterns and best practices |
 
 **Before exploring, verify Vexor is available:**
 ```bash
@@ -198,14 +198,14 @@ First search will trigger automatic indexing. Use `vexor search "query" --mode c
 
 **⚠️ CRITICAL: NO SUB-AGENTS DURING PLANNING**
 - **DO NOT use the Task tool with any subagent_type** during planning
-- Perform ALL exploration yourself using direct tool calls (Read, Grep, Glob, MCP tools)
+- Perform ALL exploration yourself using direct tool calls (Read, Grep, Glob, Context7, WebSearch)
 - Sub-agents lose context and make planning inconsistent
 - You must maintain full context throughout the planning process
 
 **For each area:**
 - Use `vexor search "query" --mode code` for semantic searches like "authentication middleware" or "database connection handling"
-- Use `mcp__Ref__ref_search_documentation` when you need library/framework API details
-- Use `mcp__tavily__tavily-search` for researching patterns, best practices, or unfamiliar technologies
+- Use Context7 (`resolve-library-id` then `query-docs`) when you need library/framework API details
+- Use WebSearch for researching patterns, best practices, or unfamiliar technologies
 - Use `Read`, `Grep`, `Glob` tools directly for file exploration
 - Document hypotheses (not conclusions)
 - Note full file paths for relevant code

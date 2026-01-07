@@ -60,8 +60,14 @@ vexor search "config loader" --path . --mode code --ext .py
 vexor search "config loader" --path . --exclude-pattern tests/** --exclude-pattern .js
 ```
 
+### Indexing
+
+- **Auto-index:** First search builds the index automatically (may take a minute). Subsequent searches use the cached index.
+- **Pre-build index:** `vexor index` to build ahead of time, `vexor index --show` to check metadata, `vexor index --clear` to rebuild.
+- **Mode-specific:** Each mode (auto, code, etc.) has its own index. Use consistent modes for cache hits.
+- **Exclude patterns are filters:** They don't persist in the index - applied at search time. Rely on `.gitignore` for common exclusions.
+
 ### Tips
 
-- First time search will index files (may take a minute). Subsequent searches are fast. Use longer timeouts if needed.
 - Results return similarity ranking, exact file location, line numbers, and matching snippet preview.
 - Combine `--ext` with `--exclude-pattern` to focus on a subset (exclude rules apply on top).
