@@ -182,6 +182,8 @@ Free for:
 - **Freelancers** - Client work and consulting
 - **Open Source Projects** - Projects that release source under AGPL-3.0
 
+If you find Claude CodePro useful, consider [sponsoring the project](https://github.com/sponsors/maxritter) to support continued development.
+
 ### Commercial License
 
 **Companies using Claude CodePro in proprietary/closed-source products must obtain a commercial license.**
@@ -192,14 +194,6 @@ This applies to:
 - SaaS products using Claude CodePro
 
 **Contact:** [mail@maxritter.net](mailto:mail@maxritter.net) for commercial licensing inquiries.
-
----
-
-## 🤝 Contributing
-
-**Pull Requests are welcome!** If you have new features, improvements, or bug fixes, feel free to open a PR.
-
-**Note:** Issues are disabled. This project evolves alongside my professional work as a freelancer, and I don't have the capacity to maintain a public issue tracker. If you want a feature or find a bug, the best way to contribute is to submit a PR.
 
 ---
 
@@ -229,6 +223,14 @@ I'm **Max Ritter**, a senior IT freelancer based near **Munich, Germany**, speci
 | 📄 **CV** | [flowcv.com/resume/hcaa0q4wdd](https://flowcv.com/resume/hcaa0q4wdd) |
 | 📝 **Blog** | [blog.maxritter.net](http://blog.maxritter.net/) |
 | 🌐 **Website** | [maxritter.net](https://maxritter.net) |
+
+---
+
+## 🤝 Contributing
+
+**Pull Requests are welcome!** If you have new features, improvements, or bug fixes, feel free to open a PR.
+
+**Note:** Issues are disabled. This project evolves alongside my professional work as a freelancer, and I don't have the capacity to maintain a public issue tracker. If you want a feature or find a bug, the best way to contribute is to submit a PR.
 
 ---
 
