@@ -241,11 +241,6 @@ def install(
 
         if tier == "free":
             console.print("  [bold green]Tier: Free[/bold green] (personal/student/nonprofit/OSS)")
-            console.print()
-            console.print("  [dim]Limitations:[/dim]")
-            console.print("    • For non-commercial use only")
-            console.print("    • No access to video trainings")
-            console.print("    • No access to community chat")
         elif tier == "trial":
             if is_expired:
                 console.print("  [bold red]Tier: Trial (EXPIRED)[/bold red]")
@@ -330,9 +325,9 @@ def install(
         console.print("  [bold]💡 What's Included with a Commercial License?[/bold]")
         console.print("  [bold cyan]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/bold cyan]")
         console.print()
-        console.print("    ✨ Exclusive access to recorded video trainings")
-        console.print("    ✨ Exclusive access to community chat for direct Q&A")
-        console.print("    ✨ Continuous updates and improvements to have the best CC setup")
+        console.print("    • You can modify Claude CodePro to fit your own workflow and requirements")
+        console.print("    • Continuous updates and improvements for the duration of your subscription")
+        console.print("    • Anything you generate using Claude CodePro is yours to use commercially forever")
         console.print()
         console.print("  [bold yellow]Subscribe:[/bold yellow] [bold cyan]https://license.claude-code.pro[/bold cyan]")
         console.print()
