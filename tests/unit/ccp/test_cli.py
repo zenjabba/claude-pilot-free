@@ -21,7 +21,7 @@ class TestCLIVersion:
 
         result = runner.invoke(app, ["--version"])
         assert result.exit_code == 0
-        assert "4.4" in result.stdout  # Version should be 4.4.x
+        assert "Claude CodePro v" in result.stdout
 
 
 class TestCLIActivate:

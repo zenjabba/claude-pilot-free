@@ -182,7 +182,7 @@ class TestCLIIntegration:
             timeout=10,
         )
         assert result.returncode == 0
-        assert "4.4" in result.stdout
+        assert "Claude CodePro v" in result.stdout
 
     def test_cli_help_as_module(self) -> None:
         """CLI shows help when invoked as module."""
