@@ -236,7 +236,7 @@ class TestDownloadInstallScript:
 
     @patch("httpx.Client")
     def test_download_install_script_success(self, mock_client):
-        """download_install_script downloads and saves script."""
+        """download_install_script downloads and saves script to /tmp."""
         from ccp.updater import download_install_script
 
         mock_response = MagicMock()
@@ -244,13 +244,14 @@ class TestDownloadInstallScript:
         mock_response.content = b"#!/bin/bash\necho test"
         mock_client.return_value.__enter__.return_value.get.return_value = mock_response
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            project_dir = Path(tmpdir)
-            result = download_install_script("4.5.16", project_dir)
+        script_path = Path("/tmp/ccp-update.sh")
+        script_path.unlink(missing_ok=True)
 
-            assert result is True
-            script_path = project_dir / ".claude" / "update.sh"
-            assert script_path.exists()
+        result = download_install_script("4.5.16")
+
+        assert result is True
+        assert script_path.exists()
+        script_path.unlink(missing_ok=True)
 
     @patch("httpx.Client")
     def test_download_install_script_failure(self, mock_client):
@@ -261,8 +262,6 @@ class TestDownloadInstallScript:
         mock_response.status_code = 404
         mock_client.return_value.__enter__.return_value.get.return_value = mock_response
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            project_dir = Path(tmpdir)
-            result = download_install_script("4.5.16", project_dir)
+        result = download_install_script("4.5.16")
 
-            assert result is False
+        assert result is False
