@@ -183,7 +183,7 @@ ccp
 > Fix the null pointer bug in user.py
 ```
 
-### Customizing Rules
+### 📐 Rules System
 
 Claude CodePro uses [Claude Code's modular rules](https://code.claude.com/docs/en/memory#modular-rules-with-claude/rules/):
 
