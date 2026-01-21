@@ -359,23 +359,6 @@ def install_pyright_lsp() -> bool:
     return _run_bash_with_retry("claude plugin install pyright-lsp")
 
 
-def install_gopls_lsp() -> bool:
-    """Install gopls language server and plugin via go install and claude plugin."""
-    if not command_exists("go"):
-        return False
-
-    if _is_plugin_installed("gopls-lsp", "claude-plugins-official"):
-        return True
-
-    if not _run_bash_with_retry("go install golang.org/x/tools/gopls@latest"):
-        return False
-
-    if not _ensure_official_marketplace():
-        return False
-
-    return _run_bash_with_retry("claude plugin install gopls-lsp")
-
-
 def _configure_claude_mem_defaults() -> bool:
     """Configure Claude Mem with recommended defaults."""
     import json
@@ -720,10 +703,6 @@ class DependenciesStep(BaseStep):
         if ctx.enable_python:
             if _install_with_spinner(ui, "Pyright LSP", install_pyright_lsp):
                 installed.append("pyright_lsp")
-
-        if ctx.enable_golang:
-            if _install_with_spinner(ui, "Gopls LSP", install_gopls_lsp):
-                installed.append("gopls_lsp")
 
         if _install_with_spinner(ui, "claude-mem plugin", install_claude_mem):
             installed.append("claude_mem")
