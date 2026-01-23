@@ -50,8 +50,10 @@ Choose your installation method:
 
 **Option A: 🐳 Dev Container (Recommended - All Platforms)**
 - **Container Runtime** - [Docker Desktop](https://www.docker.com/products/docker-desktop) or compatible equivalent
-- **IDE** - [VS Code](https://code.visualstudio.com/), [Cursor](https://cursor.sh/), or [Windsurf](https://codeium.com/windsurf)
-- **Dev Containers extension** - [Install from Marketplace](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+- **IDE with Dev Container Support** - Any IDE supporting the [Dev Container spec](https://containers.dev/):
+  - VS Code and forks: [VS Code](https://code.visualstudio.com/), [Cursor](https://cursor.sh/), [Windsurf](https://windsurf.com/), [Antigravity](https://antigravity.google/) (with [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers))
+  - JetBrains IDEs: [IntelliJ IDEA](https://www.jetbrains.com/help/idea/connect-to-devcontainer.html), WebStorm, PyCharm, GoLand, etc.
+  - Cloud: [GitHub Codespaces](https://github.com/features/codespaces), [DevPod](https://devpod.sh/), [CodeSandbox](https://codesandbox.io/)
 - Works on **macOS**, **Linux**, and **Windows (with WSL2)**
 
 **Option B: 🍺 Local Installation (Only macOS/Linux)**
