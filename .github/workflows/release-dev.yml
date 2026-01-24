@@ -60,6 +60,13 @@ jobs:
           GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
         run: bash .github/workflows/scripts/setup-git-crypt.sh
 
+      - name: Generate version
+        id: version
+        run: |
+          COMMIT_SHA="${{ github.event.pull_request.head.sha || github.sha }}"
+          VERSION="dev-$(echo $COMMIT_SHA | cut -c1-7)-$(date +%Y%m%d)"
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Build binary
         run: |
           docker run --rm \
@@ -69,7 +76,7 @@ jobs:
             bash -c "
               apt-get update && apt-get install -y binutils build-essential && \
               pip install . && \
-              python -m ccp.build --release && \
+              python -m ccp.build --release --version ${{ steps.version.outputs.VERSION }} && \
               ls -la ccp/dist/
             "
 
@@ -99,6 +106,13 @@ jobs:
           GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
         run: bash .github/workflows/scripts/setup-git-crypt.sh
 
+      - name: Generate version
+        id: version
+        run: |
+          COMMIT_SHA="${{ github.event.pull_request.head.sha || github.sha }}"
+          VERSION="dev-$(echo $COMMIT_SHA | cut -c1-7)-$(date +%Y%m%d)"
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Build binary
         run: |
           docker run --rm \
@@ -108,7 +122,7 @@ jobs:
             bash -c "
               apt-get update && apt-get install -y binutils build-essential && \
               pip install . && \
-              python -m ccp.build --release && \
+              python -m ccp.build --release --version ${{ steps.version.outputs.VERSION }} && \
               ls -la ccp/dist/
             "
 
@@ -148,10 +162,17 @@ jobs:
           key: ${{ runner.os }}-pip-pyinstaller
           restore-keys: ${{ runner.os }}-pip-
 
+      - name: Generate version
+        id: version
+        run: |
+          COMMIT_SHA="${{ github.event.pull_request.head.sha || github.sha }}"
+          VERSION="dev-$(echo $COMMIT_SHA | cut -c1-7)-$(date +%Y%m%d)"
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Build binary
         run: |
           pip install .
-          python -m ccp.build --release
+          python -m ccp.build --release --version ${{ steps.version.outputs.VERSION }}
           ls -la ccp/dist/
 
       - name: Upload artifact
@@ -190,10 +211,17 @@ jobs:
           key: ${{ runner.os }}-pip-pyinstaller
           restore-keys: ${{ runner.os }}-pip-
 
+      - name: Generate version
+        id: version
+        run: |
+          COMMIT_SHA="${{ github.event.pull_request.head.sha || github.sha }}"
+          VERSION="dev-$(echo $COMMIT_SHA | cut -c1-7)-$(date +%Y%m%d)"
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Build binary
         run: |
           pip install .
-          python -m ccp.build --release
+          python -m ccp.build --release --version ${{ steps.version.outputs.VERSION }}
           ls -la ccp/dist/
 
       - name: Upload artifact
