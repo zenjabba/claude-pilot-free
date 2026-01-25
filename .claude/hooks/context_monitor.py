@@ -143,6 +143,7 @@ def run_context_monitor() -> int:
         print("", file=sys.stderr)
         print(
             f"{YELLOW}Context: {percentage:.0f}% - Finish current task with full quality or find a good place to wrap up, then hand off{NC}",
+            f"{YELLOW}IMPORTANT: NEVER rush to finish a task when context is high. Always finish with full quality next session can also do it!{NC}",
             file=sys.stderr,
         )
         return 2
