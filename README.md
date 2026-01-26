@@ -201,7 +201,7 @@ Claude CodePro extends Claude Code with a modular system of rules, commands, and
 
 - `.claude/commands/` - Any command besides the standard ones
 - `.claude/rules/custom/` - Project-specific rules
-- `.claude/skills/` - Any skill beside the standards from CCP plugin
+- `.claude/skills/` - Any skill besides the standards from CCP plugin
 
 **When to use what:**
 

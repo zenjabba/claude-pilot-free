@@ -268,7 +268,7 @@ def _prompt_license_key(
             console.print()
 
     console.print()
-    console.error("License validation failed after 3 attempts.")
+    console.error(f"License validation failed after {max_attempts} attempts.")
     console.print("  [bold]Subscribe at:[/bold] [cyan]https://license.claude-code.pro[/cyan]")
     console.print()
     return False
@@ -467,7 +467,7 @@ def cmd_install(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_version(args: argparse.Namespace) -> int:
+def cmd_version(_args: argparse.Namespace) -> int:
     """Show version information."""
     print(f"ccp-installer (build: {__build__})")
     return 0
