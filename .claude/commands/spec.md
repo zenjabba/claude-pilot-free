@@ -139,7 +139,7 @@ LOOP:
 - Continues until everything passes (VERIFIED)
 
 **Between iterations:**
-1. Check context: `ccp check-context --json`
+1. Check context: `$CLAUDE_PROJECT_ROOT/.claude/bin/ccp check-context --json`
 2. If context >= 90%: hand off cleanly (don't rush!)
 3. If context 80-89%: continue but wrap up current task with quality
 4. If context < 80%: continue the loop freely

@@ -16,6 +16,7 @@ BIN_PATH_PATTERN = ".claude/bin/"
 PLUGIN_PATH_PATTERN = ".claude/plugin"
 SOURCE_REPO_BIN_PATH = "/workspaces/claude-codepro/.claude/bin/"
 SOURCE_REPO_PLUGIN_PATH = "/workspaces/claude-codepro/.claude/plugin"
+SOURCE_REPO_PROJECT_PATH = "/workspaces/claude-codepro"
 
 
 def patch_claude_paths(content: str, project_dir: Path) -> str:
@@ -27,9 +28,11 @@ def patch_claude_paths(content: str, project_dir: Path) -> str:
     """
     abs_bin_path = str(project_dir / ".claude" / "bin") + "/"
     abs_plugin_path = str(project_dir / ".claude" / "plugin")
+    abs_project_path = str(project_dir)
 
     content = content.replace(SOURCE_REPO_BIN_PATH, abs_bin_path)
     content = content.replace(SOURCE_REPO_PLUGIN_PATH, abs_plugin_path)
+    content = content.replace(SOURCE_REPO_PROJECT_PATH, abs_project_path)
 
     content = content.replace(" " + BIN_PATH_PATTERN, " " + abs_bin_path)
     content = content.replace('"' + BIN_PATH_PATTERN, '"' + abs_bin_path)

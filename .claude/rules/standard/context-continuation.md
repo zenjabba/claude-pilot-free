@@ -63,8 +63,8 @@ Then check the Status field in the most recent plan file(s). An **active plan** 
 **Decision Tree:**
 | Situation | Command to Use |
 |-----------|----------------|
-| Active plan exists (PENDING/COMPLETE) | `ccp send-clear docs/plans/YYYY-MM-DD-name.md` |
-| No active plan (all VERIFIED or none exist) | `ccp send-clear --general` |
+| Active plan exists (PENDING/COMPLETE) | `$CLAUDE_PROJECT_ROOT/.claude/bin/ccp send-clear docs/plans/YYYY-MM-DD-name.md` |
+| No active plan (all VERIFIED or none exist) | `$CLAUDE_PROJECT_ROOT/.claude/bin/ccp send-clear --general` |
 
 **NEVER use `--general` when there's an active plan file. This loses the plan context!**
 
