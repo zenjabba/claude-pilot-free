@@ -355,51 +355,61 @@ def _prompt_for_features(
     skip_golang: bool,
     skip_prompts: bool,
 ) -> tuple[bool, bool, bool, bool]:
-    """Prompt for feature installation preferences. Returns (python, typescript, golang, browser)."""
+    """Prompt for feature installation preferences. Returns (python, typescript, golang, browser).
+
+    Priority order for each feature:
+    1. CLI flag (--skip-python etc) - explicit override, always wins
+    2. Saved config - always read, regardless of interactive mode
+    3. User prompt - only in interactive mode when no saved config
+    4. Default (True) - non-interactive mode with no saved config
+    """
     enable_python = not skip_python
-    if not skip_python and not skip_prompts:
+    if not skip_python:
         if "enable_python" in saved_config:
             enable_python = saved_config["enable_python"]
-            console.print()
-            console.print(f"  [dim]Using saved preference: Python support = {enable_python}[/dim]")
-        else:
+            if not skip_prompts:
+                console.print()
+                console.print(f"  [dim]Using saved preference: Python support = {enable_python}[/dim]")
+        elif not skip_prompts:
             console.print()
             console.print("  [bold]Do you want to install advanced Python features?[/bold]")
             console.print("  This includes: uv, ruff, basedpyright, and Python quality hooks")
             enable_python = console.confirm("Install Python support?", default=True)
 
     enable_typescript = not skip_typescript
-    if not skip_typescript and not skip_prompts:
+    if not skip_typescript:
         if "enable_typescript" in saved_config:
             enable_typescript = saved_config["enable_typescript"]
-            console.print(f"  [dim]Using saved preference: TypeScript support = {enable_typescript}[/dim]")
-        else:
+            if not skip_prompts:
+                console.print(f"  [dim]Using saved preference: TypeScript support = {enable_typescript}[/dim]")
+        elif not skip_prompts:
             console.print()
             console.print("  [bold]Do you want to install TypeScript features?[/bold]")
             console.print("  This includes: TypeScript quality hooks (eslint, tsc, prettier)")
             enable_typescript = console.confirm("Install TypeScript support?", default=True)
 
     enable_golang = not skip_golang
-    if not skip_golang and not skip_prompts:
+    if not skip_golang:
         if "enable_golang" in saved_config:
             enable_golang = saved_config["enable_golang"]
-            console.print(f"  [dim]Using saved preference: Go support = {enable_golang}[/dim]")
-        else:
+            if not skip_prompts:
+                console.print(f"  [dim]Using saved preference: Go support = {enable_golang}[/dim]")
+        elif not skip_prompts:
             console.print()
             console.print("  [bold]Do you want to install Go features?[/bold]")
             console.print("  This includes: Go quality hooks (gofmt, go vet, golangci-lint)")
             enable_golang = console.confirm("Install Go support?", default=True)
 
     enable_agent_browser = True
-    if not skip_prompts:
-        if "enable_agent_browser" in saved_config:
-            enable_agent_browser = saved_config["enable_agent_browser"]
+    if "enable_agent_browser" in saved_config:
+        enable_agent_browser = saved_config["enable_agent_browser"]
+        if not skip_prompts:
             console.print(f"  [dim]Using saved preference: Agent browser = {enable_agent_browser}[/dim]")
-        else:
-            console.print()
-            console.print("  [bold]Do you want to install agent-browser?[/bold]")
-            console.print("  This includes: Headless Chromium browser for web automation and testing")
-            enable_agent_browser = console.confirm("Install agent-browser?", default=True)
+    elif not skip_prompts:
+        console.print()
+        console.print("  [bold]Do you want to install agent-browser?[/bold]")
+        console.print("  This includes: Headless Chromium browser for web automation and testing")
+        enable_agent_browser = console.confirm("Install agent-browser?", default=True)
 
     return enable_python, enable_typescript, enable_golang, enable_agent_browser
 

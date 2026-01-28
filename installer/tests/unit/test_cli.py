@@ -225,3 +225,84 @@ class TestLicenseInfo:
 
         result = _get_license_info(tmp_path)
         assert result is None
+
+
+class TestPromptForFeatures:
+    """Test _prompt_for_features function."""
+
+    def test_saved_config_used_in_non_interactive_mode(self):
+        """Saved config is respected even in non-interactive mode."""
+        from installer.cli import _prompt_for_features
+        from installer.ui import Console
+
+        console = Console(non_interactive=True, quiet=True)
+        saved_config = {
+            "enable_python": False,
+            "enable_typescript": False,
+            "enable_golang": False,
+            "enable_agent_browser": False,
+        }
+
+        python, typescript, golang, browser = _prompt_for_features(
+            console,
+            saved_config,
+            skip_python=False,
+            skip_typescript=False,
+            skip_golang=False,
+            skip_prompts=True,  # Non-interactive mode
+        )
+
+        # Saved config should be used even in non-interactive mode
+        assert python is False
+        assert typescript is False
+        assert golang is False
+        assert browser is False
+
+    def test_cli_flags_override_saved_config(self):
+        """CLI flags (--skip-*) override saved config."""
+        from installer.cli import _prompt_for_features
+        from installer.ui import Console
+
+        console = Console(non_interactive=True, quiet=True)
+        saved_config = {
+            "enable_python": True,
+            "enable_typescript": True,
+            "enable_golang": True,
+        }
+
+        python, typescript, golang, _browser = _prompt_for_features(
+            console,
+            saved_config,
+            skip_python=True,  # CLI flag overrides saved True
+            skip_typescript=True,
+            skip_golang=True,
+            skip_prompts=True,
+        )
+
+        # CLI flags should win over saved config
+        assert python is False
+        assert typescript is False
+        assert golang is False
+
+    def test_default_true_when_no_saved_config_non_interactive(self):
+        """Default to True when no saved config and non-interactive."""
+        from installer.cli import _prompt_for_features
+        from installer.ui import Console
+
+        console = Console(non_interactive=True, quiet=True)
+        saved_config = {}  # No saved preferences
+
+        python, typescript, golang, browser = _prompt_for_features(
+            console,
+            saved_config,
+            skip_python=False,
+            skip_typescript=False,
+            skip_golang=False,
+            skip_prompts=True,  # Non-interactive mode
+        )
+
+        # Should default to True when no saved config
+        assert python is True
+        assert typescript is True
+        assert golang is True
+        assert browser is True

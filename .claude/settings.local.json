@@ -1,6 +1,5 @@
 {
   "env": {
-    "FORCE_CLAUDE_VERSION": "2.1.20",
     "ENABLE_TOOL_SEARCH": "true",
     "ENABLE_LSP_TOOL": "true",
     "CLAUDE_CODE_ENABLE_TASKS": "true",
