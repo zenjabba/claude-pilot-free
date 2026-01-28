@@ -389,19 +389,30 @@ class ClaudeFilesStep(BaseStep):
                 pass
 
         if not ctx.local_mode:
-            hooks_json_path = ctx.project_dir / ".claude" / "ccp" / "hooks" / "hooks.json"
-            if hooks_json_path.exists():
+            ccp_hooks_dir = ctx.project_dir / ".claude" / "ccp" / "hooks"
+            files_to_remove: list[str] = []
+            if not ctx.enable_python:
+                files_to_remove.append("file_checker_python.py")
+            if not ctx.enable_typescript:
+                files_to_remove.append("file_checker_ts.py")
+            if not ctx.enable_golang:
+                files_to_remove.append("file_checker_go.py")
+
+            for hook_file in files_to_remove:
+                hook_path = ccp_hooks_dir / hook_file
+                if hook_path.exists():
+                    try:
+                        hook_path.unlink()
+                    except (OSError, IOError):
+                        pass
+
+            hooks_json_path = ccp_hooks_dir / "hooks.json"
+            if hooks_json_path.exists() and files_to_remove:
                 try:
                     hooks_config = json.loads(hooks_json_path.read_text())
-                    files_to_remove: list[str] = []
-                    if not ctx.enable_python:
-                        files_to_remove.append("file_checker_python.py")
-                    if not ctx.enable_typescript:
-                        files_to_remove.append("file_checker_ts.py")
-                    if not ctx.enable_golang:
-                        files_to_remove.append("file_checker_go.py")
-                    if files_to_remove and "PostToolUse" in hooks_config:
-                        for hook_group in hooks_config["PostToolUse"]:
+                    hooks_section = hooks_config.get("hooks", {})
+                    if "PostToolUse" in hooks_section:
+                        for hook_group in hooks_section["PostToolUse"]:
                             if "hooks" in hook_group:
                                 hook_group["hooks"] = [
                                     h
