@@ -1,6 +1,6 @@
 {
-  "name": "Claude CodePro",
-  "short_name": "CodePro",
+  "name": "Claude Pilot",
+  "short_name": "Pilot",
   "description": "Production-Grade Development Environment for Claude Code",
   "start_url": "/",
   "display": "standalone",

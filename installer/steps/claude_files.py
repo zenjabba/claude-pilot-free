@@ -12,27 +12,26 @@ from installer.downloads import DownloadConfig, FileInfo, download_file, get_rep
 from installer.steps.base import BaseStep
 
 SETTINGS_FILE = "settings.local.json"
-BIN_PATH_PATTERN = ".claude/bin/"
-PLUGIN_PATH_PATTERN = ".claude/ccp"
-SOURCE_REPO_BIN_PATH = "/workspaces/claude-codepro/.claude/bin/"
-SOURCE_REPO_PLUGIN_PATH = "/workspaces/claude-codepro/.claude/ccp"
-SOURCE_REPO_PROJECT_PATH = "/workspaces/claude-codepro"
+BIN_PATH_PATTERN = ".pilot/bin/"
+PLUGIN_PATH_PATTERN = ".pilot"
+SOURCE_REPO_BIN_PATH = "/workspaces/claude-pilot/pilot/bin/"
+SOURCE_REPO_PLUGIN_PATH = "/workspaces/claude-pilot/pilot"
+SOURCE_REPO_PROJECT_PATH = "/workspaces/claude-pilot"
 
 
 def patch_claude_paths(content: str, project_dir: Path) -> str:
-    """Patch .claude paths to use absolute paths for the target project.
+    """Patch paths to use absolute paths for the global ~/.pilot installation.
 
-    Handles both relative paths (.claude/bin/, .claude/ccp) and existing
-    absolute paths from the source repo (/workspaces/claude-codepro/.claude/).
-    Hooks are in the plugin folder and use CLAUDE_PLUGIN_ROOT, so no separate patching needed.
+    Handles both relative paths (.pilot/bin/, .pilot) and existing
+    absolute paths from the source repo (/workspaces/claude-pilot/pilot/).
     """
-    abs_bin_path = str(project_dir / ".claude" / "bin") + "/"
-    abs_plugin_path = str(project_dir / ".claude" / "ccp")
-    abs_project_path = str(project_dir)
+    home = Path.home()
+    abs_bin_path = str(home / ".pilot" / "bin") + "/"
+    abs_plugin_path = str(home / ".pilot")
 
     content = content.replace(SOURCE_REPO_BIN_PATH, abs_bin_path)
     content = content.replace(SOURCE_REPO_PLUGIN_PATH, abs_plugin_path)
-    content = content.replace(SOURCE_REPO_PROJECT_PATH, abs_project_path)
+    content = content.replace(SOURCE_REPO_PROJECT_PATH, str(project_dir))
 
     content = content.replace(" " + BIN_PATH_PATTERN, " " + abs_bin_path)
     content = content.replace('"' + BIN_PATH_PATTERN, '"' + abs_bin_path)
@@ -100,7 +99,7 @@ class ClaudeFilesStep(BaseStep):
                 repo_branch = f"v{ctx.target_version}"
 
         config = DownloadConfig(
-            repo_url="https://github.com/maxritter/claude-codepro",
+            repo_url="https://github.com/maxritter/claude-pilot",
             repo_branch=repo_branch,
             local_mode=ctx.local_mode,
             local_repo_dir=ctx.local_repo_dir,
@@ -127,7 +126,7 @@ class ClaudeFilesStep(BaseStep):
             "commands": [],
             "rules_standard": [],
             "rules": [],
-            "ccp": [],
+            "pilot": [],
             "other": [],
         }
 
@@ -144,7 +143,7 @@ class ClaudeFilesStep(BaseStep):
             if not file_path:
                 continue
 
-            if "/ccp/hooks/" in file_path and any(h in file_path for h in hooks_to_skip):
+            if "/pilot/hooks/" in file_path and any(h in file_path for h in hooks_to_skip):
                 continue
 
             if "__pycache__" in file_path:
@@ -208,8 +207,8 @@ class ClaudeFilesStep(BaseStep):
                 categories["rules_standard"].append(file_info)
             elif "/rules/" in file_path:
                 categories["rules"].append(file_info)
-            elif "/ccp/" in file_path:
-                categories["ccp"].append(file_info)
+            elif "/pilot/" in file_path:
+                categories["pilot"].append(file_info)
             elif "/hooks/" in file_path:
                 continue
             elif "/skills/" in file_path:
@@ -223,7 +222,7 @@ class ClaudeFilesStep(BaseStep):
             "commands": "slash commands",
             "rules_standard": "standard rules",
             "rules": "custom rules",
-            "ccp": "CCP files",
+            "pilot": "Pilot files",
             "other": "config files",
         }
 
@@ -263,7 +262,7 @@ class ClaudeFilesStep(BaseStep):
 
             hooks_dir = ctx.project_dir / ".claude" / "hooks"
             if hooks_dir.exists():
-                ccp_hooks = [
+                pilot_hooks = [
                     "file_checker_python.py",
                     "file_checker_ts.py",
                     "file_checker_go.py",
@@ -271,7 +270,7 @@ class ClaudeFilesStep(BaseStep):
                     "context_monitor.py",
                     "tool_redirect.py",
                 ]
-                for hook_file in ccp_hooks:
+                for hook_file in pilot_hooks:
                     hook_path = hooks_dir / hook_file
                     if hook_path.exists():
                         try:
@@ -365,7 +364,7 @@ class ClaudeFilesStep(BaseStep):
 
         ctx.config["installed_files"] = installed_files
 
-        scripts_dir = ctx.project_dir / ".claude" / "ccp" / "scripts"
+        scripts_dir = ctx.project_dir / ".claude" / "pilot" / "scripts"
         if scripts_dir.exists():
             for script in scripts_dir.glob("*.cjs"):
                 try:
@@ -374,7 +373,7 @@ class ClaudeFilesStep(BaseStep):
                 except (OSError, IOError):
                     pass
 
-        lsp_config_path = ctx.project_dir / ".claude" / "ccp" / ".lsp.json"
+        lsp_config_path = ctx.project_dir / ".claude" / "pilot" / ".lsp.json"
         if lsp_config_path.exists():
             try:
                 lsp_config = json.loads(lsp_config_path.read_text())
@@ -389,7 +388,7 @@ class ClaudeFilesStep(BaseStep):
                 pass
 
         if not ctx.local_mode:
-            ccp_hooks_dir = ctx.project_dir / ".claude" / "ccp" / "hooks"
+            pilot_hooks_dir = ctx.project_dir / ".claude" / "pilot" / "hooks"
             files_to_remove: list[str] = []
             if not ctx.enable_python:
                 files_to_remove.append("file_checker_python.py")
@@ -399,14 +398,14 @@ class ClaudeFilesStep(BaseStep):
                 files_to_remove.append("file_checker_go.py")
 
             for hook_file in files_to_remove:
-                hook_path = ccp_hooks_dir / hook_file
+                hook_path = pilot_hooks_dir / hook_file
                 if hook_path.exists():
                     try:
                         hook_path.unlink()
                     except (OSError, IOError):
                         pass
 
-            hooks_json_path = ccp_hooks_dir / "hooks.json"
+            hooks_json_path = pilot_hooks_dir / "hooks.json"
             if hooks_json_path.exists() and files_to_remove:
                 try:
                     hooks_config = json.loads(hooks_json_path.read_text())

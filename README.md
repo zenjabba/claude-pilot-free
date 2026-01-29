@@ -1,22 +1,18 @@
 <div align="center">
 
-<img src="docs/img/logo.png" alt="Claude CodePro" width="400">
+<img src="docs/img/logo.png" alt="Claude Pilot" width="400">
 
-### Production-Grade Development Environment for Claude Code
+### Pilot Takes Control of Claude Code
 
-Quality automated. Context optimized. Testing enforced. Ship with confidence.</br>
-A shortcut to state-of-the-art Claude Code development, continuously improved.
+Quality on autopilot. Context optimized. Testing enforced.</br>
+All systems go. Pilot engaged. Ready for takeoff.
 
-[![Version](https://img.shields.io/github/v/release/maxritter/claude-codepro?label=Version&color=orange)](https://github.com/maxritter/claude-codepro/releases)
-[![Stars](https://img.shields.io/github/stars/maxritter/claude-codepro?style=flat&color=yellow)](https://github.com/maxritter/claude-codepro/stargazers)
-[![Last Commit](https://img.shields.io/github/last-commit/maxritter/claude-codepro?color=blue)](https://github.com/maxritter/claude-codepro/commits/main)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/maxritter/claude-codepro/pulls)
+[![Version](https://img.shields.io/github/v/release/maxritter/claude-pilot?label=Version&color=orange)](https://github.com/maxritter/claude-pilot/releases)
+[![Stars](https://img.shields.io/github/stars/maxritter/claude-pilot?style=flat&color=yellow)](https://github.com/maxritter/claude-pilot/stargazers)
+[![Last Commit](https://img.shields.io/github/last-commit/maxritter/claude-pilot?color=blue)](https://github.com/maxritter/claude-pilot/commits/main)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/maxritter/claude-pilot/pulls)
 
-#### ⭐ [Star this repository](https://github.com/maxritter/claude-codepro) · 🌐 [Visit the website](https://claude-code.pro) · 🔔 [Follow for updates](https://www.linkedin.com/in/rittermax/)
-
-<br>
-
-<img src="docs/img/demo.gif" alt="Claude CodePro Demo" width="800">
+#### ⭐ [Star this repository](https://github.com/maxritter/claude-pilot) · 🌐 [Visit the website](https://claude-pilot.com) · 🔔 [Follow for updates](https://www.linkedin.com/in/rittermax/)
 
 </div>
 
@@ -25,10 +21,10 @@ A shortcut to state-of-the-art Claude Code development, continuously improved.
 ## ⚡ TL;DR
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/maxritter/claude-codepro/v5.4.12/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/maxritter/claude-pilot/v5.4.12/install.sh | bash
 ```
 
-Then run `ccp` in your terminal to start Claude Code, and type `/sync` inside the session to sync rules and skills. Use `/spec` for Spec-Driven Development or Quick Mode for fast fixes.
+Inside Claude Code, type `/sync` to sync rules and skills. Use `/spec` for Spec-Driven Development or Quick Mode for fast fixes.
 
 ---
 
@@ -36,7 +32,7 @@ Then run `ccp` in your terminal to start Claude Code, and type `/sync` inside th
 
 - [Getting Started](#-getting-started)
 - [What's Inside](#-whats-inside)
-- [Why Claude CodePro?](#-why-claude-codepro)
+- [Why Claude Pilot?](#-why-claude-pilot)
 - [Usage](#-usage)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -47,32 +43,21 @@ Then run `ccp` in your terminal to start Claude Code, and type `/sync` inside th
 
 ### ✅ Prerequisites
 
-🖥️ **Platforms:** macOS, Linux, Windows (WSL2)
-
-💳 **Claude:** [Max](https://www.anthropic.com/max), [Team](https://claude.com/pricing/team), or [Enterprise](https://www.anthropic.com/enterprise) recommended
-
 Choose your installation method:
 
-**Option A: 🐳 Dev Container (Recommended)**
+**Option A: 🍺 Local Installation**
 
-Pre-configured, isolated environment with all tools ready. No system conflicts, consistent across machines, easy cleanup.
+Install directly on your system using Homebrew. Works on macOS, Linux, and Windows (WSL2).
 
-- **Container Runtime** - [Docker Desktop](https://www.docker.com/products/docker-desktop) or compatible equivalent
-- **IDE with Dev Container Support** - Any IDE supporting the [Dev Container spec](https://containers.dev/):
-  - VS Code and forks: [VS Code](https://code.visualstudio.com/), [Cursor](https://cursor.sh/), [Windsurf](https://windsurf.com/), [Antigravity](https://antigravity.google/) (with [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers))
-  - JetBrains IDEs: [IntelliJ IDEA](https://www.jetbrains.com/help/idea/connect-to-devcontainer.html), WebStorm, PyCharm, GoLand, etc.
-  - Cloud: [GitHub Codespaces](https://github.com/features/codespaces), [DevPod](https://devpod.sh/), [CodeSandbox](https://codesandbox.io/)
+**Option B: 🐳 Dev Container (Any OS)**
 
-**Option B: 🍺 Local Installation**
-
-Install directly on your system. Requires Homebrew (macOS/Linux/WSL2).
-
+Pre-configured, isolated environment with all tools ready. No system conflicts, consistent across machines.
 ### 🔧 Installation
 
 Run the following command in your **project folder root**:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/maxritter/claude-codepro/v5.4.12/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/maxritter/claude-pilot/v5.4.12/install.sh | bash
 ```
 
 You'll be asked to choose between **Dev Container** or **Local Installation**.
@@ -100,7 +85,6 @@ You'll be asked to choose between **Dev Container** or **Local Installation**.
 - **Rules** - Best practices for TDD, debugging, context management, and more
 - **Commands** - `/spec` for SDD, `/sync` for updating rules, `/learn` for online learning
 - **Skills** - Coding standards for Python, TypeScript, Go, testing, and components
-- **Online Learning** - Automatically extracts reusable workflows and solutions into skills
 - **Customizable** - Add your own rules, commands, and skills that survive updates
 
 ### 🧠 Enhanced Context Capabilities
@@ -121,16 +105,16 @@ You'll be asked to choose between **Dev Container** or **Local Installation**.
 
 - **Automated Container Setup** - Isolated Linux environment with pre-configured tools and extensions
 - **Extended Language Support** - Optionally install extended support for Python, TypeScript & Go
-- **Automated Updater** - Updates CCP to the latest version when launched over the binary
-- **Shell Integration** - Auto-configures bash, fish and zsh with `ccp` alias
+- **Automated Updater** - Updates Pilot to the latest version when launched over the binary
+- **Shell Integration** - Auto-configures bash, fish and zsh with `pilot` alias
 
 ---
 
-## 🔄 Why Claude CodePro?
+## 🔄 Why Claude Pilot?
 
 Same task. Different results.
 
-| Ad-hoc Prompting                 | With Claude CodePro                                   |
+| Ad-hoc Prompting                 | With Claude Pilot                                   |
 | -------------------------------- | ----------------------------------------------------- |
 | ❌ Writes code without tests     | ✅ TDD enforced — tests first, then implementation    |
 | ❌ No quality checks             | ✅ Auto-formatted, linted, type-checked on every edit |
@@ -150,7 +134,7 @@ Same task. Different results.
 Run `/sync` to sync custom rules and skills with your codebase. Run it once initially, then anytime after major changes:
 
 ```bash
-ccp
+pilot
 > /sync
 ```
 
@@ -159,7 +143,7 @@ ccp
 Best for complex features, refactoring, or when you want to review a plan before implementation:
 
 ```bash
-ccp
+pilot
 > /spec "Add user authentication with OAuth and JWT tokens"
 ```
 
@@ -183,7 +167,7 @@ Just chat. No plan file, no approval gate. All quality hooks and TDD enforcement
 Best for bug fixes, small improvements, and exploratory work:
 
 ```bash
-ccp
+pilot
 > Fix the null pointer bug in user.py
 ```
 
@@ -192,33 +176,21 @@ ccp
 Capture non-obvious discoveries as reusable skills. Automatically prompted by the context monitor, or invoke manually:
 
 ```bash
-ccp
+pilot
 > /learn "Extract the debugging workflow we used for the race condition"
 ```
 
 ### 📐 Rules, Commands & Skills
 
-Claude CodePro extends Claude Code with a modular system of rules, commands, and skills:
+Claude Pilot automatically installs best-practice rules, commands, and coding standard skills when you run the installer.
 
-**Managed by CCP** (updated on install):
-
-- `.claude/commands/` - `spec` and `sync` commands are managed by CCP
-- `.claude/rules/standard/` - Best practices and workflows
-- `.claude/ccp/skills/` - Coding standards for languages and frameworks
-
-**Yours to customize** (never touched by updates):
-
-- `.claude/commands/` - Any command besides the standard ones
-- `.claude/rules/custom/` - Project-specific rules
-- `.claude/skills/` - Any skill besides the standards-* from CCP plugin
-
-**When to use what:**
+Create your own in your project's `.claude/` folder:
 
 | Type         | Loaded                            | Best for                                |
 | ------------ | --------------------------------- | --------------------------------------- |
 | **Rules**    | Every session (always in context) | Guidelines Claude should always follow  |
 | **Commands** | On demand via `/command`          | Specific workflows or multi-step tasks  |
-| **Skills**   | Dynamically when relevant         | Specialized knowledge, coding standards |
+| **Skills**   | Dynamically when relevant         | Specialized knowledge for specific tasks |
 
 ### 🔌 Custom MCP Servers
 
@@ -235,9 +207,9 @@ Run `/sync` after adding servers to generate documentation.
 
 ## 🤝 Contributing
 
-**Pull Requests** - New features, improvements, and bug fixes are welcome. Fun fact: CCP is built with CCP — a self-improving loop where your contributions make the tool that makes contributions better. 🔄
+**Pull Requests** - New features, improvements, and bug fixes are welcome. Fun fact: Pilot is built with Pilot — a self-improving loop where your contributions make the tool that makes contributions better. 🔄
 
-**Issues** - Found a bug or have a feature request? [Open an issue](https://github.com/maxritter/claude-codepro/issues).
+**Issues** - Found a bug or have a feature request? [Open an issue](https://github.com/maxritter/claude-pilot/issues).
 
 ---
 
@@ -245,9 +217,9 @@ Run `/sync` after adding servers to generate documentation.
 
 > **Try free for 7 days** — No signup, no credit card. Just install and go.
 
-**Why subscribe?** Claude CodePro is actively developed with daily usage in production environments. Your subscription gives you instant access to the latest best practices, workflows, and learnings — a shortcut to state-of-the-art Claude Code development without spending weeks figuring it out yourself.
+**Why subscribe?** Claude Pilot is actively developed with daily usage in production environments. Your subscription gives you instant access to the latest best practices, workflows, and learnings — a shortcut to state-of-the-art Claude Code development without spending weeks figuring it out yourself.
 
-After your trial, choose the tier that fits your needs [here](https://license.claude-code.pro):
+After your trial, choose the tier that fits your needs [here](https://license.claude-pilot.com):
 
 | Tier | Includes |
 |:-----|:---------|

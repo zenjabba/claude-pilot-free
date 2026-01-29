@@ -5,12 +5,12 @@ set -e
 DEFAULT_VERSION="5.4.12"
 VERSION="$DEFAULT_VERSION"
 
-REPO="maxritter/claude-codepro"
+REPO="maxritter/claude-pilot"
 
 INSTALL_DEV=false
 INSTALL_VERSION=""
 INSTALLER_ARGS=""
-RESTART_CCP=false
+RESTART_PILOT=false
 
 while [ $# -gt 0 ]; do
 	case "$1" in
@@ -26,8 +26,8 @@ while [ $# -gt 0 ]; do
 		INSTALL_VERSION="${1#*=}"
 		shift
 		;;
-	--restart-ccp)
-		RESTART_CCP=true
+	--restart-pilot)
+		RESTART_PILOT=true
 		shift
 		;;
 	*)
@@ -87,7 +87,7 @@ is_in_container() {
 }
 
 get_saved_install_mode() {
-	local config_file=".claude/config/ccp-config.json"
+	local config_file="$HOME/.pilot/config.json"
 	if [ -f "$config_file" ]; then
 		sed -n 's/.*"install_mode"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$config_file" 2>/dev/null
 	fi
@@ -95,7 +95,7 @@ get_saved_install_mode() {
 
 save_install_mode() {
 	local mode="$1"
-	local config_file=".claude/config/ccp-config.json"
+	local config_file="$HOME/.pilot/config.json"
 	mkdir -p "$(dirname "$config_file")"
 	if [ -f "$config_file" ]; then
 		if grep -q '"install_mode"' "$config_file"; then
@@ -149,13 +149,13 @@ install_uv() {
 
 show_macos_gatekeeper_warning() {
 	echo ""
-	echo "  ⚠️  macOS Gatekeeper is blocking the CCP binary"
+	echo "  ⚠️  macOS Gatekeeper is blocking the pilot binary"
 	echo ""
-	echo "  The installer requires CCP to verify your license."
+	echo "  The installer requires pilot to verify your license."
 	echo "  Please follow these steps to unblock it:"
 	echo ""
 	echo "    1. Open System Settings → Privacy & Security"
-	echo "    2. Scroll down to find a message about 'ccp' being blocked"
+	echo "    2. Scroll down to find a message about 'pilot' being blocked"
 	echo "    3. Click 'Allow Anyway'"
 	echo "    4. Re-run this installer"
 	echo ""
@@ -168,8 +168,8 @@ confirm_local_install() {
 	echo ""
 	echo "  Local installation will:"
 	echo "    • Install Homebrew packages: python, node, nvm, pnpm, bun, uv, go, gopls, git, gh"
-	echo "    • Add 'ccp' command to your shell config (~/.bashrc, ~/.zshrc, fish)"
-	echo "    • Configure Claude Code (~/.claude.json) according to CCP best-practices"
+	echo "    • Add 'claude' command to your shell config (~/.bashrc, ~/.zshrc, fish)"
+	echo "    • Configure Claude Code (~/.claude.json) according to Pilot best-practices"
 	echo ""
 	confirm=""
 	if [ -t 0 ]; then
@@ -201,8 +201,8 @@ setup_devcontainer() {
 		PROJECT_NAME="$(basename "$(pwd)")"
 		PROJECT_SLUG="$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]' | tr ' _' '-')"
 		if [ -f ".devcontainer/devcontainer.json" ]; then
-			sed -i.bak 's/"claude-codepro"/"'"${PROJECT_SLUG}"'"/g' ".devcontainer/devcontainer.json"
-			sed -i.bak 's|/workspaces/claude-codepro|/workspaces/'"${PROJECT_SLUG}"'|g' ".devcontainer/devcontainer.json"
+			sed -i.bak 's/"claude-pilot"/"'"${PROJECT_SLUG}"'"/g' ".devcontainer/devcontainer.json"
+			sed -i.bak 's|/workspaces/claude-pilot|/workspaces/'"${PROJECT_SLUG}"'|g' ".devcontainer/devcontainer.json"
 			rm -f ".devcontainer/devcontainer.json.bak"
 		fi
 
@@ -303,17 +303,17 @@ get_local_so_name() {
 	Darwin) platform_tag="darwin" ;;
 	esac
 
-	echo "ccp.cpython-312-${platform_tag}.so"
+	echo "pilot.cpython-312-${platform_tag}.so"
 }
 
-download_ccp_binary() {
+download_pilot_binary() {
 	local bin_dir=".claude/bin"
 	local platform_suffix
 	local so_name
 	local base_url
 
 	platform_suffix=$(get_platform_suffix) || {
-		echo "  [!!] Unsupported platform for CCP binary"
+		echo "  [!!] Unsupported platform for Pilot binary"
 		return 1
 	}
 
@@ -329,37 +329,37 @@ download_ccp_binary() {
 	fi
 	mkdir -p "$bin_dir"
 
-	echo "  [..] Downloading CCP binary (${platform_suffix})..."
+	echo "  [..] Downloading Pilot binary (${platform_suffix})..."
 
-	local so_url="${base_url}/ccp-${platform_suffix}.so"
+	local so_url="${base_url}/pilot-${platform_suffix}.so"
 	local so_path="${bin_dir}/${so_name}"
 
 	if command -v curl >/dev/null 2>&1; then
 		if ! curl -fsSL "$so_url" -o "$so_path" 2>/dev/null; then
-			echo "  [!!] Failed to download CCP module"
+			echo "  [!!] Failed to download pilot module"
 			return 1
 		fi
 	elif command -v wget >/dev/null 2>&1; then
 		if ! wget -q "$so_url" -O "$so_path" 2>/dev/null; then
-			echo "  [!!] Failed to download CCP module"
+			echo "  [!!] Failed to download pilot module"
 			return 1
 		fi
 	fi
 
 	chmod +x "$so_path"
 
-	local wrapper_url="${base_url}/ccp"
-	local wrapper_path="${bin_dir}/ccp"
+	local wrapper_url="${base_url}/pilot"
+	local wrapper_path="${bin_dir}/pilot"
 
 	if command -v curl >/dev/null 2>&1; then
 		if ! curl -fsSL "$wrapper_url" -o "$wrapper_path" 2>/dev/null; then
-			echo "  [!!] Failed to download CCP wrapper"
+			echo "  [!!] Failed to download pilot wrapper"
 			rm -f "$so_path"
 			return 1
 		fi
 	elif command -v wget >/dev/null 2>&1; then
 		if ! wget -q "$wrapper_url" -O "$wrapper_path" 2>/dev/null; then
-			echo "  [!!] Failed to download CCP wrapper"
+			echo "  [!!] Failed to download pilot wrapper"
 			rm -f "$so_path"
 			return 1
 		fi
@@ -367,37 +367,37 @@ download_ccp_binary() {
 
 	chmod +x "$wrapper_path"
 
-	echo "  [..] Verifying CCP binary..."
-	local ccp_version
-	ccp_version=$("$wrapper_path" --version 2>/dev/null) || true
+	echo "  [..] Verifying pilot binary..."
+	local pilot_version
+	pilot_version=$("$wrapper_path" --version 2>/dev/null) || true
 
-	if [ -z "$ccp_version" ] && [ "$(uname -s)" = "Darwin" ]; then
+	if [ -z "$pilot_version" ] && [ "$(uname -s)" = "Darwin" ]; then
 		echo "  [..] Removing macOS quarantine attributes..."
 		xattr -cr "$bin_dir" 2>/dev/null || true
 		spctl --add "$wrapper_path" 2>/dev/null || true
 		spctl --add "$so_path" 2>/dev/null || true
-		ccp_version=$("$wrapper_path" --version 2>/dev/null) || true
+		pilot_version=$("$wrapper_path" --version 2>/dev/null) || true
 	fi
 
-	if [ -z "$ccp_version" ]; then
+	if [ -z "$pilot_version" ]; then
 		if [ "$(uname -s)" = "Darwin" ]; then
 			show_macos_gatekeeper_warning
 			exit 1
 		else
-			echo "  [!!] CCP binary failed to execute"
+			echo "  [!!] Pilot binary failed to execute"
 			return 1
 		fi
 	fi
 
 	local installed_version
-	installed_version=$(echo "$ccp_version" | sed -n 's/.*CodePro v\(.*\)/\1/p')
+	installed_version=$(echo "$pilot_version" | sed -n 's/.*Pilot v\(.*\)/\1/p')
 
 	if [ -z "$installed_version" ]; then
-		echo "  [!!] Could not determine CCP version"
+		echo "  [!!] Could not determine pilot version"
 		return 1
 	fi
 
-	echo "  [OK] CCP binary ready (v${installed_version})"
+	echo "  [OK] Pilot binary ready (v${installed_version})"
 }
 
 run_installer() {
@@ -426,7 +426,7 @@ run_installer() {
 if ! is_in_container; then
 	echo ""
 	echo "======================================================================"
-	echo "  Claude CodePro Installer (v${VERSION})"
+	echo "  Claude Pilot Installer (v${VERSION})"
 	echo "======================================================================"
 	echo ""
 
@@ -447,8 +447,8 @@ if ! is_in_container; then
 	else
 		echo "  Choose installation method:"
 		echo ""
-		echo "    1) Dev Container - Isolated, pre-configured environment (RECOMMENDED)"
-		echo "    2) Local - Install directly on your system (requires Homebrew)"
+		echo "    1) Local - Install directly on your system (RECOMMENDED)"
+		echo "    2) Dev Container - Isolated, pre-configured environment"
 		echo ""
 
 		choice=""
@@ -459,28 +459,28 @@ if ! is_in_container; then
 			printf "  Enter choice [1-2]: "
 			read -r choice </dev/tty
 		else
-			echo "  No interactive terminal available, defaulting to Dev Container."
+			echo "  No interactive terminal available, defaulting to Local."
 			choice="1"
 		fi
 
 		case $choice in
 		2)
+			save_install_mode "container"
+			setup_devcontainer
+			;;
+		*)
 			save_install_mode "local"
 			echo ""
 			echo "  Local Installation selected (preference saved)"
 			echo ""
 			confirm_local_install
 			;;
-		*)
-			save_install_mode "container"
-			setup_devcontainer
-			;;
 		esac
 	fi
 fi
 
 echo ""
-echo "Downloading Claude CodePro (v${VERSION})..."
+echo "Downloading Claude Pilot (v${VERSION})..."
 echo ""
 
 if check_uv; then
@@ -490,16 +490,16 @@ else
 fi
 
 download_installer
-download_ccp_binary
+download_pilot_binary
 
 run_installer $INSTALLER_ARGS
 
-if [ "$RESTART_CCP" = true ]; then
-	CCP_BIN=".claude/bin/ccp"
-	if [ -x "$CCP_BIN" ]; then
+if [ "$RESTART_PILOT" = true ]; then
+	PILOT_BIN=".claude/bin/pilot"
+	if [ -x "$PILOT_BIN" ]; then
 		echo ""
-		echo "  Restarting Claude CodePro..."
+		echo "  Restarting Claude Pilot..."
 		echo ""
-		exec "$CCP_BIN" --skip-update-check
+		exec "$PILOT_BIN" --skip-update-check
 	fi
 fi

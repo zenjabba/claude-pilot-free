@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 CONFIG_DIR = ".claude/config"
-CONFIG_FILE = "ccp-config.json"
+CONFIG_FILE = "pilot-config.json"
 
 VALID_CONFIG_KEYS = frozenset(
     {
@@ -32,7 +32,7 @@ def get_config_path(project_dir: Path) -> Path:
 
 
 def load_config(project_dir: Path) -> dict[str, Any]:
-    """Load user configuration from .claude/config/ccp-config.json.
+    """Load user configuration from .claude/config/pilot-config.json.
 
     Automatically removes any deprecated/unknown keys.
     """
@@ -47,7 +47,7 @@ def load_config(project_dir: Path) -> dict[str, Any]:
 
 
 def save_config(project_dir: Path, config: dict[str, Any]) -> bool:
-    """Save user configuration to .claude/config/ccp-config.json.
+    """Save user configuration to .claude/config/pilot-config.json.
 
     Automatically removes any deprecated/unknown keys before saving.
     """

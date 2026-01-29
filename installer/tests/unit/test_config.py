@@ -13,7 +13,7 @@ class TestConfigKeyFiltering:
 
         config_dir = tmp_path / ".claude" / "config"
         config_dir.mkdir(parents=True)
-        config_file = config_dir / "ccp-config.json"
+        config_file = config_dir / "pilot-config.json"
         config_file.write_text(
             json.dumps(
                 {
@@ -42,7 +42,7 @@ class TestConfigKeyFiltering:
 
         save_config(tmp_path, config)
 
-        config_file = tmp_path / ".claude" / "config" / "ccp-config.json"
+        config_file = tmp_path / ".claude" / "config" / "pilot-config.json"
         saved = json.loads(config_file.read_text())
 
         assert "enable_python" in saved

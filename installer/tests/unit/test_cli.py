@@ -181,7 +181,7 @@ class TestLicenseInfo:
 
         bin_dir = tmp_path / ".claude" / "bin"
         bin_dir.mkdir(parents=True)
-        (bin_dir / "ccp").touch()
+        (bin_dir / "pilot").touch()
 
         result = _get_license_info(tmp_path)
         assert result is not None
@@ -200,7 +200,7 @@ class TestLicenseInfo:
 
         bin_dir = tmp_path / ".claude" / "bin"
         bin_dir.mkdir(parents=True)
-        (bin_dir / "ccp").touch()
+        (bin_dir / "pilot").touch()
 
         result = _get_license_info(tmp_path)
         assert result is not None
@@ -208,7 +208,7 @@ class TestLicenseInfo:
         assert result.get("is_expired") is True
 
     def test_get_license_info_returns_none_without_binary(self, tmp_path: Path):
-        """_get_license_info returns None when ccp binary doesn't exist."""
+        """_get_license_info returns None when pilot binary doesn't exist."""
         from installer.cli import _get_license_info
 
         result = _get_license_info(tmp_path)

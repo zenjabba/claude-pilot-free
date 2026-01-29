@@ -215,7 +215,7 @@ def install_claude_code(project_dir: Path, ui: Any = None) -> tuple[bool, str]:
 
 
 def _migrate_legacy_plugins(ui: Any = None) -> None:
-    """Remove legacy plugins and marketplaces installed by previous CCP versions.
+    """Remove legacy plugins and marketplaces installed by previous Pilot versions.
 
     MCP servers are now defined in plugin/.mcp.json, so we clean up:
     - Context7 from official marketplace
@@ -531,7 +531,7 @@ def _install_plugin_dependencies(project_dir: Path, ui: Any = None) -> bool:
     This installs all Node.js dependencies defined in plugin/package.json,
     which includes runtime dependencies for MCP servers and hooks.
     """
-    plugin_dir = project_dir / ".claude" / "ccp"
+    plugin_dir = project_dir / ".claude" / "pilot"
 
     if not plugin_dir.exists():
         if ui:
@@ -573,7 +573,7 @@ def _install_claude_code_with_ui(ui: Any, project_dir: Path) -> bool:
         if success:
             if version != "latest":
                 ui.success(f"Claude Code installed (pinned to v{version})")
-                ui.info(f"Version {version} is the last stable release tested with CCP")
+                ui.info(f"Version {version} is the last stable release tested with Pilot")
                 ui.info("To change: edit FORCE_CLAUDE_VERSION in .claude/settings.local.json")
             else:
                 ui.success("Claude Code installed (latest)")
