@@ -2,6 +2,12 @@
 
 All notable changes to Claude Pilot will be documented in this file.
 
+## [6.0.6] - 2026-02-02
+
+### Bug Fixes
+
+- Improved Plan and Spec Verifier Flow
+
 ## [6.0.5] - 2026-02-02
 
 ### Bug Fixes
