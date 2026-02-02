@@ -2,6 +2,12 @@
 
 All notable changes to Claude Pilot will be documented in this file.
 
+## [6.0.2] - 2026-02-02
+
+### Bug Fixes
+
+- Preserve user's .claude/skills folder and clean up empty rules/custom
+
 ## [6.0.1] - 2026-02-02
 
 ### Bug Fixes
