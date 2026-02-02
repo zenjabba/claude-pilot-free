@@ -2,6 +2,13 @@
 
 All notable changes to Claude Pilot will be documented in this file.
 
+## [6.0.5] - 2026-02-02
+
+### Bug Fixes
+
+- Add demo gif to README
+- Make sx vault setup mandatory when sx installed but not configured
+
 ## [6.0.4] - 2026-02-02
 
 ### Bug Fixes
