@@ -526,9 +526,9 @@ After `/learn` completes:
 2. Confirm SKILL.md has proper frontmatter (name, description with triggers)
 3. Test skill is recognized: mention it in conversation to trigger
 
-### Phase 10: Team Vault (sx) - Optional
+### Phase 10: Team Vault (sx)
 
-**Share rules and skills with your team via sx. Skip if not using team sharing.**
+**Share rules and skills with your team via sx.**
 
 #### Step 10.1: Check sx Availability
 
@@ -536,7 +536,7 @@ After `/learn` completes:
 which sx 2>/dev/null || echo "sx not installed"
 ```
 
-**If sx not installed:** Skip Phase 10 entirely. Inform user they can install sx later for team sharing.
+**If sx not installed:** Inform user and skip to Phase 11.
 
 #### Step 10.2: Check Vault Status
 
@@ -544,29 +544,36 @@ which sx 2>/dev/null || echo "sx not installed"
 sx vault list 2>&1
 ```
 
-| Result | Action |
-|--------|--------|
-| Lists assets | Vault configured, proceed to Step 10.3 |
-| "no vault configured" | Ask if user wants to set up (Step 10.2a) |
-| Auth error | Tell user to run `sx init` manually |
+**IMPORTANT: Parse the output carefully:**
 
-#### Step 10.2a: Vault Setup (if not configured)
+| Output Contains | Action |
+|-----------------|--------|
+| Lists assets (table with Name, Type, Version) | Vault configured → Step 10.3 |
+| "configuration not found" or "Run 'sx init'" | **MUST ask user** → Step 10.2a |
+| "failed to load" or any other error | **MUST ask user** → Step 10.2a |
+
+**DO NOT skip Phase 10 just because vault isn't configured. Always offer setup.**
+
+#### Step 10.2a: Vault Setup (not configured)
+
+**This step is MANDATORY when sx is installed but vault is not configured.**
 
 ```
-Question: "Set up team vault for sharing skills/rules?"
+Question: "sx is installed but no vault configured. Set up team sharing?"
 Header: "Team Vault"
 Options:
-- "Yes" - I'll paste my git repo URL
+- "Yes, set up vault" - I'll provide a git repo URL
 - "Skip" - Continue without team sharing
 ```
 
 **If user chooses Yes:**
-1. User will type their repo URL via "Other" option
-2. Run setup:
+1. Ask for repo URL (user types via "Other" option)
+2. Run:
    ```bash
    sx init --type git --repo-url <user-provided-url>
    ```
-3. If setup fails, inform user to check credentials and try `sx init` manually
+3. Verify with `sx vault list`
+4. If fails, show error and suggest user run `sx init` manually
 
 #### Step 10.3: Pull Team Assets
 
