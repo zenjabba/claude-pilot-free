@@ -2,12 +2,19 @@
 
 All notable changes to Claude Pilot will be documented in this file.
 
+## [6.0.9] - 2026-02-03
+
+### Bug Fixes
+
+- Release pipeline now updates files for manual triggers
+- Parallel downloads, box alignment, TypeScript errors, remove analytics
+
 ## [6.0.8] - 2026-02-03
 
 ### Bug Fixes
 
 - Add memory system source from other repo
-- Added grep-mcp server for GitHub code search
+- Added grep-mcp server
 
 ## [6.0.7] - 2026-02-03
 
