@@ -3,7 +3,10 @@
     "ENABLE_TOOL_SEARCH": "true",
     "ENABLE_LSP_TOOL": "true",
     "CLAUDE_CODE_ENABLE_TASKS": "true",
+    "CLAUDE_CODE_HIDE_ACCOUNT_INFO": "true",
     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "true",
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "100",
     "MAX_THINKING_TOKENS": "63999",
     "MAX_MCP_OUTPUT_TOKENS": "22000",
     "DISABLE_AUTO_COMPACT": "true",
@@ -12,6 +15,7 @@
     "DISABLE_AUTO_COMPACT_THRESHOLD": "100",
     "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "true",
     "DISABLE_INSTALLATION_CHECKS": "true",
+    "DISABLE_ERROR_REPORTING": "true",
     "DISABLE_AUTOUPDATER": "true",
     "DISABLE_TELEMETRY": "true"
   },
@@ -72,11 +76,13 @@
   },
   "outputStyle": "default",
   "spinnerTipsEnabled": false,
+  "showTurnDuration": false,
   "alwaysThinkingEnabled": true,
   "attribution": {
     "commit": "",
     "pr": ""
   },
+  "companyAnnouncements": ["🚀 Open the Claude Pilot Console at http://localhost:41777 📊"],
   "respectGitignore": false,
   "cleanupPeriodDays": 31
 }
