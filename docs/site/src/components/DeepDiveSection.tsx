@@ -294,7 +294,7 @@ const DeepDiveSection = () => {
               <Cpu className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-foreground">14 Built-in Coding Skills</h3>
+              <h3 className="text-2xl font-bold text-foreground">Built-in Coding Skills</h3>
               <p className="text-sm text-muted-foreground">Dynamically activated when relevant — specialized knowledge on demand</p>
             </div>
           </div>
@@ -378,6 +378,7 @@ const DeepDiveSection = () => {
                   </div>
                   <p className="text-xs text-muted-foreground">gopls — official Go language server, auto-restart on crash</p>
                 </div>
+                <p className="text-xs text-muted-foreground mt-3 pl-1">Add your own language servers via <code className="text-primary bg-primary/10 px-1 py-0.5 rounded">.lsp.json</code></p>
               </div>
             </div>
           </div>

@@ -80,9 +80,13 @@ const InstallSection = () => {
                   Run <code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded">pilot</code>{" "}
                   to launch. Use{" "}
                   <code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded">/sync</code> to
-                  load rules and{" "}
+                  load rules,{" "}
                   <code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded">/spec</code> for
-                  planned features.
+                  planned features,{" "}
+                  <code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded">/learn</code> to
+                  extract reusable knowledge, and{" "}
+                  <code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded">/vault</code> to
+                  share with your team.
                 </p>
               </div>
             </div>
