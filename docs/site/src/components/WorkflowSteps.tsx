@@ -9,10 +9,10 @@ const specSteps = [
 ];
 
 const planDetails = [
-  { icon: Search, text: "Explores entire codebase with semantic search" },
+  { icon: Search, text: "Explores entire codebase with semantic search (Vexor)" },
   { icon: MessageSquare, text: "Asks clarifying questions before committing to a design" },
   { icon: FileText, text: "Writes detailed spec to docs/plans/ as reviewed markdown" },
-  { icon: Shield, text: "Verifies plan logic for correctness before presenting" },
+  { icon: Shield, text: "Plan-verifier sub-agent validates completeness and alignment" },
   { icon: CheckCircle2, text: "Waits for your approval — you can edit the plan first" },
 ];
 
@@ -26,10 +26,10 @@ const implementDetails = [
 
 const verifyDetails = [
   { icon: CheckCircle2, text: "Runs full test suite — unit, integration, and E2E" },
-  { icon: Shield, text: "Type checking across the entire project" },
-  { icon: Search, text: "Verifier sub-agents perform independent code review" },
+  { icon: Shield, text: "Type checking and linting across the entire project" },
+  { icon: Search, text: "Spec-verifier sub-agent performs independent code review" },
   { icon: FileText, text: "Validates every plan task was actually completed" },
-  { icon: RefreshCw, text: "Loops back to implementation if any check fails" },
+  { icon: RefreshCw, text: "Auto-fixes findings, loops back if issues remain" },
 ];
 
 const WorkflowSteps = () => {

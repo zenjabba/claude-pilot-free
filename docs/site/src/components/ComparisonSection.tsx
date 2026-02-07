@@ -7,11 +7,14 @@ const ComparisonSection = () => {
   const [tableRef, tableInView] = useInView<HTMLDivElement>();
 
   const comparison = [
-    { without: "Writes code, skips tests", with: "TDD enforced — tests first" },
-    { without: "No quality checks", with: "Auto-linted, formatted, type-checked" },
-    { without: "Context degrades mid-task", with: "Endless Mode preserves context" },
-    { without: "Every session starts fresh", with: "Persistent memory across sessions" },
-    { without: "Hope it works", with: "Verified before marked complete" },
+    { without: "Writes code, skips tests", with: "TDD enforced — RED, GREEN, REFACTOR on every feature" },
+    { without: "No quality checks", with: "7 hooks auto-lint, format, type-check on every file edit" },
+    { without: "Context degrades mid-task", with: "Endless Mode with 80%/90%/95% thresholds and auto-handoff" },
+    { without: "Every session starts fresh", with: "Persistent memory across sessions via Pilot Console" },
+    { without: "Hope it works", with: "Verifier sub-agents perform code review before marking complete" },
+    { without: "No codebase knowledge", with: "21 rules (2,800+ lines) loaded into every session" },
+    { without: "Generic suggestions", with: "14 coding skills activated dynamically when relevant" },
+    { without: "Manual tool setup", with: "5 MCP servers + 3 LSP servers pre-configured and ready" },
   ];
 
   return (

@@ -2,7 +2,7 @@
 
 <img src="docs/img/logo.png" alt="Claude Pilot" width="400">
 
-### Production-Grade Development with Claude Code
+### ✈︎ Production-Grade Development with Claude Code
 
 Claude Code ships fast but breaks things — Pilot fixes that:</br>
 **Tests enforced. Context preserved. Quality automated.**
@@ -13,7 +13,7 @@ Claude Code ships fast but breaks things — Pilot fixes that:</br>
 [![Last Commit](https://img.shields.io/github/last-commit/maxritter/claude-pilot?color=blue)](https://github.com/maxritter/claude-pilot/commits/main)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/maxritter/claude-pilot/pulls)
 
-[Star this repo](https://github.com/maxritter/claude-pilot) · [Website](https://claude-pilot.com) · [Follow for updates](https://www.linkedin.com/in/rittermax/) · [Changelog](https://pilot.openchangelog.com/) · [License](LICENSE)
+⭐ [Star this repo](https://github.com/maxritter/claude-pilot) · 🌐 [Website](https://claude-pilot.com) · 🔔 [Follow for updates](https://www.linkedin.com/in/rittermax/) · 📋 [Changelog](https://pilot.openchangelog.com/) · 📄 [License](LICENSE)
 
 <br>
 
@@ -37,10 +37,10 @@ After installation, run `pilot` to launch Claude Pilot. Use `/sync` to load rule
 
 ## Table of Contents
 
-- [The Problem](#the-problem)
-- [Getting Started](#getting-started)
-- [Usage](#usage)
-- [Under the Hood](#under-the-hood)
+- [🎯 The Problem](#-the-problem)
+- [🚀 Getting Started](#-getting-started)
+- [⚡ Usage](#-usage)
+- [🔧 Under the Hood](#-under-the-hood)
   - [The Hooks Pipeline](#the-hooks-pipeline)
   - [Context Monitor & Endless Mode](#context-monitor--endless-mode)
   - [21 Built-in Rules](#21-built-in-rules)
@@ -48,16 +48,16 @@ After installation, run `pilot` to launch Claude Pilot. Use `/sync` to load rule
   - [5 MCP Servers](#5-mcp-servers)
   - [3 Language Servers (LSP)](#3-language-servers-lsp)
   - [25 Language Modes](#25-language-modes)
-- [What's Inside](#whats-inside)
-- [Claude Pilot Console](#claude-pilot-console)
-- [Before & After](#before--after)
-- [License](#license)
-- [Changelog](#changelog)
-- [Contributing](#contributing)
+- [📦 What's Inside](#-whats-inside)
+- [🖥️ Claude Pilot Console](#-claude-pilot-console)
+- [🔄 Before & After](#-before--after)
+- [📄 License](#-license)
+- [📋 Changelog](#-changelog)
+- [🤝 Contributing](#-contributing)
 
 ---
 
-## The Problem
+## 🎯 The Problem
 
 Claude Code writes code fast. But without structure, you get:
 
@@ -70,17 +70,17 @@ Sound familiar? Pilot fixes that with **21 rules, 7 automated hooks, 14 coding s
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
+### ✅ Prerequisites
 
 **Claude Subscription:** [Max](https://www.anthropic.com/max), [Team](https://claude.ai/pricing/team), or [Enterprise](https://www.anthropic.com/enterprise) recommended
 
 **Choose your environment:**
-- **Local Installation** — Install directly on your system using Homebrew. Works on macOS, Linux, and Windows (WSL2).
-- **Dev Container** — Pre-configured, isolated environment with all tools ready. No system conflicts and works on any OS.
+- **🍺 Local Installation** — Install directly on your system using Homebrew. Works on macOS, Linux, and Windows (WSL2).
+- **🐳 Dev Container** — Pre-configured, isolated environment with all tools ready. No system conflicts and works on any OS.
 
-### Installation
+### 🔧 Installation
 
 `cd` into your project folder, then run:
 
@@ -90,7 +90,7 @@ curl -fsSL https://raw.githubusercontent.com/maxritter/claude-pilot/main/install
 
 After installation, run `pilot` or `ccp` in your project folder to start Claude Pilot.
 
-### Installing a Specific Version
+### 📌 Installing a Specific Version
 
 If the current version has issues, you can install a specific stable version (see [releases](https://github.com/maxritter/claude-pilot/releases)):
 
@@ -101,9 +101,9 @@ curl -fsSL https://raw.githubusercontent.com/maxritter/claude-pilot/main/install
 
 ---
 
-## Usage
+## ⚡ Usage
 
-### Sync Rules & Skills
+### 🔄 Sync Rules & Skills
 
 Run `/sync` to sync custom rules and skills with your codebase. This is an **11-phase process** that explores your codebase, builds a semantic search index, discovers undocumented patterns, updates project documentation, creates new skills, and optionally shares assets via Team Vault. Run it once initially, then anytime again:
 
@@ -132,7 +132,7 @@ pilot
 
 </details>
 
-### Spec-Driven Mode
+### 📋 Spec-Driven Mode
 
 Best for complex features, refactoring, or when you want to review a plan before implementation:
 
@@ -144,9 +144,9 @@ pilot
 **How it works:**
 
 ```
-Plan  →  Approve  →  Implement  →  Verify
-                        ↑              ↓
-                        └── Loop ──────┘
+📋 Plan  →  ✅ Approve  →  🔨 Implement  →  🔍 Verify
+                                ↑              ↓
+                                └── 🔄 Loop ───┘
 ```
 
 <details>
@@ -154,9 +154,10 @@ Plan  →  Approve  →  Implement  →  Verify
 
 1. Explores entire codebase with semantic search (Vexor)
 2. Asks clarifying questions before committing to a design
-3. Writes detailed spec to `docs/plans/` as reviewed markdown
-4. Verifies plan logic for correctness before presenting
-5. Waits for your approval — you can edit the plan first
+3. Writes detailed spec to `docs/plans/` as reviewed markdown with scope, tasks, and definition of done
+4. **Plan-verifier sub-agent** independently validates completeness and alignment with your request
+5. Auto-fixes any issues found by the verifier
+6. Waits for your approval — you can edit the plan first
 
 </details>
 
@@ -176,10 +177,12 @@ Plan  →  Approve  →  Implement  →  Verify
 <summary><b>Verify Phase — what actually happens</b></summary>
 
 1. Runs full test suite — unit, integration, and E2E
-2. Type checking across the entire project
-3. **Verifier sub-agents** perform independent code review
-4. Validates every plan task was actually completed
-5. Loops back to implementation if any check fails
+2. Type checking and linting across the entire project
+3. Executes actual program to verify real-world behavior (not just tests)
+4. **Spec-verifier sub-agent** performs independent code review against the plan
+5. Categorizes findings as `must_fix`, `should_fix`, or `suggestion`
+6. Auto-fixes all findings, then re-verifies until clean
+7. Loops back to implementation if structural issues remain
 
 </details>
 
@@ -192,7 +195,7 @@ Plan  →  Approve  →  Implement  →  Verify
 | COMPLETE | * | Run verification |
 | VERIFIED | * | Done |
 
-### Quick Mode
+### 💬 Quick Mode
 
 Just chat. No plan file, no approval gate. All quality hooks and TDD enforcement still apply.
 
@@ -203,7 +206,7 @@ pilot
 > Fix the null pointer bug in user.py
 ```
 
-### Online Learning
+### 🧠 Online Learning
 
 Capture non-obvious discoveries as reusable skills. Triggered automatically after 10+ minute investigations, or manually:
 
@@ -219,7 +222,7 @@ pilot
 - Repeatable workflows and patterns
 - External service queries (Jira, GitHub, Confluence)
 
-### Rules, Commands & Skills
+### 📐 Rules, Commands & Skills
 
 Create your own rules, commands or skills in your project's `.claude/` folder:
 
@@ -231,7 +234,7 @@ Create your own rules, commands or skills in your project's `.claude/` folder:
 
 Claude Pilot automatically installs best-practice rules, commands, and coding standard skills.
 
-### Team Vault
+### 👥 Team Vault
 
 Share rules, commands, and skills across your team via a private Git repository:
 
@@ -245,7 +248,7 @@ pilot
 - **Push** - Share your custom rules and skills with teammates
 - **Version** - Assets are versioned automatically (v1, v2, v3...)
 
-### Custom MCP Servers
+### 🔌 Custom MCP Servers
 
 Add your own MCP servers in two locations:
 
@@ -258,7 +261,7 @@ Run `/sync` after adding servers to generate documentation.
 
 ---
 
-## Under the Hood
+## 🔧 Under the Hood
 
 Pilot isn't a thin wrapper or a prompt template — it's a deeply engineered system with layers of automation working together on every edit.
 
@@ -423,23 +426,25 @@ English, Arabic, Bengali, Czech, German, Spanish, French, Hindi, Indonesian, Ita
 
 ---
 
-## What's Inside
+## 📦 What's Inside
 
-### Endless Mode
+### ♾️ Endless Mode
 
 - **Context monitor** with 80% / 90% / 95% thresholds and automatic action at each level
 - **Automatic session handoff** with state preservation to `~/.pilot/sessions/`
+- **Crash recovery** — Automatic restart with exponential backoff on unexpected exits (max 3 retries)
 - **Multi-session parallel** — run multiple Pilot sessions in the same project without interference
 - **Persistent memory** bridges observations across all sessions via Pilot Console
+- **Pipe-based IPC** — Launcher supervisor manages session lifecycle via named pipes
 
-### Spec-Driven Development
+### 📋 Spec-Driven Development
 
 - **Plan** — Semantic search, clarifying questions, markdown spec to `docs/plans/`
 - **Approve** — Human review gate before any code is written, editable plan
 - **Implement** — Mandatory TDD with RED → GREEN → REFACTOR, quality hooks on every edit
 - **Verify** — Sub-agent code review, full test suite, loops back if any check fails
 
-### Quality Automation
+### ✅ Quality Automation
 
 - **TDD enforcer** — Warns when modifying implementation files without a failing test
 - **Python hooks** — ruff format + lint + basedpyright type checking on every `.py` edit
@@ -447,15 +452,16 @@ English, Arabic, Bengali, Czech, German, Spanish, French, Hindi, Indonesian, Ita
 - **Go hooks** — gofmt + golangci-lint + gopls type checking on every `.go` edit
 - **Spec stop guard** — Blocks session completion when verification is incomplete
 - **Context monitor** — Tracks context usage and manages session continuity
+- **Status line** — Live display of context usage, memory status, active plan, and license info
 
-### Modular Rules, Commands & Skills
+### 📚 Modular Rules, Commands & Skills
 
 - **21 rules** (2,800+ lines) — TDD, debugging, context management, language standards, tool integration
 - **6 commands** — `/spec` (SDD), `/sync` (11-phase sync), `/learn` (online learning), plus internal phases
 - **14 skills** — Coding standards for Python, TypeScript, Go, testing, API, components, CSS, accessibility, and more
 - **Customizable** — Add your own rules, commands, and skills that survive updates
 
-### Enhanced Context Capabilities
+### 🧠 Enhanced Context Capabilities
 
 - **Pilot Console** at localhost:41777 — visual dashboard for observations, search, session management
 - **Persistent memory** with semantic search (Vexor) across all sessions
@@ -463,22 +469,27 @@ English, Arabic, Bengali, Czech, German, Spanish, French, Hindi, Indonesian, Ita
 - **Agent browser** — headless browser for E2E UI testing with screenshots
 - **3 language servers** (basedpyright, vtsls, gopls) for real-time diagnostics
 
-### One-Command Installer
+### 🛠️ One-Command Installer
 
+8-step installer with progress tracking, rollback on failure, and idempotent re-runs:
+
+- **Prerequisites** — Checks Homebrew, Node.js, Python 3.12+, uv, git
+- **Dependencies** — Installs Vexor, agent-browser, mcp-cli, Claude Code
+- **Shell integration** — Auto-configures bash, fish, and zsh with `pilot` alias
+- **Config & Claude files** — Sets up `.claude/` plugin, rules, skills, hooks, MCP servers
+- **VS Code extensions** — Installs recommended extensions for your stack
 - **Dev Container** auto-setup with all tools pre-configured
-- **Extended language support** — Python, TypeScript & Go with linters, formatters, type checkers
-- **Automated updater** — Updates Pilot to the latest version when launched
-- **Shell integration** — Auto-configures bash, fish, and zsh with `pilot` alias (and `ccp` for migration)
+- **Automated updater** — Checks for updates on launch with release notes and one-key upgrade
 - **Cross-platform** — macOS, Linux, Windows (WSL2)
 
-### Team Vault
+### 👥 Team Vault
 
 - **Private Git repo** for shared rules, commands, and skills across your team
 - **Pull/Push** — Install shared assets or share your own with teammates
 - **Automatic versioning** — Assets are versioned (v1, v2, v3...) on every push
 - **Works everywhere** — GitHub, GitLab, Bitbucket (public or private repos)
 
-### Online Learning
+### 🧠 Online Learning
 
 - **Automatic extraction** of non-obvious debugging patterns after 10+ minute investigations
 - **Captures workarounds**, misleading error messages, tool integrations
@@ -487,7 +498,7 @@ English, Arabic, Bengali, Czech, German, Spanish, French, Hindi, Indonesian, Ita
 
 ---
 
-## Claude Pilot Console
+## 🖥️ Claude Pilot Console
 
 Access the web-based Claude Pilot Console at **http://localhost:41777** to visualize your development workflow:
 
@@ -502,7 +513,7 @@ Access the web-based Claude Pilot Console at **http://localhost:41777** to visua
 
 ---
 
-## Before & After
+## 🔄 Before & After
 
 | Without Pilot | With Pilot |
 | ------------- | ---------- |
@@ -517,7 +528,7 @@ Access the web-based Claude Pilot Console at **http://localhost:41777** to visua
 
 ---
 
-## License
+## 📄 License
 
 Claude Pilot is source-available under a commercial license. See the [LICENSE](LICENSE) file for full terms.
 
@@ -531,15 +542,15 @@ Details and licensing at [license.claude-pilot.com](https://license.claude-pilot
 
 ---
 
-## Changelog
+## 📋 Changelog
 
 See the full changelog at [pilot.openchangelog.com](https://pilot.openchangelog.com/).
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
-**Pull Requests** - New features, improvements, and bug fixes are welcome. Fun fact: Pilot is built with Pilot — a self-improving loop where your contributions make the tool that makes contributions better.
+**Pull Requests** - New features, improvements, and bug fixes are welcome. Fun fact: Pilot is built with Pilot — a self-improving loop where your contributions make the tool that makes contributions better. 🔄
 
 **Issues** - Found a bug or have a feature request? [Open an issue](https://github.com/maxritter/claude-pilot/issues).
 

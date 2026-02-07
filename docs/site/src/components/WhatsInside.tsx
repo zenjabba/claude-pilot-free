@@ -26,7 +26,7 @@ const insideItems: InsideItem[] = [
     items: [
       "Context monitor with 80% / 90% / 95% thresholds",
       "Automatic session handoff with state preservation",
-      "Continuation files written to ~/.pilot/sessions/",
+      "Crash recovery with exponential backoff (max 3 retries)",
       "Multiple Pilot sessions in parallel, zero interference",
       "Persistent memory bridges observations across all sessions",
     ],
@@ -52,7 +52,7 @@ const insideItems: InsideItem[] = [
       "Python: ruff format + lint + basedpyright type checking",
       "TypeScript: Prettier + ESLint + vtsls type checking",
       "Go: gofmt + golangci-lint + gopls type checking",
-      "Spec stop guard — blocks completion without verification",
+      "Status line — live context, memory, plan, and license info",
     ],
   },
   {
@@ -84,9 +84,9 @@ const insideItems: InsideItem[] = [
     title: "One-Command Installer",
     description: "Ready in minutes, auto-updates",
     items: [
+      "8-step installer with progress, rollback, and idempotent re-runs",
       "Dev Container auto-setup with all tools pre-configured",
-      "Extended support for Python, TypeScript & Go",
-      "Automated updater — always the latest version",
+      "Auto-updater with release notes and one-key upgrade",
       "Shell integration: bash, fish, zsh with pilot alias",
       "macOS, Linux, Windows (WSL2) support",
     ],
