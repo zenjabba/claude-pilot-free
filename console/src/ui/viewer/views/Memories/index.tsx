@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MemoriesToolbar } from './MemoriesToolbar';
 import { MemoryCard } from './MemoryCard';
 import { MemoryDetailModal } from './MemoryDetailModal';
-import { EmptyState, Spinner, Button, Icon } from '../../components/ui';
-import { useToast } from '../../context';
+import { EmptyState, Spinner, Button, Icon, ScopeBadge } from '../../components/ui';
+import { useToast, useProject } from '../../context';
 
 type ViewMode = 'grid' | 'list';
 type FilterType = 'all' | 'observation' | 'summary' | 'prompt';
@@ -30,24 +30,7 @@ export function MemoriesView() {
   const [isExporting, setIsExporting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const toast = useToast();
-
-  const getProjectFromUrl = (): string | null => {
-    const hash = window.location.hash;
-    const queryIndex = hash.indexOf('?');
-    if (queryIndex === -1) return null;
-    const params = new URLSearchParams(hash.slice(queryIndex + 1));
-    return params.get('project');
-  };
-
-  const [projectFilter, setProjectFilter] = useState<string | null>(getProjectFromUrl);
-
-  useEffect(() => {
-    const handleHashChange = () => {
-      setProjectFilter(getProjectFromUrl());
-    };
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+  const { selectedProject } = useProject();
 
   const fetchMemories = useCallback(async () => {
     setIsLoading(true);
@@ -56,8 +39,8 @@ export function MemoriesView() {
       if (filterType !== 'all') {
         params.set('type', filterType);
       }
-      if (projectFilter) {
-        params.set('project', projectFilter);
+      if (selectedProject) {
+        params.set('project', selectedProject);
       }
       params.set('limit', '50');
 
@@ -80,7 +63,7 @@ export function MemoriesView() {
     } finally {
       setIsLoading(false);
     }
-  }, [filterType, projectFilter]);
+  }, [filterType, selectedProject]);
 
   function formatTimestamp(timestamp: string): string {
     if (!timestamp) return '';
@@ -206,14 +189,11 @@ export function MemoriesView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">
-          {projectFilter ? `Memories: ${projectFilter}` : 'Memories'}
-        </h1>
-        <p className="text-base-content/60">
-          {projectFilter
-            ? `Showing memories for project "${projectFilter}"`
-            : 'Browse and manage your stored memories'}
-        </p>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold">Memories</h1>
+          <ScopeBadge project={selectedProject} />
+        </div>
+        <p className="text-base-content/60">Browse and manage your stored memories</p>
       </div>
 
       <MemoriesToolbar

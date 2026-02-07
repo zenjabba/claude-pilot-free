@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { SessionCard } from './SessionCard';
 import { SessionTimeline } from './SessionTimeline';
-import { EmptyState, Spinner, Button, Icon, Select } from '../../components/ui';
+import { EmptyState, Spinner, Button, Icon, ScopeBadge } from '../../components/ui';
+import { useProject } from '../../context';
 
 interface Session {
   id: number;
@@ -22,16 +23,15 @@ export function SessionsView() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
-  const [projects, setProjects] = useState<string[]>([]);
-  const [projectFilter, setProjectFilter] = useState<string>('');
+  const { selectedProject } = useProject();
 
   const fetchSessions = useCallback(async () => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
       params.set('limit', '50');
-      if (projectFilter) {
-        params.set('project', projectFilter);
+      if (selectedProject) {
+        params.set('project', selectedProject);
       }
 
       const response = await fetch(`/api/sessions?${params}`);
@@ -42,49 +42,27 @@ export function SessionsView() {
     } finally {
       setIsLoading(false);
     }
-  }, [projectFilter]);
-
-  const fetchProjects = useCallback(async () => {
-    try {
-      const response = await fetch('/api/projects');
-      const data = await response.json();
-      setProjects(data.projects || []);
-    } catch (error) {
-      console.error('Failed to fetch projects:', error);
-    }
-  }, []);
+  }, [selectedProject]);
 
   useEffect(() => {
     fetchSessions();
-    fetchProjects();
-  }, [fetchSessions, fetchProjects]);
+  }, [fetchSessions]);
 
   const handleSelectSession = (id: number) => {
     setSelectedSessionId(selectedSessionId === id ? null : id);
   };
 
-  const projectOptions = [
-    { value: '', label: 'All Projects' },
-    ...projects.map((p) => ({ value: p, label: p })),
-  ];
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Sessions</h1>
-          <p className="text-base-content/60">
-            Browse sessions and explore their timeline
-          </p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold">Sessions</h1>
+            <ScopeBadge project={selectedProject} />
+          </div>
+          <p className="text-base-content/60">Browse sessions and explore their timeline</p>
         </div>
         <div className="flex items-center gap-2">
-          <Select
-            options={projectOptions}
-            value={projectFilter}
-            onChange={(e) => setProjectFilter(e.target.value)}
-            selectSize="sm"
-            className="w-48"
-          />
           <Button variant="ghost" size="sm" onClick={fetchSessions}>
             <Icon icon="lucide:refresh-cw" size={16} />
           </Button>

@@ -2,7 +2,8 @@ import { useState, useRef } from 'react';
 import { SearchInput } from './SearchInput';
 import { SearchResultCard } from './SearchResultCard';
 import { CodebaseResultCard } from './CodebaseResultCard';
-import { EmptyState, Spinner, Badge, Icon } from '../../components/ui';
+import { EmptyState, Spinner, Badge, Icon, ScopeBadge } from '../../components/ui';
+import { useProject } from '../../context';
 
 type SearchTab = 'memories' | 'codebase';
 
@@ -43,6 +44,7 @@ interface VexorSearchResponse {
 }
 
 export function SearchView() {
+  const { selectedProject } = useProject();
   const [activeTab, setActiveTab] = useState<SearchTab>('memories');
   const [memoryResults, setMemoryResults] = useState<MemorySearchResult[]>([]);
   const [codebaseResults, setCodebaseResults] = useState<VexorSearchResult[]>([]);
@@ -72,6 +74,9 @@ export function SearchView() {
     setSearchError(null);
     try {
       const params = new URLSearchParams({ query, limit: '30' });
+      if (selectedProject) {
+        params.set('project', selectedProject);
+      }
       const response = await fetch(`/api/search/semantic?${params}`, { signal: controller.signal });
       const data: MemorySearchResponse = await response.json();
 
@@ -164,7 +169,7 @@ export function SearchView() {
         <p className="text-base-content/60">Find memories and code using AI-powered semantic similarity</p>
       </div>
 
-      {/* Tabs */}
+      {/* Tabs with scope indicators */}
       <div role="tablist" className="tabs tabs-bordered">
         <button
           role="tab"
@@ -183,6 +188,22 @@ export function SearchView() {
           Codebase
         </button>
       </div>
+
+      {/* Scope indicator below tabs */}
+      {activeTab === 'memories' ? (
+        selectedProject && (
+          <div className="flex items-center gap-2">
+            <ScopeBadge project={selectedProject} />
+          </div>
+        )
+      ) : (
+        <div className="flex items-center gap-2 text-sm text-base-content/50 bg-base-200/50 rounded-lg px-3 py-2">
+          <ScopeBadge project={null} workspace />
+          {selectedProject && (
+            <span className="ml-1">Codebase search covers all workspace files — not filtered by project</span>
+          )}
+        </div>
+      )}
 
       <SearchInput onSearch={handleSearch} isSearching={isSearching} placeholder={placeholder} />
 

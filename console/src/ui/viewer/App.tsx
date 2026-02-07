@@ -7,7 +7,7 @@ import { CommandPalette } from './components/CommandPalette';
 import { useTheme } from './hooks/useTheme';
 import { useStats } from './hooks/useStats';
 import { useHotkeys } from './hooks/useHotkeys';
-import { ToastProvider } from './context';
+import { ToastProvider, ProjectProvider } from './context';
 
 const routes = [
   { path: '/', component: DashboardView },
@@ -79,6 +79,7 @@ export function App() {
   useHotkeys(handleShortcut);
 
   return (
+    <ProjectProvider>
     <ToastProvider>
       <DashboardLayout
         currentPath={`#${path}`}
@@ -101,5 +102,6 @@ export function App() {
         onToggleSidebar={handleToggleSidebar}
       />
     </ToastProvider>
+    </ProjectProvider>
   );
 }

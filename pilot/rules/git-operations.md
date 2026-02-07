@@ -75,7 +75,7 @@ git submodule           # Submodule operations
 
 When user explicitly says "commit", "push", "commit and push", etc.:
 1. **Execute the command** - don't ask for confirmation again
-2. **Use appropriate commit message format** (see custom/git-commits.md)
+2. **Use appropriate commit message format** (see `.claude/rules/git-commits.md`)
 
 ### When User Hasn't Mentioned Git
 

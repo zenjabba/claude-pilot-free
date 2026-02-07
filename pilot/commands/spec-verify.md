@@ -6,7 +6,7 @@ model: opus
 ---
 # /spec-verify - Verification Phase
 
-**Phase 3 of the /spec workflow.** Runs comprehensive verification: tests, program execution, rules audit, coverage, code review, and E2E tests.
+**Phase 3 of the /spec workflow.** Runs comprehensive verification: tests, process compliance, code review, program execution, E2E tests, and edge case testing.
 
 **Input:** Path to a plan file with `Status: COMPLETE`
 **Output:** Plan status set to VERIFIED (success) or looped back to implementation (failure)
@@ -19,67 +19,63 @@ model: opus
 
 | # | Rule |
 |---|------|
-| 1 | **NEVER SKIP verification** - Code verification (Step 3.8) is mandatory. No exceptions. |
+| 1 | **NEVER SKIP verification** - Code review (Step 3.5) is mandatory. No exceptions. |
 | 2 | **NO stopping** - Everything is automatic. Never ask "Should I fix these?" |
 | 3 | **Fix ALL findings automatically** - must_fix AND should_fix. No permission needed. |
 | 4 | **Quality over speed** - Never rush due to context pressure |
 | 5 | **Plan file is source of truth** - Survives session clears |
+| 6 | **Code changes finish BEFORE runtime testing** - Code review and fixes happen before build/deploy/E2E |
+| 7 | **Re-verification after fixes is MANDATORY** - Fixes can introduce new bugs. Always re-verify. |
 
 ---
 
 ## The Process
 
-**Unit tests → Integration tests → Program execution (with log inspection) → Rules audit → Coverage → Quality → Code review → E2E tests → Final verification**
+The verification process is split into two phases. All code changes (from review findings) happen in Phase A. All runtime testing happens in Phase B against the finalized code.
+
+```
+Phase A — Finalize the code:
+  Tests → Process Compliance → Code Review → Fix → Re-verify loop
+
+Phase B — Verify the running program:
+  Build → Deploy → Code Identity Check → Program Execution → DoD Audit → E2E → Edge Cases
+
+Final:
+  Regression check → Update plan status
+```
+
+**Why this order:** Code review findings change the code. If you run E2E before code review, you test unfixed code and must re-test after fixes. By finishing all code changes first, E2E tests the final product exactly once.
 
 **All test levels are MANDATORY:** Unit tests alone are insufficient. You must run integration tests AND E2E tests AND execute the actual program with real data.
 
-### Step 3.1: Run & Fix Unit Tests
+---
 
-Run unit tests and fix any failures immediately.
+## Phase A: Finalize the Code
+
+### Step 3.1: Run & Fix Tests
+
+Run the full test suite (unit + integration) and fix any failures immediately.
 
 **If failures:** Identify → Read test → Fix implementation → Re-run → Continue until all pass
 
-### Step 3.2: Run & Fix Integration Tests
+### Step 3.2: Process Compliance Check
 
-Run integration tests and fix any failures immediately.
+Run mechanical verification tools. These check process adherence that the code review agent cannot assess.
 
-**Common issues:** Database connections, mock configuration, missing test data
+**Run each tool and show output:**
 
-### Step 3.3: Build and Execute the Actual Program (MANDATORY)
+1. **Type checker** — `tsc --noEmit` / `basedpyright` / equivalent
+2. **Linter** — `eslint` / `ruff check` / equivalent
+3. **Coverage** — Run with coverage flag, verify ≥ 80%
+4. **Build** — Clean build with no errors
 
-**⚠️ CRITICAL: Tests passing ≠ Program works**
+**Fix all errors before proceeding.** Warnings are acceptable; errors are blockers.
 
-Run the actual program and verify real output.
+**Note:** The spec-verifier agent handles code quality, spec compliance, and rules enforcement. This step only covers mechanical tool checks that produce binary pass/fail results.
 
-**Execution checklist:**
-- [ ] Build/compile succeeds without warnings
-- [ ] Program starts without errors
-- [ ] **Inspect logs** - Check for errors, warnings, stack traces
-- [ ] **Verify output correctness** - Fetch source data independently, compare against program output
-- [ ] Test with real/sample data, not just mocks
+### Step 3.3: Feature Parity Check (if applicable)
 
-**⛔ Output Correctness - MANDATORY:**
-If code processes external data, ALWAYS verify by fetching source data and comparing:
-```bash
-# Fetch actual source data
-aws <service> get-<resource> --output json
-
-# Compare counts/content with what your code logged
-# If mismatch → BUG (don't trust logs alone)
-```
-
-**If bugs are found:**
-
-| Bug Type | Action |
-|----------|--------|
-| **Minor** (typo, off-by-one, missing import) | Fix immediately, re-run, continue verification |
-| **Major** (logic error, missing function, architectural issue) | Add task to plan, set PENDING, **⛔ Context Guard** (spec.md 0.3), then `Skill(skill='spec-implement', args='<plan-path>')` |
-
-**Rule of thumb:** If you can fix it in < 5 minutes without writing new tests, fix inline. Otherwise, add a task.
-
-### Step 3.3a: Feature Parity Check (if applicable)
-
-**For refactoring/migration tasks:** Verify ALL original functionality is preserved.
+**For refactoring/migration tasks only:** Verify ALL original functionality is preserved.
 
 **Process:**
 1. Compare old implementation with new implementation
@@ -105,7 +101,9 @@ This is a serious issue - the implementation is incomplete.
    Iterations: N     →  Iterations: N+1
    ```
 
-3. **Inform user:**
+3. **Register status change:** `~/.pilot/bin/pilot register-plan "<plan_path>" "PENDING" 2>/dev/null || true`
+
+4. **Inform user:**
    ```
    🔄 Iteration N+1: Missing features detected, looping back to implement...
 
@@ -116,89 +114,10 @@ This is a serious issue - the implementation is incomplete.
    The plan has been updated with [N] new tasks.
    ```
 
-4. **⛔ Phase Transition Context Guard:** Run `~/.pilot/bin/pilot check-context --json`. If >= 70%, hand off instead (see spec.md Section 0.3).
-5. **Invoke implementation phase:** `Skill(skill='spec-implement', args='<plan-path>')`
+5. **⛔ Phase Transition Context Guard:** Run `~/.pilot/bin/pilot check-context --json`. If >= 80%, hand off instead (see spec.md Section 0.3).
+6. **Invoke implementation phase:** `Skill(skill='spec-implement', args='<plan-path>')`
 
-### Step 3.4: Rules Compliance Audit
-
-**⚠️ MANDATORY: Actually READ every rule file and verify compliance. Don't skip this.**
-
-This step exists because we often forget our own rules. By re-reading each rule file and explicitly checking compliance, we catch mistakes before they ship.
-
-#### Process
-
-**Step 3.4a: Discover and read ALL rules (BOTH standard AND custom)**
-
-**⛔ CRITICAL: You MUST check BOTH directories. Checking only custom rules is NOT sufficient.**
-
-```bash
-# List ALL rule files - BOTH directories are MANDATORY
-ls -la ~/.claude/rules/*.md    # Standard rules (global) - REQUIRED
-ls -la .claude/rules/*.md      # Custom rules (project) - REQUIRED
-```
-
-Then use `Read` tool to read EACH file completely from BOTH directories:
-
-| Directory | What It Contains | Required? |
-|-----------|------------------|-----------|
-| `~/.claude/rules/*.md` | Core development standards (TDD, testing, execution, Python/TS/Go rules, etc.) | **YES - MANDATORY** |
-| `.claude/rules/*.md` | Project-specific rules (git commits, project conventions) | **YES - MANDATORY** |
-
-**DO NOT skip standard rules. They contain critical requirements like TDD enforcement, execution verification, and testing standards.**
-
-**Step 3.4b: For EACH rule file, create a compliance checklist**
-
-After reading each rule file, extract the key requirements and check each one:
-
-```markdown
-## Rules Compliance Report
-
-### [rule-filename.md]
-- [ ] Requirement 1: [description] → ✅ Compliant / ❌ Violation
-- [ ] Requirement 2: [description] → ✅ Compliant / ❌ Violation
-...
-
-### [next-rule-filename.md]
-...
-```
-
-#### Common Rules to Check (examples)
-
-| Rule File | Key Requirements to Verify |
-|-----------|---------------------------|
-| `execution-verification.md` | Did you RUN the actual program (not just tests)? Show output. |
-| `tdd-enforcement.md` | Did each test FAIL before you wrote the code? |
-| `verification-before-completion.md` | Did you show actual command output as evidence? |
-| `testing-strategies-coverage.md` | Is coverage ≥ 80%? Did you mock external calls in unit tests? |
-| `python-rules.md` | Did you use `uv` (not pip)? Did you run `ruff` and `basedpyright`? |
-| `typescript-rules.md` | Did you detect the package manager? Run `tsc --noEmit`? |
-| `git-commits.md` | Using `fix:` prefix? No AI attribution footers? |
-
-**Step 3.4c: Fix ALL violations immediately**
-
-For each violation found:
-
-1. **Fixable Now** (missing command, missing test, formatting):
-   - Execute the fix immediately
-   - Show the fix output
-   - Re-verify the requirement passes
-
-2. **Structural** (missed TDD cycle, wrong architecture):
-   - Document the violation
-   - If critical, add fix task to plan and loop back
-
-**Step 3.4d: Output brief compliance report**
-
-```
-## Rules Compliance Audit
-- Standard rules (~/.claude/rules/): [N] checked ✅
-- Custom rules (.claude/rules/): [N] checked ✅
-- Violations found: [N] | Fixed: [N]
-```
-
-**⛔ DO NOT proceed until BOTH directories are checked and all fixable violations are fixed.**
-
-### Step 3.5: Call Chain Analysis
+### Step 3.4: Call Chain Analysis
 
 **Perform deep impact analysis for all changes:**
 
@@ -218,17 +137,7 @@ For each violation found:
    - External system impacts
    - Global state modifications
 
-### Step 3.6: Check Coverage
-
-Verify test coverage meets requirements.
-
-**If insufficient:** Identify uncovered lines → Write tests for critical paths → Verify improvement
-
-### Step 3.7: Run Quality Checks
-
-Run automated quality tools and fix any issues found.
-
-### Step 3.8: Code Review Verification
+### Step 3.5: Code Review Verification
 
 **⛔ THIS STEP IS NON-NEGOTIABLE. You MUST run code verification.**
 
@@ -240,14 +149,22 @@ Run automated quality tools and fix any issues found.
 
 **None of these are valid reasons to skip. ALWAYS VERIFY.**
 
-#### 3.8a: Identify Changed Files
+#### 3.5a: Identify Changed Files
 
 Get list of files changed in this implementation:
 ```bash
 git status --short  # Shows staged and unstaged changes
 ```
 
-#### 3.8b: Launch Code Verification
+#### 3.5b: Gather Context for the Verifier
+
+Before launching the agent, gather information it needs for actionable findings:
+
+1. **Test framework constraints** — What can/can't the test framework test? (e.g., "SSR-only via renderToString — no client-side effects or state testing possible")
+2. **Runtime environment** — How to start the program, what port, where artifacts are deployed
+3. **Plan risks section** — Copy the Risks and Mitigations table from the plan (if present)
+
+#### 3.5c: Launch Code Verification
 
 Spawn 1 `spec-verifier` agent using the Task tool:
 
@@ -258,6 +175,10 @@ Task(
   **Plan file:** <plan-path>
   **Changed files:** [file list from git status]
 
+  **Runtime environment:** [how to start, port, deploy path, etc.]
+  **Test framework constraints:** [what the test framework can/cannot test]
+  **Plan risks section:** [copy risks table if present, or "None listed"]
+
   Review the implementation against the plan. Read the plan file first to understand
   the requirements, then verify the changed files implement them correctly.
   You may read related files for context as needed.
@@ -267,12 +188,15 @@ Task(
 
 The verifier:
 - Receives the plan file path as source of truth
+- Reads ALL rule files (global + project) and enforces them
 - Reviews changed files against plan requirements
+- Verifies plan risk mitigations were implemented
+- Checks each task's Definition of Done criteria
 - Can read related files for context (imports, dependencies, etc.)
 - Runs with fresh context (no anchoring bias)
 - Returns structured JSON findings
 
-#### 3.8c: Report Findings
+#### 3.5d: Report Findings
 
 Present findings briefly:
 
@@ -286,7 +210,7 @@ Present findings briefly:
 Implementing fixes automatically...
 ```
 
-#### 3.8d: Automatically Implement ALL Findings
+#### 3.5e: Automatically Implement ALL Findings
 
 **⛔ DO NOT ask user for permission. Fix everything automatically.**
 
@@ -296,50 +220,151 @@ This is part of the automated /spec workflow. The user approved the plan - verif
 
 1. **must_fix issues** - Fix immediately (security, crashes, TDD violations)
 2. **should_fix issues** - Fix immediately (spec deviations, missing tests, error handling)
-3. **suggestions** - Implement if reasonable and quick (< 5 min each)
+3. **suggestions** - Implement if reasonable and quick
 
 **For each fix:**
 1. Implement the fix
 2. Run relevant tests to verify
 3. Log: "✅ Fixed: [issue title]"
 
-**After all fixes:**
-1. Re-run verification (spawn new verifier) to catch any regressions
-2. Repeat until no must_fix or should_fix issues remain (max 3 iterations)
-3. If iterations exhausted with remaining issues, add them to plan. **⛔ Phase Transition Context Guard** (spec.md Section 0.3) before invoking `Skill(skill='spec-implement', args='<plan-path>')`
+### Step 3.6: Re-verification Loop (MANDATORY)
+
+**⛔ This step is NON-NEGOTIABLE. Fixes can introduce new bugs.**
+
+After implementing ALL code review findings from Step 3.5e:
+
+1. **Re-run the spec-verifier agent** with the same parameters as Step 3.5c
+2. If new must_fix or should_fix issues found → fix them and re-run again
+3. Maximum 3 iterations of the fix → re-verify cycle
+4. **Only proceed to Phase B when the verifier returns zero must_fix and zero should_fix**
+
+If iterations exhausted with remaining issues, add them to plan. **⛔ Phase Transition Context Guard** (spec.md Section 0.3) before invoking `Skill(skill='spec-implement', args='<plan-path>')`
 
 **The only stopping point in /spec is plan approval. Everything else is automatic.**
 
-### Step 3.9: E2E Verification (MANDATORY for apps with UI/API)
+---
+
+## Phase B: Verify the Running Program
+
+All code is now finalized. No more code changes should happen in this phase (except critical bugs found during execution).
+
+### Step 3.7: Build, Deploy, and Verify Code Identity
+
+**⚠️ CRITICAL: Tests passing ≠ Program works. And building ≠ running your build.**
+
+#### 3.7a: Build
+
+Build/compile the project. Verify zero errors.
+
+#### 3.7b: Deploy (if applicable)
+
+If the project builds artifacts that are deployed separately from source (e.g., bundled JS, compiled binaries, Docker images):
+
+1. Identify where built artifacts are installed (e.g., `~/.claude/pilot/scripts/`)
+2. Copy new builds to the installed location
+3. Restart any running services that use the old artifacts
+
+**If no separate deployment is needed, skip to 3.7c.**
+
+#### 3.7c: Code Identity Verification (MANDATORY)
+
+**Before testing ANY endpoint or behavior, prove the running instance uses your newly built code.**
+
+1. Identify a behavioral change unique to this implementation (new query parameter, changed response field, new endpoint, different behavior for specific input)
+2. Craft a request that ONLY the new code would handle correctly (e.g., filter by nonexistent value should return 0 results; old code returns unfiltered results)
+3. Execute the request against the running program
+4. **If the response matches OLD behavior** → you are testing stale code
+   - Redeploy artifacts
+   - Restart the service
+   - Re-verify until the response matches NEW behavior
+5. **If the response matches NEW behavior** → proceed
+
+**Example:** You added `?project=` filtering. Query `?project=nonexistent-xyz`. New code returns 0 results. Old code ignores the parameter and returns all results. If you see all results, you're testing old code.
+
+**⛔ DO NOT proceed to program execution testing until code identity is confirmed.**
+
+### Step 3.8: Program Execution Verification
+
+Run the actual program and verify real output.
+
+**Execution checklist:**
+- [ ] Program starts without errors
+- [ ] **Inspect logs** - Check for errors, warnings, stack traces
+- [ ] **Verify output correctness** - Fetch source data independently, compare against program output
+- [ ] Test with real/sample data, not just mocks
+
+**⛔ Output Correctness - MANDATORY:**
+If code processes external data, ALWAYS verify by fetching source data independently and comparing:
+```bash
+# Fetch actual source data (database query, API call, file contents)
+# Compare counts/content with what your code returned
+# If mismatch → BUG (don't trust program output alone)
+```
+
+**If bugs are found:**
+
+| Bug Type | Action |
+|----------|--------|
+| **Minor** (typo, off-by-one, missing import) | Fix immediately, re-run, continue verification |
+| **Major** (logic error, missing function, architectural issue) | Add task to plan, set PENDING, **⛔ Context Guard** (spec.md 0.3), then `Skill(skill='spec-implement', args='<plan-path>')` |
+
+### Step 3.9: Definition of Done Audit
+
+**For EACH task in the plan**, read its Definition of Done criteria and verify each criterion is met with evidence from the running program.
+
+```markdown
+### Task N: [title]
+- [ ] DoD criterion 1 → [evidence: command output / API response / screenshot]
+- [ ] DoD criterion 2 → [evidence]
+...
+```
+
+**If any criterion is unmet:**
+- If fixable inline → fix immediately
+- If structural → add task to plan and loop back to implementation
+
+### Step 3.10: E2E Verification (MANDATORY for apps with UI/API)
 
 **⚠️ Unit + Integration tests are NOT enough. You MUST also run E2E tests.**
 
-Run end-to-end tests to verify the complete user workflow works.
+#### 3.10a: Happy Path Testing
 
-#### For APIs
-Test endpoints with curl. Verify status codes, response content, and error handling.
+Test the primary user workflow end-to-end.
 
-#### For Frontend/UI
-Use `agent-browser` to verify UI renders and workflows complete. See `~/.claude/rules/agent-browser.md`.
+**For APIs:** Test endpoints with curl. Verify status codes, response content, and state changes.
 
-### Step 3.10: Final Verification
+**For Frontend/UI:** Use `agent-browser` to verify UI renders and workflows complete. See `~/.claude/rules/agent-browser.md`.
 
-**Run everything one more time:**
-- All tests
-- Program build and execution
-- Diagnostics
-- Call chain validation
+Walk through the main user scenario described in the plan. Every view, every interaction, every state transition.
 
-**Success criteria:**
-- All tests passing
-- No diagnostics errors
-- Program builds and executes successfully with correct output
-- Coverage ≥ 80%
-- All Definition of Done criteria met
-- Code review checklist complete
-- No breaking changes in call chains
+#### 3.10b: Edge Case and Negative Testing
 
-### Step 3.11: Update Plan Status
+After the happy path passes, test failure modes. **This is not optional.**
+
+| Category | What to test | Example |
+|----------|-------------|---------|
+| **Empty state** | No data, no items, no results | Empty database, no projects, search returns nothing |
+| **Invalid input** | Bad parameters, wrong types | SQL injection in query params, empty strings, special characters |
+| **Stale state** | Cached/stored data references something deleted | localStorage has project name that no longer exists |
+| **Error state** | Backend unreachable, API returns error | What does the UI show when fetch fails? |
+| **Boundary** | Maximum values, zero values, single item | Exactly 1 project, 0 observations, 100-char project name |
+
+For each edge case:
+1. Set up the condition
+2. Exercise the UI/API
+3. Verify the result is reasonable (not blank, not broken, not stuck, no unhandled errors)
+
+### Step 3.11: Final Regression Check
+
+Run the test suite and type checker one final time to catch any regressions from Phase B fixes (if any code changed during execution/E2E testing):
+
+1. Run full test suite — all pass
+2. Run type checker — zero errors
+3. Verify build still succeeds
+
+**If no code changed during Phase B** (no bugs found during execution/E2E), this confirms the same green state from Phase A. Still run it — it's cheap insurance.
+
+### Step 3.12: Update Plan Status
 
 **Status Lifecycle:** `PENDING` → `COMPLETE` → `VERIFIED`
 
@@ -350,8 +375,9 @@ Use `agent-browser` to verify UI renders and workflows complete. See `~/.claude/
    Edit the plan file and change the Status line:
    Status: COMPLETE  →  Status: VERIFIED
    ```
-2. Read the Iterations count from the plan file
-3. Report completion:
+2. **Register status change:** `~/.pilot/bin/pilot register-plan "<plan_path>" "VERIFIED" 2>/dev/null || true`
+3. Read the Iterations count from the plan file
+4. Report completion:
    ```
    ✅ Workflow complete! Plan status: VERIFIED
 
@@ -372,9 +398,10 @@ Use `agent-browser` to verify UI renders and workflows complete. See `~/.claude/
    Status: COMPLETE  →  Status: PENDING
    Iterations: N     →  Iterations: N+1
    ```
-3. Inform user: "🔄 Iteration N+1: Issues found, fixing and re-verifying..."
-4. **⛔ Phase Transition Context Guard:** Run `~/.pilot/bin/pilot check-context --json`. If >= 70%, hand off instead (see spec.md Section 0.3).
-5. **Invoke implementation phase:** `Skill(skill='spec-implement', args='<plan-path>')`
+3. **Register status change:** `~/.pilot/bin/pilot register-plan "<plan_path>" "PENDING" 2>/dev/null || true`
+4. Inform user: "🔄 Iteration N+1: Issues found, fixing and re-verifying..."
+5. **⛔ Phase Transition Context Guard:** Run `~/.pilot/bin/pilot check-context --json`. If >= 80%, hand off instead (see spec.md Section 0.3).
+6. **Invoke implementation phase:** `Skill(skill='spec-implement', args='<plan-path>')`
 
 ---
 

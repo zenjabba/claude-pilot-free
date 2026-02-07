@@ -49,42 +49,41 @@ tests/
 
 ### Test Naming Convention
 
-**Mandatory Pattern:** `test_<function>_<scenario>_<expected_result>`
+**Names must be self-documenting without reading code.**
 
-Examples:
+**Python (pytest):** `test_<function>_<scenario>_<expected_result>`
 - `test_process_payment_with_insufficient_funds_raises_error`
 - `test_fetch_users_with_admin_role_returns_filtered_list`
-- `test_parse_csv_with_missing_columns_uses_defaults`
 
-Names must be self-documenting without reading code.
+**TypeScript/JS (Jest/Vitest):** `describe("<module>") + it("should <behavior> when <condition>")`
+- `describe("processPayment") { it("should raise error with insufficient funds") }`
+- `describe("fetchUsers") { it("should return filtered list for admin role") }`
 
 ### Running Tests
 
-Identify framework first (pytest, jest, vitest, mocha):
+Identify framework first, then use minimal output:
 
 ```bash
-# Run all tests
-pytest                    # Python
-npm test                  # Node.js
+# Python (pytest)
+uv run pytest -q                              # Quiet mode (preferred)
+uv run pytest -q -m unit                      # Unit only
+uv run pytest tests/unit/test_auth.py -q      # Specific file
 
-# Run by type
-pytest -m unit           # Unit only
-pytest -m integration    # Integration only
-
-# Run specific file/test
-pytest tests/unit/test_auth.py
-pytest tests/unit/test_auth.py::test_login_success
-
-# With output
-pytest -v -s            # Verbose with prints
+# TypeScript/JS (Jest/Vitest/Bun)
+bun test                                      # Bun
+npm test -- --silent                          # Jest/Vitest quiet
+npx vitest run tests/unit/auth.test.ts        # Specific file
 ```
 
 ### Coverage Requirements
 
 **Before marking work complete:**
 
-1. Run coverage: `pytest --cov=src --cov-report=term-missing --cov-fail-under=80`
-2. Verify ≥ 80% coverage
+1. Run coverage with the project's test runner:
+   - Python: `uv run pytest --cov=src --cov-report=term-missing --cov-fail-under=80`
+   - Jest/Vitest: `npx vitest run --coverage` or `npm test -- --coverage`
+   - Bun: `bun test --coverage`
+2. Verify ≥ 80% coverage on new code
 3. Add tests for uncovered critical paths
 
 **Must cover:**
@@ -260,34 +259,7 @@ def test_process_increments_total():
 
 ### ⛔ MANDATORY: Fix ALL Errors (Tests, Types, Lint)
 
-**NEVER skip or ignore errors. No exceptions. No excuses.**
-
-When verification finds ANY errors - tests, type checker, or linter - you MUST fix them before marking work complete. This applies to ALL errors, not just ones "related" to your changes.
-
-The following justifications are INVALID and FORBIDDEN:
-
-| ❌ Invalid Excuse | Why It's Wrong |
-|------------------|----------------|
-| "Pre-existing failure" | If it was broken before, fix it now. You found it, you own it. |
-| "Unrelated to my changes" | You ran the checks, you saw the error. Fix it. |
-| "Will fix later" | Later never comes. Fix it now. |
-| "Not my code" | Irrelevant. The error exists. Fix it. |
-| "Flaky test" | Either fix the flakiness or delete the test. No middle ground. |
-| "Test/type error is wrong" | Then fix it. Don't leave it broken. |
-
-**The Rule:**
-1. Run tests → failures? **STOP** and fix
-2. Run type checker → errors? **STOP** and fix
-3. Run linter → errors? **STOP** and fix
-4. All checks pass → Continue with your work
-
-**Why this matters:**
-- Broken checks erode trust in the quality gates
-- "Pre-existing" failures multiply into more failures
-- Skipping errors normalizes ignoring quality
-- The user trusts you to leave the codebase better than you found it
-
-**If you catch yourself about to say "pre-existing" or "unrelated":** STOP. Fix the error. Then continue.
+**Fix ALL verification errors before marking work complete — no exceptions.** See `verification-before-completion.md` for the full policy, invalid excuses table, and auto-fix rules in /spec workflows.
 
 ### Test Markers
 

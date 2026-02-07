@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, Badge, Icon, Button, Spinner, Progress, Tooltip } from '../../components/ui';
+import { Card, CardBody, Badge, Icon, Button, Spinner, Progress, Tooltip, ScopeBadge } from '../../components/ui';
 import { SpecContent } from './SpecContent';
 import { TIMING } from '../../constants/timing';
 
@@ -190,6 +190,9 @@ export function SpecView() {
   return (
     <div className="space-y-6">
       {/* Spec selector: tabs for active, dropdown for archived */}
+      <div className="flex items-center gap-2">
+        <ScopeBadge project={null} workspace />
+      </div>
       <div className="flex items-center gap-2">
         {/* Active plan tabs */}
         {activeSpecs.length > 0 && (

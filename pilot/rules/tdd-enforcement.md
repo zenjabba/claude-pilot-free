@@ -12,15 +12,28 @@ Write one minimal test that describes the desired behavior.
 
 **Test requirements:**
 - Tests one specific behavior
-- Has descriptive name: `test_<function>_<scenario>_<expected_result>`
+- Has descriptive name (see naming patterns below)
 - Uses real code (avoid mocks unless testing external dependencies)
 - Focuses on behavior, not implementation details
 
-**Example:**
+**Naming patterns by language:**
+- Python: `test_<function>_<scenario>_<expected_result>`
+- TypeScript/JS: `describe("<module>", () => { it("should <behavior> when <condition>") })`
+
+**Examples:**
 ```python
 def test_calculate_discount_with_valid_coupon_returns_discounted_price():
     result = calculate_discount(price=100, coupon="SAVE20")
     assert result == 80
+```
+
+```typescript
+describe("calculateDiscount", () => {
+  it("should return discounted price with valid coupon", () => {
+    const result = calculateDiscount(100, "SAVE20");
+    expect(result).toBe(80);
+  });
+});
 ```
 
 #### 2. VERIFY RED - Confirm Test Fails
@@ -47,12 +60,19 @@ Write the simplest code that makes the test pass.
 - No refactoring of other code
 - Hardcoding is acceptable if it passes the test
 
-**Example:**
+**Examples:**
 ```python
 def calculate_discount(price, coupon):
     if coupon == "SAVE20":
         return price * 0.8
     return price
+```
+
+```typescript
+function calculateDiscount(price: number, coupon: string): number {
+  if (coupon === "SAVE20") return price * 0.8;
+  return price;
+}
 ```
 
 #### 4. VERIFY GREEN - Confirm Test Passes

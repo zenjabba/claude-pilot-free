@@ -9,9 +9,10 @@ interface Stats {
 
 interface StatsGridProps {
   stats: Stats;
+  selectedProject?: string | null;
 }
 
-export function StatsGrid({ stats }: StatsGridProps) {
+export function StatsGrid({ stats, selectedProject }: StatsGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <StatsCard
@@ -29,11 +30,13 @@ export function StatsGrid({ stats }: StatsGridProps) {
         label="Summaries"
         value={stats.summaries.toLocaleString()}
       />
-      <StatsCard
-        icon="lucide:folder"
-        label="Projects"
-        value={stats.projects.toLocaleString()}
-      />
+      {!selectedProject && (
+        <StatsCard
+          icon="lucide:folder"
+          label="Projects"
+          value={stats.projects.toLocaleString()}
+        />
+      )}
     </div>
   );
 }

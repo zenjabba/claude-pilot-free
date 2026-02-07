@@ -119,12 +119,12 @@ Is there anything else you'd like me to help with?
 
 | Percentage | Action |
 |------------|--------|
-| **< 70%** | Proceed with phase transition |
-| **>= 70%** | **Do NOT invoke the next phase.** Hand off instead. |
+| **< 80%** | Proceed with phase transition |
+| **>= 80%** | **Do NOT invoke the next phase.** Hand off instead. |
 
-Each phase (plan, implement, verify) needs significant context to complete. Starting a new phase above 70% risks overshooting to 100% — the worst-case scenario where all work is lost.
+Each phase (plan, implement, verify) needs significant context to complete. Starting a new phase above 80% risks overshooting to 100% — the worst-case scenario where all work is lost.
 
-**When >= 70%:** Write continuation file, trigger `send-clear`. The next session dispatches to the correct phase automatically based on plan status.
+**When >= 80%:** Write continuation file, trigger `send-clear`. The next session dispatches to the correct phase automatically based on plan status.
 
 **This applies to ALL transitions:** plan→implement, implement→verify, verify→implement (feedback loop), and dispatcher→any phase.
 
@@ -188,8 +188,8 @@ Pilot will restart with `/spec --continue <plan-path>`
 
 | # | Rule |
 |---|------|
-| 1 | **NO sub-agents during planning/implementation** - Phase 1 and 2 use direct tools only. Verification steps (Step 1.7, Step 3.8) each use a single verifier sub-agent. |
-| 2 | **NEVER SKIP verification** - Plan verification (Step 1.7) and Code verification (Step 3.8) are mandatory. No exceptions. |
+| 1 | **NO sub-agents during planning/implementation** - Phase 1 and 2 use direct tools only. Verification steps (Step 1.7, Step 3.5) each use a single verifier sub-agent. |
+| 2 | **NEVER SKIP verification** - Plan verification (Step 1.7) and Code verification (Step 3.5) are mandatory. No exceptions. |
 | 3 | **ONLY stopping point is plan approval** - Everything else is automatic. Never ask "Should I fix these?" |
 | 4 | **Batch questions together** - Don't interrupt user flow |
 | 5 | **Run explorations sequentially** - One at a time, never in parallel |
@@ -200,6 +200,6 @@ Pilot will restart with `/spec --continue <plan-path>`
 | 10 | **Update plan checkboxes after EACH task** - Not at the end |
 | 11 | **Quality over speed** - Never rush due to context pressure. But at 90%+ context, handoff overrides everything - do NOT start new fix cycles |
 | 12 | **Plan file is source of truth** - Survives session clears |
-| 13 | **Phase Transition Context Guard** - Check context before EVERY phase transition. If >= 70%, hand off instead of starting next phase (Section 0.3) |
+| 13 | **Phase Transition Context Guard** - Check context before EVERY phase transition. If >= 80%, hand off instead of starting next phase (Section 0.3) |
 
 ARGUMENTS: $ARGUMENTS

@@ -143,7 +143,7 @@ There are TWO verification points that use a single verifier sub-agent each:
 | Phase Skill | Agent | Purpose |
 |-------------|-------|---------|
 | **`spec-plan` (Step 1.7)** | `plan-verifier` | Verify plan captures user requirements before approval |
-| **`spec-verify` (Step 3.8)** | `spec-verifier` | Verify code implements the plan correctly |
+| **`spec-verify` (Step 3.5)** | `spec-verifier` | Verify code implements the plan correctly |
 
 **⛔ VERIFICATION STEPS ARE MANDATORY - NEVER SKIP THEM.**
 
@@ -219,7 +219,7 @@ spec-verify finds issues → Status: PENDING → spec-implement fixes → COMPLE
 | Point | What | When |
 |-------|------|------|
 | **Plan Verification (Step 1.7)** | `plan-verifier` checks plan matches user requirements | End of `spec-plan` |
-| **Code Verification (Step 3.8)** | `spec-verifier` checks code implements plan correctly | During `spec-verify` |
+| **Code Verification (Step 3.5)** | `spec-verifier` checks code implements plan correctly | During `spec-verify` |
 
 **⛔ Both verification steps are NON-NEGOTIABLE. Skipping is FORBIDDEN.**
 
@@ -263,10 +263,10 @@ The user approved the plan. Verification fixes are part of that approval.
 ~/.pilot/bin/pilot check-context --json
 ```
 
-- **< 70%:** Proceed with phase transition.
-- **>= 70%:** Do NOT start the next phase. Hand off instead.
+- **< 80%:** Proceed with phase transition.
+- **>= 80%:** Do NOT start the next phase. Hand off instead.
 
-Each phase needs significant context headroom. Starting a new phase above 70% risks hitting the hard context limit — the worst-case scenario where all progress in the current turn is lost. The next session dispatches automatically based on plan status.
+Each phase needs significant context headroom. Starting a new phase above 80% risks hitting the hard context limit — the worst-case scenario where all progress in the current turn is lost. The next session dispatches automatically based on plan status.
 
 **Applies to:** plan→implement, implement→verify, verify→implement (feedback loop), dispatcher→any phase. See spec.md Section 0.3 for details.
 

@@ -1,6 +1,7 @@
 import { SidebarLogo } from './SidebarLogo';
 import { SidebarNav } from './SidebarNav';
 import { SidebarFooter } from './SidebarFooter';
+import { SidebarProjectSelector } from './SidebarProjectSelector';
 import { Icon } from '../../components/ui';
 
 interface SidebarProps {
@@ -35,6 +36,9 @@ export function Sidebar({
           <Icon icon={collapsed ? 'lucide:panel-left-open' : 'lucide:panel-left-close'} size={18} />
         </button>
       </div>
+
+      {/* Project selector */}
+      <SidebarProjectSelector collapsed={collapsed} />
 
       {/* Navigation */}
       <div className="flex-1">

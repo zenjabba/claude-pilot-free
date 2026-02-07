@@ -24,6 +24,9 @@ The orchestrator provides:
 3. **Check clarification answers** - Are they incorporated into the plan?
 4. **Verify scope alignment** - Is anything in-scope that shouldn't be? Out-of-scope that should be in?
 5. **Check task coverage** - Do tasks cover all requirements?
+6. **Verify risk mitigations are concrete** - Each mitigation must be an implementable behavior, not a vague statement like "be careful" or "handle appropriately"
+7. **Verify DoD criteria are measurable** - Each criterion must be checkable against code or runtime behavior, not vague like "it works"
+8. **Verify Runtime Environment section** - If the project has a running service/API/UI, the plan must document how to start, test, and verify it
 
 ## Analysis Categories
 
@@ -34,11 +37,13 @@ The orchestrator provides:
 - **Ambiguity**: Are there vague or unclear parts that need clarification?
 - **Contradictions**: Does anything in the plan contradict user requirements?
 - **Definition of Done**: Are DoD criteria measurable and complete?
+- **Risk Quality**: Are risk mitigations concrete commitments the implementer can code? Or vague platitudes?
+- **Verifiability**: Will the spec-verifier be able to check these DoD criteria and risk mitigations against code?
 
 ## Severity Levels
 
-- **must_fix**: Missing critical requirement, contradicts user request, major scope issue
-- **should_fix**: Incomplete task, unclear DoD, minor scope gap
+- **must_fix**: Missing critical requirement, contradicts user request, major scope issue, risk mitigations too vague to implement (e.g., "handle edge cases" without specifying which)
+- **should_fix**: Incomplete task, unclear DoD, minor scope gap, DoD criteria that say "it works" without measurable criteria, missing Runtime Environment section for a service/API project
 - **suggestion**: Could be clearer, nice-to-have improvement
 
 ## Output Format
@@ -52,7 +57,7 @@ Output ONLY valid JSON (no markdown wrapper, no explanation outside JSON):
   "issues": [
     {
       "severity": "must_fix | should_fix | suggestion",
-      "category": "requirement_coverage | scope_alignment | clarification_integration | task_completeness | ambiguity | contradiction | definition_of_done",
+      "category": "requirement_coverage | scope_alignment | clarification_integration | task_completeness | ambiguity | contradiction | definition_of_done | risk_quality | verifiability",
       "title": "Brief title (max 100 chars)",
       "description": "Detailed explanation of the issue",
       "user_requirement": "Quote from user request or clarification that's affected",
@@ -75,13 +80,17 @@ For EVERY plan you review, verify:
 - [ ] Task count is appropriate (not over-engineered, not missing steps)
 - [ ] Architecture/approach aligns with any stated user preferences
 - [ ] No tasks that contradict user requirements
+- [ ] Each risk mitigation is a concrete action (code behavior), not a vague statement
+- [ ] Each DoD criterion is verifiable against code or runtime behavior
+- [ ] Runtime Environment section exists if the project has a running service
+- [ ] Risks section has real mitigations, not just "be careful" or "monitor"
 
 ## Rules
 
 1. **Focus on user alignment** - Does this plan deliver what the user asked for?
 2. **Be specific** - Quote the user requirement and plan section in issues
 3. **Actionable fixes** - Don't just identify problems, suggest solutions
-4. **Review independently** - You don't know what other passes found
+4. **Review with fresh eyes** - Don't anchor on implementation assumptions, verify against the plan
 5. **If no issues found** - Return empty issues array with pass_summary
 6. **Check scope carefully** - Both over-scoping and under-scoping are problems
 7. **Verify DoD completeness** - Vague "it works" is not acceptable
@@ -105,3 +114,12 @@ User said "keep it simple" but plan includes complex abstractions.
 
 ### Incomplete DoD
 DoD says "tests pass" but doesn't specify what tests or coverage.
+
+### Unverifiable Risk Mitigations
+Plan says "handle edge cases appropriately" — this is not implementable. Must specify WHICH edge cases and WHAT behavior. The spec-verifier checks every risk mitigation against actual code, so vague mitigations cause verification failures.
+
+### Vague DoD
+DoD says "feature works correctly" — the spec-verifier cannot check this. Must say something like "API returns filtered results when ?project= parameter is provided; returns all results when omitted; returns empty results for nonexistent project."
+
+### Missing Runtime Environment
+Plan describes a web API or service but doesn't document how to start it, what port it listens on, or where artifacts deploy. The verification phase needs this to run execution tests.

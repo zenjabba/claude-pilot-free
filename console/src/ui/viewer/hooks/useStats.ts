@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useProject } from '../context';
 
 interface Stats {
   observations: number;
@@ -68,6 +69,8 @@ interface UseStatsResult {
 const VEXOR_POLL_INTERVAL_MS = 60_000;
 
 export function useStats(): UseStatsResult {
+  const { selectedProject, setProjects } = useProject();
+
   const [stats, setStats] = useState<Stats>({
     observations: 0,
     summaries: 0,
@@ -107,11 +110,12 @@ export function useStats(): UseStatsResult {
   }, []);
 
   const loadStats = useCallback(async () => {
+    const projectParam = selectedProject ? `?project=${encodeURIComponent(selectedProject)}` : '';
     try {
       const [statsRes, healthRes, activityRes, projectsRes, planRes, gitRes] = await Promise.all([
-        fetch('/api/stats'),
+        fetch(`/api/stats${projectParam}`),
         fetch('/health'),
-        fetch('/api/observations?limit=5'),
+        fetch(`/api/observations?limit=5${selectedProject ? `&project=${encodeURIComponent(selectedProject)}` : ''}`),
         fetch('/api/projects'),
         fetch('/api/plan'),
         fetch('/api/git'),
@@ -128,11 +132,14 @@ export function useStats(): UseStatsResult {
       const recentItems = Array.isArray(rawItems) ? rawItems : [];
       const lastObsTimestamp = recentItems.length > 0 ? (recentItems[0]?.created_at || null) : null;
 
+      const projectList: string[] = projectsData.projects || [];
+      setProjects(projectList);
+
       setStats({
         observations: statsData.database?.observations || 0,
         summaries: statsData.database?.summaries || 0,
         lastObservationAt: lastObsTimestamp ? formatTimestamp(lastObsTimestamp) : null,
-        projects: projectsData.projects?.length || 0,
+        projects: projectList.length,
       });
 
       setWorkerStatus({
@@ -174,12 +181,17 @@ export function useStats(): UseStatsResult {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [selectedProject, setProjects]);
+
+  const loadStatsRef = useRef(loadStats);
+  useEffect(() => { loadStatsRef.current = loadStats; }, [loadStats]);
 
   useEffect(() => {
     loadStats();
-    loadVexorStatus();
+  }, [loadStats]);
 
+  useEffect(() => {
+    loadVexorStatus();
     const vexorInterval = setInterval(loadVexorStatus, VEXOR_POLL_INTERVAL_MS);
 
     const eventSource = new EventSource('/stream');
@@ -197,7 +209,7 @@ export function useStats(): UseStatsResult {
         }
 
         if (data.type === 'new_observation' || data.type === 'new_summary' || data.type === 'plan_association_changed') {
-          loadStats();
+          loadStatsRef.current();
         }
       } catch (e) {
       }
@@ -207,7 +219,7 @@ export function useStats(): UseStatsResult {
       clearInterval(vexorInterval);
       eventSource.close();
     };
-  }, [loadStats, loadVexorStatus]);
+  }, [loadVexorStatus]);
 
   return {
     stats,

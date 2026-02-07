@@ -61,7 +61,7 @@ node cli.js command
 
 **API Services:**
 ```bash
-# Start server (use controlBashProcess for long-running)
+# Start server (use timeout parameter for long-running commands)
 npm start
 # Or for quick verification
 python -m uvicorn app:app
@@ -95,8 +95,8 @@ pip install dist/*.whl && run-command
 
 **Frontend/Web Apps:**
 ```bash
-# Start the app
-npm run dev &
+# Start the app (if not already running)
+# Use the project's start command from Runtime Environment section
 
 # Open with agent-browser and verify UI
 agent-browser open http://localhost:3000

@@ -149,8 +149,8 @@ TaskCreate: "Task 4: Add documentation"            → id=4, addBlockedBy: [2]
    - Write failing test first, **verify it fails**
    - Implement minimal code to pass
    - Refactor if needed (keep tests green)
-5. **Verify tests pass** - `uv run pytest tests/path/to/test.py -q`
-6. **Run actual program** - Show real output with sample data
+5. **Verify tests pass** - Run the project's test runner (e.g., `uv run pytest -q`, `bun test`, `npm test`)
+6. **Run actual program** - Use the plan's Runtime Environment section to start the service/program. Show real output with sample data.
 7. **Check diagnostics** - Must be zero errors
 8. **Validate Definition of Done** - Check all criteria from plan
 9. **Mark task as `completed`** - `TaskUpdate(taskId="<id>", status="completed")`
@@ -191,7 +191,7 @@ Update counts:
 
 **⚠️ CRITICAL: Follow these steps exactly:**
 
-1. Quick verification: Check diagnostics and run `uv run pytest -q`
+1. Quick verification: Check diagnostics and run the project's test suite
 2. **FOR MIGRATIONS ONLY - Feature Parity Check:**
    - Run the NEW code and verify it produces expected output
    - Compare behavior with OLD code (if still available)
@@ -202,8 +202,9 @@ Update counts:
    Edit the plan file and change the Status line:
    Status: PENDING  →  Status: COMPLETE
    ```
-4. **⛔ Phase Transition Context Guard:** Run `~/.pilot/bin/pilot check-context --json`. If >= 70%, hand off instead (see spec.md Section 0.3).
-5. **Invoke verification phase:** `Skill(skill='spec-verify', args='<plan-path>')`
+4. **Register status change:** `~/.pilot/bin/pilot register-plan "<plan_path>" "COMPLETE" 2>/dev/null || true`
+5. **⛔ Phase Transition Context Guard:** Run `~/.pilot/bin/pilot check-context --json`. If >= 80%, hand off instead (see spec.md Section 0.3).
+6. **Invoke verification phase:** `Skill(skill='spec-verify', args='<plan-path>')`
 
 ---
 

@@ -5,9 +5,11 @@ import { PlanStatus } from './PlanStatus';
 import { GitStatus } from './GitStatus';
 import { RecentActivity } from './RecentActivity';
 import { useStats } from '../../hooks/useStats';
+import { useProject } from '../../context';
 
 export function DashboardView() {
   const { stats, workerStatus, vexorStatus, recentActivity, planStatus, gitInfo, isLoading } = useStats();
+  const { selectedProject } = useProject();
 
   if (isLoading) {
     return (
@@ -18,32 +20,41 @@ export function DashboardView() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-base-content/60">Overview of your Pilot Console</p>
+        <p className="text-base-content/60">
+          {selectedProject ? `Filtered by: ${selectedProject}` : 'Overview of your Pilot Console'}
+        </p>
       </div>
 
-      <StatsGrid stats={stats} />
+      {/* Project-scoped data */}
+      <div className="space-y-4">
+        <StatsGrid stats={stats} selectedProject={selectedProject} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <RecentActivity items={recentActivity} />
+        </div>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <PlanStatus
-          plans={planStatus.plans}
-        />
-        <WorkerStatus
-          status={workerStatus.status}
-          version={workerStatus.version}
-          uptime={workerStatus.uptime}
-          queueDepth={workerStatus.queueDepth}
-        />
-        <VexorStatus
-          isIndexed={vexorStatus.isIndexed}
-          files={vexorStatus.files}
-          generatedAt={vexorStatus.generatedAt}
-          isReindexing={vexorStatus.isReindexing}
-        />
-        <GitStatus gitInfo={gitInfo} />
-        <RecentActivity items={recentActivity} />
+      {/* Workspace-level status (not affected by project filter) */}
+      <div className="space-y-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-base-content/40">Workspace</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <PlanStatus plans={planStatus.plans} />
+          <WorkerStatus
+            status={workerStatus.status}
+            version={workerStatus.version}
+            uptime={workerStatus.uptime}
+            queueDepth={workerStatus.queueDepth}
+          />
+          <VexorStatus
+            isIndexed={vexorStatus.isIndexed}
+            files={vexorStatus.files}
+            generatedAt={vexorStatus.generatedAt}
+            isReindexing={vexorStatus.isReindexing}
+          />
+          <GitStatus gitInfo={gitInfo} />
+        </div>
       </div>
     </div>
   );

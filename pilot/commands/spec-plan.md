@@ -187,11 +187,9 @@ Before any exploration:
 2. Identify the core problem being solved
 3. List any assumptions you're making
 
-**Then gather all clarifications needed (Question Batch 1):**
+**Then gather clarifications if needed (Question Batch 1):**
 
-Use AskUserQuestion to ask everything upfront in a single interaction.
-
-**Don't proceed to exploration until clarifications are complete.**
+If ambiguities exist, use AskUserQuestion to ask everything upfront in a single interaction. If the task is clear and unambiguous, skip directly to Step 1.3.
 
 ### Step 1.3: Exploration
 
@@ -231,16 +229,19 @@ Use AskUserQuestion to ask everything upfront in a single interaction.
 Summarize what you found, then use AskUserQuestion with all decisions at once.
 
 **After user answers:**
-- Summarize the chosen design approach
-- Confirm: "Does this design work for your needs?"
-- Don't proceed until design is validated
+- Incorporate their choices into the plan design
+- Proceed to Step 1.5 — the user will review the full plan at Step 1.8
 
 ### Step 1.5: Implementation Planning
 
-**Task Count Guidance**
-- Avoid bloating plans with unnecessary or overly granular tasks
-- If the work genuinely requires more tasks, that's fine - the workflow handles multi-session execution
-- Focus on keeping tasks meaningful and necessary
+**Task Granularity**
+
+Each task should be:
+- **Independently testable** — has its own tests that pass without other tasks being complete
+- **Focused** — touches 2-4 files max; more means it should be split
+- **Verifiable** — produces an observable result (test output, API response, UI change)
+
+Split a task if it has multiple unrelated DoD criteria. Merge tasks if one can't be tested without the other. Don't create tasks for setup/boilerplate that have no standalone value — fold them into the first task that uses them.
 
 **Task Structure:**
 ```markdown
@@ -253,19 +254,30 @@ Summarize what you found, then use AskUserQuestion with all decisions at once.
 - Modify: `exact/path/to/existing.py`
 - Test: `tests/exact/path/to/test.py`
 
-**Implementation Steps:**
-1. Write failing test - Define expected behavior
-2. Implement minimal code - Make test pass
-3. Verify execution - Run actual program
-4. Integration test - Test with other components
+**Key Decisions / Notes:**
+- [Technical approach or algorithm to use]
+- [Which existing pattern to follow, with file:line reference]
+- [Integration points with other tasks or existing code]
 
 **Definition of Done:**
 - [ ] All tests pass (unit, integration if applicable)
 - [ ] No diagnostics errors (linting, type checking)
-- [ ] Code functions correctly with real data
-- [ ] Edge cases handled appropriately
-- [ ] Error messages are clear and actionable
+- [ ] [Task-specific criterion with observable outcome]
+- [ ] [Task-specific criterion with observable outcome]
 ```
+
+**⚠️ DoD criteria must be verifiable.** The verification phase checks each criterion against the actual code and running program. Replace the `[Task-specific criterion]` placeholders with criteria that can be checked with a specific test, command, or observation.
+
+✅ Good DoD examples:
+- "GET /api/users?role=admin returns only admin users"
+- "Form shows validation error when email field is empty"
+- "CLI exits with code 1 and prints usage when no arguments given"
+- "Retry logic attempts 3 times with exponential backoff before failing"
+
+❌ Bad DoD (never use these):
+- "Feature works correctly"
+- "Edge cases handled appropriately"
+- "Error messages are clear and actionable"
 
 **Zero-context assumption:**
 - Assume implementer knows nothing about codebase
@@ -319,9 +331,25 @@ Iterations: 0
 - [Environment setup needed]
 
 ## Context for Implementer
-- [Key codebase convention or pattern]
-- [Domain knowledge needed]
-- [Integration points or dependencies]
+
+> This section is critical for cross-session continuity. Write it for an implementer who has never seen the codebase.
+
+- **Patterns to follow:** [Reference existing file:line that demonstrates the pattern, e.g., "Follow the route handler pattern in `src/routes/users.ts:45`"]
+- **Conventions:** [Naming, file organization, error handling approach used in this project]
+- **Key files:** [Important files the implementer must read first, with brief description of each]
+- **Gotchas:** [Non-obvious dependencies, quirks, things that look wrong but are intentional]
+- **Domain context:** [Business logic or domain concepts needed to understand the task]
+
+## Runtime Environment (if applicable)
+
+> Include this section when the project has a running service, API, or UI.
+> Delete if the project is a library or CLI tool with no long-running process.
+
+- **Start command:** [How to start the service, e.g., `bun worker-service.cjs`]
+- **Port:** [What port it listens on]
+- **Deploy path:** [Where built artifacts are installed, if different from source]
+- **Health check:** [How to verify the service is running, e.g., `curl http://localhost:PORT/health`]
+- **Restart procedure:** [How to restart after code changes]
 
 ## Feature Inventory (FOR MIGRATION/REFACTORING ONLY)
 
@@ -368,9 +396,16 @@ Iterations: 0
 
 ## Risks and Mitigations
 
+> Consider: breaking changes, backward compatibility, data loss/migration, performance regression, security implications, state management complexity, cross-component coupling, external dependency failures.
+
 | Risk | Likelihood | Impact | Mitigation |
 |------|------------|--------|------------|
-| [Risk 1] | Low/Med/High | Low/Med/High | [How to mitigate] |
+| [Risk 1] | Low/Med/High | Low/Med/High | [Concrete, implementable mitigation] |
+
+**⚠️ Risk mitigations are commitments.** The verification phase (spec-verifier) will check that every mitigation listed here is actually implemented in code. Write mitigations as concrete, implementable behaviors, not vague statements.
+
+✅ Good: "If selected project not in available list, reset to null (All Projects)"
+❌ Bad: "Handle edge cases appropriately"
 
 ## Open Questions
 - [Any remaining questions for the user]
@@ -443,7 +478,7 @@ After verification completes, fix all issues by severity:
 
    **If user selects "Yes, proceed with implementation":**
    - Edit the plan file to change `Approved: No` to `Approved: Yes`
-   - **⛔ Phase Transition Context Guard:** Run `~/.pilot/bin/pilot check-context --json`. If >= 70%, hand off instead (see spec.md Section 0.3).
+   - **⛔ Phase Transition Context Guard:** Run `~/.pilot/bin/pilot check-context --json`. If >= 80%, hand off instead (see spec.md Section 0.3).
    - **Invoke implementation phase:** `Skill(skill='spec-implement', args='<plan-path>')`
 
    **If user selects "No, I need to make changes":**

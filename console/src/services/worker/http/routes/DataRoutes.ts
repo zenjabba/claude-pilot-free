@@ -350,6 +350,7 @@ export class DataRoutes extends BaseRouteHandler {
    * Get database statistics (with worker metadata)
    */
   private handleGetStats = this.wrapHandler((req: Request, res: Response): void => {
+    const project = req.query.project as string | undefined;
     const db = this.dbManager.getSessionStore().db;
 
     const packageRoot = getPackageRoot();
@@ -357,9 +358,23 @@ export class DataRoutes extends BaseRouteHandler {
     const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
     const version = packageJson.version;
 
-    const totalObservations = db.prepare("SELECT COUNT(*) as count FROM observations").get() as { count: number };
+    let totalObservations: { count: number };
+    let totalSummaries: { count: number };
+
+    if (project) {
+      totalObservations = db.prepare("SELECT COUNT(*) as count FROM observations WHERE project = ?").get(project) as { count: number };
+      totalSummaries = db.prepare(
+        `SELECT COUNT(DISTINCT ss.id) as count FROM session_summaries ss
+         INNER JOIN sdk_sessions s ON ss.memory_session_id = s.memory_session_id
+         INNER JOIN observations o ON o.memory_session_id = s.memory_session_id
+         WHERE o.project = ?`
+      ).get(project) as { count: number };
+    } else {
+      totalObservations = db.prepare("SELECT COUNT(*) as count FROM observations").get() as { count: number };
+      totalSummaries = db.prepare("SELECT COUNT(*) as count FROM session_summaries").get() as { count: number };
+    }
+
     const totalSessions = db.prepare("SELECT COUNT(*) as count FROM sdk_sessions").get() as { count: number };
-    const totalSummaries = db.prepare("SELECT COUNT(*) as count FROM session_summaries").get() as { count: number };
 
     const dbPath = path.join(homedir(), ".pilot/memory", "pilot-memory.db");
     let dbSize = 0;

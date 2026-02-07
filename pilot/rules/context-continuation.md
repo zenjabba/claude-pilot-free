@@ -63,10 +63,8 @@ When you see the context warning (80% or 90%), take action:
 
 Before writing the continuation file, you MUST run verification commands:
 ```bash
-# Run tests
-uv run pytest tests/ -q
-# Run type checker
-uv run basedpyright installer/
+# Run the project's test suite (e.g., uv run pytest -q, bun test, npm test)
+# Run the project's type checker (e.g., basedpyright src, tsc --noEmit)
 ```
 
 **DO NOT claim work is complete without showing verification output in the continuation file.**
@@ -103,8 +101,8 @@ Include VERIFIED status with actual command output.
 **Active Plan:** [path/to/plan.md or "None"]
 
 ## VERIFIED STATUS (run just before handoff):
-- `uv run pytest tests/ -q` → **X passed** or **X failed** (be honest!)
-- `uv run basedpyright src/` → **X errors** or **0 errors**
+- Test suite → **X passed** or **X failed** (be honest!)
+- Type checker → **X errors** or **0 errors**
 - If tests fail or errors exist, document WHAT is broken
 
 ## Completed This Session:

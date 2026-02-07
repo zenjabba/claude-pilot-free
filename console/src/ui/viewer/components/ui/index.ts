@@ -14,3 +14,4 @@ export { EmptyState } from './EmptyState';
 export { Tooltip } from './Tooltip';
 export { Toast, ToastContainer } from './Toast';
 export type { ToastData, ToastType } from './Toast';
+export { ScopeBadge } from './ScopeBadge';

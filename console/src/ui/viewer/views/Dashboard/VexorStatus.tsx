@@ -58,7 +58,10 @@ export function VexorStatus({ isIndexed, files, generatedAt, isReindexing }: Vex
     <Card>
       <CardBody>
         <div className="flex items-center justify-between mb-4">
-          <CardTitle>Codebase Indexing</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle>Codebase Indexing</CardTitle>
+            <Badge variant="ghost" size="sm">Workspace</Badge>
+          </div>
           {reindexActive ? (
             <Badge variant="warning">
               <Icon icon="lucide:refresh-cw" size={12} className="mr-1 animate-spin" />
