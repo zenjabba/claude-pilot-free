@@ -15,7 +15,8 @@ on:
   pull_request:
     types: [opened, synchronize, ready_for_review, reopened]
     paths-ignore:
-      - 'launcher/**'  # git-crypted - exclude from review
+      - 'launcher/**'       # git-crypted - exclude from review
+      - 'docs/site/api/**'  # git-crypted - exclude from review
 
   # Manual trigger
   workflow_dispatch:

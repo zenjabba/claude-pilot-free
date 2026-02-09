@@ -85,7 +85,7 @@ After installation, run `pilot` or `ccp` in your project folder to start Claude 
 8-step installer with progress tracking, rollback on failure, and idempotent re-runs:
 
 1. **Prerequisites** — Checks Homebrew, Node.js, Python 3.12+, uv, git
-2. **Dependencies** — Installs Vexor, agent-browser, mcp-cli, Claude Code
+2. **Dependencies** — Installs Vexor, playwright-cli, mcp-cli, Claude Code
 3. **Shell integration** — Auto-configures bash, fish, and zsh with `pilot` alias
 4. **Config & Claude files** — Sets up `.claude/` plugin, rules, skills, hooks, MCP servers
 5. **VS Code extensions** — Installs recommended extensions for your stack
@@ -330,7 +330,7 @@ Production-tested best practices loaded into **every session**. These aren't sug
 - `context7-docs.md` — Library documentation: fetching API docs for any dependency
 - `grep-mcp.md` — GitHub code search: finding real-world usage patterns across repos
 - `web-search.md` — Web search via DuckDuckGo, Bing, Exa with query syntax and filtering
-- `agent-browser.md` — Headless browser for E2E UI testing with page navigation and screenshots
+- `playwright-cli.md` — Browser automation for E2E UI testing with page navigation, screenshots, tracing, and network mocking
 - `mcp-cli.md` — MCP command line: listing servers, running tools, custom configuration
 
 </details>

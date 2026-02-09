@@ -333,7 +333,7 @@ Test the primary user workflow end-to-end.
 
 **For APIs:** Test endpoints with curl. Verify status codes, response content, and state changes.
 
-**For Frontend/UI:** Use `agent-browser` to verify UI renders and workflows complete. See `~/.claude/rules/agent-browser.md`.
+**For Frontend/UI:** Use `playwright-cli` to verify UI renders and workflows complete. See `~/.claude/rules/playwright-cli.md`.
 
 Walk through the main user scenario described in the plan. Every view, every interaction, every state transition.
 

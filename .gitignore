@@ -224,6 +224,10 @@ __marimo__/
 # Claude Code
 CLAUDE.md
 .devcontainer
+.playwright-*/
+.vercel
+.env*
+playwright/
 .claude.backup.*
 *.backup
 .claude/config/

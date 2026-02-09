@@ -27,6 +27,7 @@ export class MigrationRunner {
     this.repairSessionIdColumnRename();
     this.addFailedAtEpochColumn();
     this.createTagsTable();
+    this.removeObservationTypeCheckConstraint();
   }
 
   /**
@@ -75,7 +76,7 @@ export class MigrationRunner {
           memory_session_id TEXT NOT NULL,
           project TEXT NOT NULL,
           text TEXT NOT NULL,
-          type TEXT NOT NULL CHECK(type IN ('decision', 'bugfix', 'feature', 'refactor', 'discovery')),
+          type TEXT NOT NULL,
           created_at TEXT NOT NULL,
           created_at_epoch INTEGER NOT NULL,
           FOREIGN KEY(memory_session_id) REFERENCES sdk_sessions(memory_session_id) ON DELETE CASCADE
@@ -197,6 +198,7 @@ export class MigrationRunner {
 
     logger.debug("DB", "Removing UNIQUE constraint from session_summaries.memory_session_id");
 
+    this.db.run("PRAGMA foreign_keys = OFF");
     this.db.run("BEGIN TRANSACTION");
 
     this.db.run(`
@@ -238,6 +240,7 @@ export class MigrationRunner {
     `);
 
     this.db.run("COMMIT");
+    this.db.run("PRAGMA foreign_keys = ON");
 
     this.db
       .prepare("INSERT OR IGNORE INTO schema_versions (version, applied_at) VALUES (?, ?)")
@@ -306,6 +309,7 @@ export class MigrationRunner {
 
     logger.debug("DB", "Making observations.text nullable");
 
+    this.db.run("PRAGMA foreign_keys = OFF");
     this.db.run("BEGIN TRANSACTION");
 
     this.db.run(`
@@ -314,7 +318,7 @@ export class MigrationRunner {
         memory_session_id TEXT NOT NULL,
         project TEXT NOT NULL,
         text TEXT,
-        type TEXT NOT NULL CHECK(type IN ('decision', 'bugfix', 'feature', 'refactor', 'discovery', 'change')),
+        type TEXT NOT NULL,
         title TEXT,
         subtitle TEXT,
         facts TEXT,
@@ -349,6 +353,7 @@ export class MigrationRunner {
     `);
 
     this.db.run("COMMIT");
+    this.db.run("PRAGMA foreign_keys = ON");
 
     this.db
       .prepare("INSERT OR IGNORE INTO schema_versions (version, applied_at) VALUES (?, ?)")
@@ -669,5 +674,81 @@ export class MigrationRunner {
       .run(21, new Date().toISOString());
 
     logger.debug("DB", "Tags table created successfully");
+  }
+
+  /**
+   * Remove CHECK constraint on observations.type column (migration 22)
+   * Allows custom observation types beyond the original hardcoded set.
+   */
+  private removeObservationTypeCheckConstraint(): void {
+    const applied = this.db.prepare("SELECT version FROM schema_versions WHERE version = ?").get(22) as
+      | SchemaVersion
+      | undefined;
+    if (applied) return;
+
+    const sql = this.db
+      .query("SELECT sql FROM sqlite_master WHERE type='table' AND name='observations'")
+      .get() as { sql: string } | undefined;
+
+    if (!sql || !sql.sql.includes("CHECK(type IN")) {
+      this.db
+        .prepare("INSERT OR IGNORE INTO schema_versions (version, applied_at) VALUES (?, ?)")
+        .run(22, new Date().toISOString());
+      return;
+    }
+
+    logger.debug("DB", "Removing CHECK constraint from observations.type column");
+
+    const tableInfo = this.db.query("PRAGMA table_info(observations)").all() as TableColumnInfo[];
+    const columns = tableInfo.map((col) => col.name);
+    const columnList = columns.join(", ");
+
+    this.db.run("PRAGMA foreign_keys = OFF");
+    this.db.run("BEGIN TRANSACTION");
+
+    this.db.run(`
+      CREATE TABLE observations_new (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        memory_session_id TEXT NOT NULL,
+        project TEXT NOT NULL,
+        text TEXT,
+        type TEXT NOT NULL,
+        title TEXT,
+        subtitle TEXT,
+        facts TEXT,
+        narrative TEXT,
+        concepts TEXT,
+        files_read TEXT,
+        files_modified TEXT,
+        prompt_number INTEGER,
+        discovery_tokens INTEGER DEFAULT 0,
+        tags TEXT,
+        created_at TEXT NOT NULL,
+        created_at_epoch INTEGER NOT NULL,
+        FOREIGN KEY(memory_session_id) REFERENCES sdk_sessions(memory_session_id) ON DELETE CASCADE
+      )
+    `);
+
+    this.db.run(`INSERT INTO observations_new SELECT ${columnList} FROM observations`);
+
+    this.db.run("DROP TABLE observations");
+    this.db.run("ALTER TABLE observations_new RENAME TO observations");
+
+    this.db.run(`
+      CREATE INDEX idx_observations_sdk_session ON observations(memory_session_id);
+      CREATE INDEX idx_observations_project ON observations(project);
+      CREATE INDEX idx_observations_type ON observations(type);
+      CREATE INDEX idx_observations_created ON observations(created_at_epoch DESC);
+      CREATE INDEX idx_observations_tags ON observations(tags);
+    `);
+
+    this.db.run("COMMIT");
+    this.db.run("PRAGMA foreign_keys = ON");
+
+    this.db
+      .prepare("INSERT OR IGNORE INTO schema_versions (version, applied_at) VALUES (?, ?)")
+      .run(22, new Date().toISOString());
+
+    logger.debug("DB", "Successfully removed CHECK constraint from observations.type");
   }
 }

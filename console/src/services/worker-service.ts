@@ -199,6 +199,22 @@ export class WorkerService {
    * Register all route handlers with the server
    */
   private registerRoutes(): void {
+    this.server.app.get("/api/context/inject", async (req, res, next) => {
+      const timeoutMs = 300000;
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Initialization timeout")), timeoutMs),
+      );
+
+      await Promise.race([this.initializationComplete, timeoutPromise]);
+
+      if (!this.searchRoutes) {
+        res.status(503).json({ error: "Search routes not initialized" });
+        return;
+      }
+
+      next();
+    });
+
     this.server.registerRoutes(new AuthRoutes());
 
     this.server.registerRoutes(new ViewerRoutes(this.sseBroadcaster, this.dbManager, this.sessionManager));
@@ -228,22 +244,6 @@ export class WorkerService {
     this.server.registerRoutes(this.vexorRoutes);
 
     startRetentionScheduler(this.dbManager);
-
-    this.server.app.get("/api/context/inject", async (req, res, next) => {
-      const timeoutMs = 300000;
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Initialization timeout")), timeoutMs),
-      );
-
-      await Promise.race([this.initializationComplete, timeoutPromise]);
-
-      if (!this.searchRoutes) {
-        res.status(503).json({ error: "Search routes not initialized" });
-        return;
-      }
-
-      next();
-    });
   }
 
   /**
