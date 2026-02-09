@@ -51,26 +51,6 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel
 
-      - name: Pull Vercel environment
-        working-directory: docs/site
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: team_jAsHrk71vRyWK6bCTYGJyp0q
-          VERCEL_PROJECT_ID: prj_TXccrJI83HyNvQUZxqStUFgus9NB
-        run: vercel pull --yes --token=$VERCEL_TOKEN
-
-      - name: Install dependencies
-        working-directory: docs/site
-        run: npm install
-
-      - name: Build
-        working-directory: docs/site
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: team_jAsHrk71vRyWK6bCTYGJyp0q
-          VERCEL_PROJECT_ID: prj_TXccrJI83HyNvQUZxqStUFgus9NB
-        run: vercel build --token=$VERCEL_TOKEN ${{ (github.ref == 'refs/heads/main' || inputs.environment == 'production') && '--prod' || '' }}
-
       - name: Deploy
         working-directory: docs/site
         env:
@@ -78,5 +58,5 @@ jobs:
           VERCEL_ORG_ID: team_jAsHrk71vRyWK6bCTYGJyp0q
           VERCEL_PROJECT_ID: prj_TXccrJI83HyNvQUZxqStUFgus9NB
         run: |
-          DEPLOY_URL=$(vercel deploy --prebuilt --token=$VERCEL_TOKEN ${{ (github.ref == 'refs/heads/main' || inputs.environment == 'production') && '--prod' || '' }})
+          DEPLOY_URL=$(vercel deploy --token=$VERCEL_TOKEN ${{ (github.ref == 'refs/heads/main' || inputs.environment == 'production') && '--prod' || '' }})
           echo "Deployed to: $DEPLOY_URL"
