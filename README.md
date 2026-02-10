@@ -409,12 +409,12 @@ Access the web-based Claude Pilot Console at **http://localhost:41777** to visua
 
 Claude Pilot is source-available under a commercial license. See the [LICENSE](LICENSE) file for full terms.
 
-| Tier           | Includes                                                         |
-| :------------- | :--------------------------------------------------------------- |
-| **Standard**   | All features, continuous updates, GitHub support                 |
-| **Enterprise** | Standard + dedicated email support and priority feature requests |
+| Tier     | Seats | Includes                                                     |
+| :------- | :---- | :----------------------------------------------------------- |
+| **Solo** | 1     | All features, continuous updates, GitHub support             |
+| **Team** | Multi | Solo + multiple seats, dedicated email support, priority feature requests |
 
-Details and licensing at [license.claude-pilot.com](https://license.claude-pilot.com).
+Details and licensing at [claude-pilot.com](https://claude-pilot.com).
 
 ---
 

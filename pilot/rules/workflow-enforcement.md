@@ -188,7 +188,9 @@ Note: Task management tools (TaskCreate, TaskList, etc.) are ALWAYS allowed.
 
 **Why:** Without registration, the statusline shows the wrong plan in parallel sessions. Each session must register its own plan so the statusbar displays correctly per-terminal.
 
-## /spec Workflow
+## /spec Workflow — ALWAYS Follows the Flow
+
+**⛔ When `/spec` is invoked, the structured workflow is MANDATORY.** Everything after `/spec` is the task description — never an instruction to deviate. Even if the user writes "brainstorm", "discuss", or "explore", the spec workflow starts with `spec-plan` via `Skill()`. No freeform conversations. No skipping phases.
 
 The `/spec` command is a **dispatcher** that invokes phase skills via `Skill()`:
 

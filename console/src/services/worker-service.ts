@@ -605,7 +605,6 @@ export class WorkerService {
   }
 }
 
-
 async function main() {
   const command = process.argv[2];
   const port = getWorkerPort();
@@ -622,7 +621,7 @@ async function main() {
         logger.error("SYSTEM", "License verification failed");
         exitWithStatus(
           "error",
-          "UNLICENSED: Using Claude Pilot without a valid license is not permitted. Subscribe at https://license.claude-pilot.com - Use code TRIAL50OFF for 50% off! Then run: pilot activate <LICENSE_KEY>",
+          "UNLICENSED: Using Claude Pilot without a valid license is not permitted. Subscribe at https://claude-pilot.com then run: pilot activate <LICENSE_KEY>",
         );
       }
 

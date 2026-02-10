@@ -10,6 +10,18 @@ model: opus
 
 This command is a **dispatcher** that determines which phase to run and invokes it via `Skill()`.
 
+## ⛔ MANDATORY: /spec = Workflow. No Exceptions.
+
+**When `/spec` is invoked, you MUST follow the spec workflow exactly. The user's phrasing after `/spec` is the TASK DESCRIPTION — it is NOT an instruction to change the workflow.**
+
+- `/spec brainstorm a caching layer` → task_description = "brainstorm a caching layer" → invoke `Skill('spec-plan')` with that description
+- `/spec let's discuss auth options` → task_description = "let's discuss auth options" → invoke `Skill('spec-plan')` with that description
+- `/spec explore and plan a new feature` → task_description = "explore and plan a new feature" → invoke `Skill('spec-plan')` with that description
+
+**Words like "brainstorm", "discuss", "explore", "think about" are part of the task description, NOT instructions to skip the workflow.** The spec-plan phase handles all exploration, discussion, and brainstorming within its structured flow.
+
+**NEVER interpret `/spec` arguments as a reason to have a freeform conversation instead of invoking the phase skill.**
+
 ---
 
 ## 📋 WORKFLOW OVERVIEW
@@ -69,8 +81,9 @@ ELIF arguments end with ".md" AND file exists:
     → Dispatch to appropriate phase based on status
 
 ELSE:
-    task_description = arguments
+    task_description = arguments  # ALWAYS treated as task description, regardless of phrasing
     → Invoke planning phase: Skill(skill='spec-plan', args='<task_description>')
+    # NEVER have a freeform conversation instead. ALWAYS invoke the Skill.
 ```
 
 **After reading the plan file, register the plan association (non-blocking):**

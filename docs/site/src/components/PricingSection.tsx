@@ -1,11 +1,27 @@
-import { ExternalLink, Check, Building2, Clock, Sparkles, Shield, Zap } from "lucide-react";
+import { useEffect } from "react";
+import mixpanel from "mixpanel-browser";
+import { Check, Building2, Clock, Sparkles, Shield, Zap } from "lucide-react";
+import { PolarEmbedCheckout } from "@polar-sh/checkout/embed";
 import { Button } from "@/components/ui/button";
 import { useInView } from "@/hooks/use-in-view";
+
+const SOLO_CHECKOUT_URL = "https://buy.polar.sh/polar_cl_nxoqkuI0m3K60V4EpyaruDdPsd7CjS4jalKqc4TszL3";
+const TEAM_CHECKOUT_URL = "https://buy.polar.sh/polar_cl_y5uSffkVLnESyfzfOSJ1M9YmMd8sIpcT7bza82oFv4C";
 
 const PricingSection = () => {
   const [headerRef, headerInView] = useInView<HTMLDivElement>();
   const [cardsRef, cardsInView] = useInView<HTMLDivElement>();
   const [valueRef, valueInView] = useInView<HTMLDivElement>();
+
+  useEffect(() => {
+    PolarEmbedCheckout.init();
+
+    const handleCheckoutConfirmed = () => {
+      mixpanel.track("purchase_completed", { source: "website" });
+    };
+    window.addEventListener("polar:checkout:confirmed", handleCheckoutConfirmed);
+    return () => window.removeEventListener("polar:checkout:confirmed", handleCheckoutConfirmed);
+  }, []);
 
   return (
     <section id="pricing" className="py-16 lg:py-24 px-4 sm:px-6 relative" aria-labelledby="pricing-heading">
@@ -64,7 +80,7 @@ const PricingSection = () => {
             </Button>
           </div>
 
-          {/* Standard - Featured */}
+          {/* Solo - Featured */}
           <div
             className={`group relative rounded-2xl p-6 sm:p-8 border-2 border-primary/50 bg-card/40 backdrop-blur-sm
               hover:border-primary hover:bg-card/60 hover:shadow-xl hover:shadow-primary/20
@@ -77,7 +93,7 @@ const PricingSection = () => {
                 group-hover:bg-primary/30 group-hover:scale-110 transition-all duration-300">
                 <Check className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-bold text-foreground">Standard</h3>
+              <h3 className="text-xl font-bold text-foreground">Solo</h3>
             </div>
 
             <div className="mb-6">
@@ -105,14 +121,13 @@ const PricingSection = () => {
             </ul>
 
             <Button asChild className="w-full">
-              <a href="https://license.claude-pilot.com" target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4 mr-2" />
+              <a href={SOLO_CHECKOUT_URL} data-polar-checkout data-polar-checkout-theme="dark">
                 Subscribe
               </a>
             </Button>
           </div>
 
-          {/* Enterprise */}
+          {/* Team */}
           <div
             className={`group relative rounded-2xl p-6 sm:p-8 border border-border/50 bg-card/30 backdrop-blur-sm
               hover:border-indigo-500/50 hover:bg-card/50 hover:shadow-lg hover:shadow-indigo-500/10
@@ -125,7 +140,7 @@ const PricingSection = () => {
                 group-hover:bg-indigo-500/25 group-hover:scale-110 transition-all duration-300">
                 <Building2 className="h-6 w-6 text-indigo-500" />
               </div>
-              <h3 className="text-xl font-bold text-foreground">Enterprise</h3>
+              <h3 className="text-xl font-bold text-foreground">Team</h3>
             </div>
 
             <div className="mb-6">
@@ -136,7 +151,11 @@ const PricingSection = () => {
             <ul className="space-y-3 mb-8">
               <li className="flex items-start gap-3">
                 <Sparkles className="h-5 w-5 text-indigo-500 flex-shrink-0 mt-0.5" />
-                <span className="text-muted-foreground text-sm group-hover:text-foreground/80 transition-colors">Everything in Standard</span>
+                <span className="text-muted-foreground text-sm group-hover:text-foreground/80 transition-colors">Everything in Solo</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Check className="h-5 w-5 text-indigo-500 flex-shrink-0 mt-0.5" />
+                <span className="text-muted-foreground text-sm group-hover:text-foreground/80 transition-colors">Multiple seats — one key per team member</span>
               </li>
               <li className="flex items-start gap-3">
                 <Check className="h-5 w-5 text-indigo-500 flex-shrink-0 mt-0.5" />
@@ -149,13 +168,19 @@ const PricingSection = () => {
             </ul>
 
             <Button asChild variant="outline" className="w-full border-indigo-500/50 hover:bg-indigo-500/10">
-              <a href="https://license.claude-pilot.com" target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4 mr-2" />
+              <a href={TEAM_CHECKOUT_URL} data-polar-checkout data-polar-checkout-theme="dark">
                 Subscribe
               </a>
             </Button>
           </div>
         </div>
+
+        <p className="text-center text-sm text-muted-foreground mt-6">
+          Already a subscriber?{" "}
+          <a href="https://polar.sh/max-ritter/portal" className="text-primary hover:underline">
+            Manage your subscription
+          </a>
+        </p>
 
         {/* Value proposition */}
         <div

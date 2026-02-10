@@ -485,9 +485,11 @@ After verification completes, fix all issues by severity:
 
 3. **Based on user response:**
 
-   **If user selects "Yes, proceed with implementation":**
-   - Edit the plan file to change `Approved: No` to `Approved: Yes`
-   - Edit the plan file `Worktree:` field to match the user's worktree choice (`Yes` or `No`)
+   **If user approves (selects "Yes" or any approval option):**
+   - **⛔ BOTH fields MUST be updated in a single edit — never one without the other:**
+     1. `Approved: No` → `Approved: Yes`
+     2. `Worktree:` → match the user's worktree choice (`Yes` or `No`)
+   - If approval and worktree were combined into one answer (e.g., "Approve (no worktree)"), parse the worktree preference from that answer
    - **⛔ Phase Transition Context Guard:** Run `~/.pilot/bin/pilot check-context --json`. If >= 80%, hand off instead (see spec.md Section 0.3).
    - **Invoke implementation phase:** `Skill(skill='spec-implement', args='<plan-path>')`
 
