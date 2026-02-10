@@ -1,12 +1,15 @@
 import { useEffect } from "react";
-import mixpanel from "mixpanel-browser";
 import { Check, Building2, Clock, Sparkles, Shield, Zap } from "lucide-react";
 import { PolarEmbedCheckout } from "@polar-sh/checkout/embed";
 import { Button } from "@/components/ui/button";
 import { useInView } from "@/hooks/use-in-view";
 
-const SOLO_CHECKOUT_URL = "https://buy.polar.sh/polar_cl_nxoqkuI0m3K60V4EpyaruDdPsd7CjS4jalKqc4TszL3";
-const TEAM_CHECKOUT_URL = "https://buy.polar.sh/polar_cl_y5uSffkVLnESyfzfOSJ1M9YmMd8sIpcT7bza82oFv4C";
+const SOLO_CHECKOUT_URL = import.meta.env.VITE_POLAR_CHECKOUT_SOLO
+  || "https://buy.polar.sh/polar_cl_nxoqkuI0m3K60V4EpyaruDdPsd7CjS4jalKqc4TszL3";
+const TEAM_CHECKOUT_URL = import.meta.env.VITE_POLAR_CHECKOUT_TEAM
+  || "https://buy.polar.sh/polar_cl_y5uSffkVLnESyfzfOSJ1M9YmMd8sIpcT7bza82oFv4C";
+const PORTAL_URL = import.meta.env.VITE_POLAR_PORTAL_URL
+  || "https://polar.sh/max-ritter/portal";
 
 const PricingSection = () => {
   const [headerRef, headerInView] = useInView<HTMLDivElement>();
@@ -15,12 +18,6 @@ const PricingSection = () => {
 
   useEffect(() => {
     PolarEmbedCheckout.init();
-
-    const handleCheckoutConfirmed = () => {
-      mixpanel.track("purchase_completed", { source: "website" });
-    };
-    window.addEventListener("polar:checkout:confirmed", handleCheckoutConfirmed);
-    return () => window.removeEventListener("polar:checkout:confirmed", handleCheckoutConfirmed);
   }, []);
 
   return (
@@ -177,7 +174,7 @@ const PricingSection = () => {
 
         <p className="text-center text-sm text-muted-foreground mt-6">
           Already a subscriber?{" "}
-          <a href="https://polar.sh/max-ritter/portal" className="text-primary hover:underline">
+          <a href={PORTAL_URL} className="text-primary hover:underline">
             Manage your subscription
           </a>
         </p>
