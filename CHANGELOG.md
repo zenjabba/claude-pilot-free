@@ -2,6 +2,24 @@
 
 All notable changes to Claude Pilot will be documented in this file.
 
+## [6.3.2] - 2026-02-11
+
+### Bug Fixes
+
+- Trial endpoint so users can reactivate if license file gots lost
+- Git-cliff now parses squash merge bodies for release notes
+- Git-cliff now parses squash merge bodies for release notes
+- Git-cliff now parses squash merge bodies for release notes
+- Git-cliff now parses squash merge bodies for release notes
+- Release trigger now detects fix:/feat: in squash merge bodies
+- Correct seat display for solo/team licenses and enrich activation output
+- Replace seats with activations, refactor hooks and spec workflow
+- Prevent incremental review from overwriting initial PR analysis
+
+### Miscellaneous
+
+- Add model routing docs and Pilot CLI reference to README and website
+
 ## [6.3.1] - 2026-02-11
 
 ### Bug Fixes
