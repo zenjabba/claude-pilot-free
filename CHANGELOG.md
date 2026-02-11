@@ -2,6 +2,41 @@
 
 All notable changes to Claude Pilot will be documented in this file.
 
+## [6.3.0] - 2026-02-11
+
+### Bug Fixes
+
+- Updated models for commands and agents
+- Add MCP server smoke-testing step to sync command
+- Add MCP server smoke-testing step to sync command
+- Resolve console test failures from parallel execution and mock contamination
+- Show server-side license dates and seat count in banner
+- Promote parallel execution as primary implement strategy and add license display
+- Resolve trial activation failures caused by www subdomain redirects
+- Sandbox support improvements and UX polish
+- Move worktree question to beginning of spec flow
+- Add staleness check to context-pct.json cache
+- Migrate licensing from Gumroad to Polar.sh
+- Simplify dashboard layout and add delta-aware PR reviews
+- Make worktree isolation optional and fix worker startup crash
+- Remove working-directory from deploy step to prevent doubled path
+- Remove dead code and simplify auth module
+- Migrate service integrations and enrich system metadata
+- Simplify Vercel deploy to single step (fixes spawn sh ENOENT)
+- Add npm install to deploy workflow and handle init timeout rejection
+- Migrate to playwright-cli, backport console stability fixes, and harden CI/CD
+
+### Features
+
+- Add parallel execution, goal verification, and workflow improvements
+- Implement spec/polar-activation-analytics
+- Implement spec/console-spec-dashboard-metrics
+- Add git worktree isolation for /spec workflow
+
+### Miscellaneous
+
+- Sync claude review workflow paths-ignore for encrypted dirs
+
 ## [6.2.2] - 2026-02-08
 
 ### Bug Fixes
