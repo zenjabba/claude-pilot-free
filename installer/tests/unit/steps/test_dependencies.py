@@ -668,15 +668,7 @@ class TestPrecacheNpxMcpServers:
         }
 
         mock_proc = MagicMock()
-        mock_proc.terminate = MagicMock()
-        mock_proc.wait = MagicMock()
-
-        call_count = 0
-
-        def cache_on_second_call(_pkg):
-            nonlocal call_count
-            call_count += 1
-            return call_count > 1
+        mock_proc.wait = MagicMock(return_value=0)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             plugin_dir = Path(tmpdir) / ".claude" / "pilot"
@@ -686,14 +678,18 @@ class TestPrecacheNpxMcpServers:
             with patch.object(Path, "home", return_value=Path(tmpdir)):
                 with patch(
                     "installer.steps.dependencies._is_npx_package_cached",
-                    side_effect=cache_on_second_call,
+                    return_value=False,
                 ):
-                    with patch("installer.steps.dependencies.subprocess.Popen", return_value=mock_proc):
-                        with patch("installer.steps.dependencies.time.sleep"):
-                            result = _precache_npx_mcp_servers(None)
+                    with patch("installer.steps.dependencies.subprocess.Popen", return_value=mock_proc) as mock_popen:
+                        result = _precache_npx_mcp_servers(None)
 
             assert result is True
-            mock_proc.terminate.assert_called_once()
+            popen_args = mock_popen.call_args[0][0]
+            assert popen_args[:2] == ["npx", "-y"]
+            assert "--package" in popen_args
+            assert "-c" in popen_args
+            assert "true" in popen_args
+            mock_proc.wait.assert_called_once()
 
     def test_is_npx_package_cached_finds_cached(self):
         """_is_npx_package_cached returns True when package exists in npx cache."""

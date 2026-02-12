@@ -650,7 +650,10 @@ def _precache_npx_mcp_servers(_ui: Any) -> bool:
     """Pre-cache npx-based MCP server packages so Claude Code can start them instantly.
 
     Reads .mcp.json from the plugin directory, finds servers that use npx,
-    launches all in parallel, polls until cached, then kills them.
+    and installs each package into the npx cache using --package + -c "true".
+    This ensures packages are fully installed (including all dependencies)
+    before returning, avoiding the race condition of launching the actual
+    server and killing it mid-install.
     """
     mcp_config_path = Path.home() / ".claude" / "pilot" / ".mcp.json"
     if not mcp_config_path.exists():
@@ -678,7 +681,7 @@ def _precache_npx_mcp_servers(_ui: Any) -> bool:
     for package in uncached:
         try:
             proc = subprocess.Popen(
-                ["npx", "-y", package],
+                ["npx", "-y", "--package", package, "-c", "true"],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 stdin=subprocess.DEVNULL,
@@ -690,23 +693,12 @@ def _precache_npx_mcp_servers(_ui: Any) -> bool:
     if not procs:
         return True
 
-    max_wait = 60
-    poll_interval = 0.5
-    elapsed = 0.0
-    remaining = {pkg for pkg, _ in procs}
-
-    while remaining and elapsed < max_wait:
-        time.sleep(poll_interval)
-        elapsed += poll_interval
-        for pkg in list(remaining):
-            if _is_npx_package_cached(pkg):
-                remaining.discard(pkg)
-
+    max_wait = 120
     for _, proc in procs:
         try:
+            proc.wait(timeout=max_wait)
+        except subprocess.TimeoutExpired:
             _kill_proc(proc)
-        except Exception:
-            pass
 
     return True
 
