@@ -4,7 +4,7 @@
 
 ### Claude Code is powerful. Pilot makes it reliable.
 
-Ship code you can actually trust. Pilot is your quality autopilot.</br>
+Start a task, grab a coffee, come back to production-grade code.</br>
 **Tests enforced. Context preserved. Quality automated.**
 
 [![Stars](https://img.shields.io/github/stars/maxritter/claude-pilot?style=flat&color=F59E0B)](https://github.com/maxritter/claude-pilot/stargazers)
@@ -53,6 +53,7 @@ So I built Pilot. Instead of adding process on top, it bakes quality into every 
 | Generic suggestions        | Coding standards activated conditionally by file type           |
 | Changes mixed into branch  | Isolated worktrees — review and squash merge when verified      |
 | Manual tool setup          | MCP servers + language servers pre-configured and ready         |
+| Requires constant oversight| Start a task, grab a coffee, come back to verified results      |
 
 ---
 
@@ -63,6 +64,8 @@ There are other AI coding frameworks out there. I tried them. They add complexit
 **Pilot optimizes for output quality, not system complexity.** The rules are minimal and focused. There's no big learning curve, no project scaffolding to set up, no state files to manage. You install it, run `pilot`, and the quality guardrails are just there — hooks, TDD, type checking, formatting — enforced automatically on every edit, in every session.
 
 This isn't a vibe coding tool. It's built for developers who ship to production and need code that actually works. Every rule in the system comes from daily professional use: real bugs caught, real regressions prevented, real sessions where the AI cut corners and the hooks stopped it. The rules are continuously refined based on what measurably improves output.
+
+**The result: you can actually walk away.** Start a `/spec` task, approve the plan, then go grab a coffee. When you come back, the work is done — tested, verified, formatted, and ready to ship. Endless Mode handles session continuity automatically, quality hooks catch every mistake along the way, and verifier agents review the code before marking it complete. No babysitting required.
 
 The system stays fast because it stays simple. Quick mode is direct execution with zero overhead — no sub-agents, no plan files, no directory scaffolding. You describe the task and it gets done. `/spec` adds structure only when you need it: plan verification, TDD enforcement, independent code review, automated quality checks. Both modes share the same quality hooks. Both modes hand off cleanly across sessions with Endless Mode.
 
@@ -483,7 +486,7 @@ Access the web-based Claude Pilot Console at **http://localhost:41777** to visua
 
 <!-- Replace with real testimonials from GitHub issues, discussions, or direct feedback as they come in -->
 
-> "I stopped reviewing every line Claude writes. The hooks catch formatting and type errors automatically, TDD catches logic errors, and the spec verifier catches everything else. I review the plan, approve it, and the output is production-ready."
+> "I stopped reviewing every line Claude writes. The hooks catch formatting and type errors automatically, TDD catches logic errors, and the spec verifier catches everything else. I review the plan, approve it, and the output is production-grade."
 
 > "Other frameworks I tried added so much overhead that half my tokens went to the system itself. Pilot is lean — quick mode has zero scaffolding, and even /spec only adds structure where it matters. More of my context goes to actual work."
 
@@ -509,14 +512,26 @@ Details and licensing at [claude-pilot.com](https://claude-pilot.com).
 <details>
 <summary><b>Does Pilot send my code or data to external services?</b></summary>
 
-No. All development data stays on your machine. Vector search (Vexor), embeddings, persistent memory (Pilot Console), and session state all run locally. Pilot does not operate any cloud backend or telemetry service. The only external communication is between Claude Code and Anthropic's API — using your own subscription or API key, exactly as it would without Pilot.
+**No code, files, prompts, project data, or personal information ever leaves your machine through Pilot.** All development tools — vector search (Vexor), persistent memory (Pilot Console), session state, and quality hooks — run entirely locally.
+
+Pilot makes external calls **only for licensing**. Here is the complete list:
+
+| When | Where | What is sent |
+|------|-------|--------------|
+| License validation (once per 24h) | `api.polar.sh` | License key, organization ID |
+| License activation (once) | `api.polar.sh` | License key, machine fingerprint, OS, architecture, Python version |
+| Activation analytics (once) | `claude-pilot.com` | Tier, Pilot version, OS, architecture, Python version, machine fingerprint |
+| Trial start (once) | `claude-pilot.com` | Hashed hardware fingerprint, OS, Pilot version, locale |
+| Trial heartbeat (each session during trial) | `claude-pilot.com` | Hashed hardware fingerprint, OS, Pilot version |
+
+That's it. No code, no filenames, no prompts, no project content, no personal data. The validation result is cached locally, and Pilot works fully offline for up to 7 days between checks. Beyond these licensing calls, the only external communication is between Claude Code and Anthropic's API — using your own subscription or API key.
 
 </details>
 
 <details>
 <summary><b>Is Pilot enterprise-compliant for data privacy?</b></summary>
 
-Yes. Since Pilot runs entirely locally and adds no additional external data flows beyond what Claude Code itself uses, it is compatible with enterprise data policies. Your source code, project files, and development context never leave your machine through Pilot. Enterprises using Claude Code with their own API key or Anthropic Enterprise subscription can add Pilot without changing their data compliance posture.
+Yes. Your source code, project files, and development context never leave your machine through Pilot. The only external calls Pilot makes are for license management — validation (daily to `api.polar.sh`), activation and analytics (one-time), and trial heartbeats. None of these transmit any code, project data, or personal information. Enterprises using Claude Code with their own API key or Anthropic Enterprise subscription can add Pilot without changing their data compliance posture.
 
 </details>
 

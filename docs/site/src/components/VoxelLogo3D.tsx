@@ -361,7 +361,7 @@ function Scene() {
 
 const VoxelLogo3D = () => (
   <div
-    className="w-[80vw] max-w-[220px] xs:max-w-[270px] sm:max-w-[380px] md:max-w-[460px] lg:max-w-[540px] aspect-[2/1]"
+    className="w-[85vw] max-w-[240px] xs:max-w-[300px] sm:max-w-[420px] md:max-w-[500px] lg:max-w-[580px] aspect-[2/1]"
     aria-label="Claude Pilot - Claude Code is powerful. Pilot makes it reliable."
     role="img"
   >

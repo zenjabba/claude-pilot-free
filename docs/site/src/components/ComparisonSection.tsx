@@ -169,7 +169,7 @@ const ComparisonSection = () => {
             {/* Result */}
             <div className="mt-4 flex items-center justify-center gap-2 text-primary text-sm">
               <Zap className="h-4 w-4" />
-              <span>Systematic. Tested. Confident.</span>
+              <span>Grab a coffee. Come back to verified code.</span>
             </div>
           </div>
         </div>
@@ -208,7 +208,7 @@ const ComparisonSection = () => {
         {/* Bottom highlight */}
         <div className="mt-10 text-center">
           <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto">
-            <span className="text-primary font-medium">Code you can actually ship.</span> Tested. Verified. Done.
+            <span className="text-primary font-medium">Start a task. Walk away. Come back to code you can actually ship.</span>
           </p>
         </div>
       </div>

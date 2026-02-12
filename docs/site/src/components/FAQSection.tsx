@@ -6,12 +6,12 @@ const faqItems = [
   {
     question: "Does Pilot send my code or data to external services?",
     answer:
-      "No. All development data stays on your machine. Vector search (Vexor), embeddings, persistent memory (Pilot Console), and session state all run locally. Pilot does not operate any cloud backend or telemetry service. The only external communication is between Claude Code and Anthropic's API \u2014 using your own subscription or API key, exactly as it would without Pilot.",
+      "No code, files, prompts, project data, or personal information ever leaves your machine through Pilot. All development tools \u2014 vector search, persistent memory, session state, and quality hooks \u2014 run entirely locally. Pilot makes external calls only for licensing: (1) License validation \u2014 once every 24 hours, your license key is checked against Polar\u2019s API (api.polar.sh). (2) License activation \u2014 one-time, sends license key, machine fingerprint, OS, and architecture to api.polar.sh, plus a one-time activation analytics event (tier, Pilot version, OS info) to claude-pilot.com. (3) Trial \u2014 sends a hashed hardware fingerprint, OS, and Pilot version to claude-pilot.com to generate a 7-day trial key, with a lightweight heartbeat on each session start during the trial. That\u2019s the complete list. No code, no filenames, no prompts, no project content. The validation result is cached locally, and Pilot works fully offline for up to 7 days.",
   },
   {
     question: "Is Pilot enterprise-compliant for data privacy?",
     answer:
-      "Yes. Since Pilot runs entirely locally and adds no additional external data flows beyond what Claude Code itself uses, it is compatible with enterprise data policies. Your source code, project files, and development context never leave your machine through Pilot. Enterprises using Claude Code with their own API key or Anthropic Enterprise subscription can add Pilot without changing their data compliance posture.",
+      "Yes. Your source code, project files, and development context never leave your machine through Pilot. The only external calls Pilot makes are for license management \u2014 validation (daily to api.polar.sh), activation and analytics (one-time), and trial heartbeats. None of these transmit any code, project data, or personal information. Enterprises using Claude Code with their own API key or Anthropic Enterprise subscription can add Pilot without changing their data compliance posture.",
   },
   {
     question: "What are the licenses of Pilot's dependencies?",

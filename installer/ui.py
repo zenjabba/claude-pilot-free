@@ -139,6 +139,7 @@ class Console:
         tagline.append("  ✈ ", style="cyan")
         tagline.append("Claude Code is powerful. Pilot makes it reliable.", style="bold white")
         self._console.print(tagline)
+        self._console.print("    Start a task, grab a coffee, come back to production-grade code.", style="dim")
         self._console.print()
 
         self._console.print("  [bold white]What You're Getting[/bold white]")

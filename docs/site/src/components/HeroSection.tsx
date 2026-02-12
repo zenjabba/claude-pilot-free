@@ -51,8 +51,8 @@ const HeroSection = () => {
         </div>
 
         {/* 3D Voxel Logo */}
-        <div className="animate-fade-in-up animation-delay-100 flex justify-center">
-          <Suspense fallback={<div className="w-[80vw] max-w-[220px] xs:max-w-[270px] sm:max-w-[380px] md:max-w-[460px] lg:max-w-[540px] aspect-[2/1]" />}>
+        <div className="animate-fade-in-up animation-delay-100 flex justify-center my-2 xs:my-4 sm:my-6">
+          <Suspense fallback={<div className="w-[85vw] max-w-[240px] xs:max-w-[300px] sm:max-w-[420px] md:max-w-[500px] lg:max-w-[580px] aspect-[2/1]" />}>
             <VoxelLogo3D />
           </Suspense>
         </div>
@@ -60,7 +60,7 @@ const HeroSection = () => {
         {/* Subtitle */}
         <div className="animate-fade-in-up animation-delay-200 mb-6 xs:mb-8 px-1">
           <p className="text-muted-foreground text-[11px] xs:text-xs sm:text-sm md:text-base lg:text-lg max-w-[90%] xs:max-w-xl sm:max-w-2xl mx-auto leading-relaxed">
-            Ship code you can actually trust. Pilot is your quality autopilot.
+            Start a task, grab a coffee, come back to production-grade code.
           </p>
           <p className="text-muted-foreground/70 text-[10px] xs:text-xs sm:text-sm md:text-base max-w-[90%] xs:max-w-xl sm:max-w-2xl mx-auto mt-2 leading-relaxed">
             Tests enforced. Context preserved. Quality automated.
@@ -82,6 +82,16 @@ const HeroSection = () => {
           <div className="text-center">
             <div className="text-lg xs:text-xl sm:text-2xl font-bold text-primary">MCP</div>
             <div className="text-[9px] xs:text-[10px] sm:text-xs text-muted-foreground">External Context</div>
+          </div>
+          <div className="w-px h-8 bg-border/50 hidden xs:block" />
+          <div className="text-center">
+            <div className="text-lg xs:text-xl sm:text-2xl font-bold text-primary">LSP</div>
+            <div className="text-[9px] xs:text-[10px] sm:text-xs text-muted-foreground">Live Diagnostics</div>
+          </div>
+          <div className="w-px h-8 bg-border/50 hidden xs:block" />
+          <div className="text-center">
+            <div className="text-lg xs:text-xl sm:text-2xl font-bold text-primary">Search</div>
+            <div className="text-[9px] xs:text-[10px] sm:text-xs text-muted-foreground">Semantic Index</div>
           </div>
         </div>
 

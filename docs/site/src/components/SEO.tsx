@@ -12,7 +12,7 @@ interface SEOProps {
 
 const SEO = ({
   title = "Claude Pilot - Claude Code is powerful. Pilot makes it reliable.",
-  description = "Ship code you can actually trust. Pilot is your quality autopilot. Tests enforced, context preserved, quality automated.",
+  description = "Start a task, grab a coffee, come back to production-grade code. Tests enforced, context preserved, quality automated.",
   keywords = "Claude Pilot, Claude Code, AI coding assistant, AI pair programming, TDD enforcement, Test-Driven Development, code quality automation, linting, formatting, type checking, spec-driven development, dev containers, VS Code, Cursor, Windsurf, Claude API, Anthropic, AI development tools, automated testing, code review, persistent memory, semantic code search",
   canonicalUrl = "https://claude-pilot.com",
   ogImage = "https://claude-pilot.com/logo.png",
