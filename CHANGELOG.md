@@ -2,6 +2,21 @@
 
 All notable changes to Claude Pilot will be documented in this file.
 
+## [6.4.0] - 2026-02-12
+
+### Bug Fixes
+
+- Consolidate website deployment into release pipelines and fix changelog duplication
+- Prevent changelog duplication from squash merge commits
+
+### Features
+
+- Parallel multi-agent verification, standards migration, blog & dashboard 
+
+### Miscellaneous
+
+- Updated Readme header
+
 ## [6.3.3] - 2026-02-11
 
 ### Bug Fixes
