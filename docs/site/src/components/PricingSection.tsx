@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Check, Building2, Clock, Sparkles, Shield, Zap } from "lucide-react";
 import { PolarEmbedCheckout } from "@polar-sh/checkout/embed";
 import { Button } from "@/components/ui/button";
@@ -12,10 +12,28 @@ const PORTAL_URL = import.meta.env.VITE_POLAR_PORTAL_URL
   || "https://polar.sh/max-ritter/portal";
 const IS_PRODUCTION = import.meta.env.PROD && !import.meta.env.VITE_POLAR_PORTAL_URL?.includes("sandbox");
 
+function getCookie(name: string): string | undefined {
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match?.[1];
+}
+
+function appendDatafastMetadata(checkoutUrl: string): string {
+  const visitorId = getCookie("datafast_visitor_id");
+  const sessionId = getCookie("datafast_session_id");
+  if (!visitorId && !sessionId) return checkoutUrl;
+  const url = new URL(checkoutUrl);
+  if (visitorId) url.searchParams.set("metadata[datafast_visitor_id]", visitorId);
+  if (sessionId) url.searchParams.set("metadata[datafast_session_id]", sessionId);
+  return url.toString();
+}
+
 const PricingSection = () => {
   const [headerRef, headerInView] = useInView<HTMLDivElement>();
   const [cardsRef, cardsInView] = useInView<HTMLDivElement>();
   const [valueRef, valueInView] = useInView<HTMLDivElement>();
+
+  const soloUrl = useMemo(() => appendDatafastMetadata(SOLO_CHECKOUT_URL), []);
+  const teamUrl = useMemo(() => appendDatafastMetadata(TEAM_CHECKOUT_URL), []);
 
   useEffect(() => {
     if (IS_PRODUCTION) {
@@ -121,7 +139,7 @@ const PricingSection = () => {
             </ul>
 
             <Button asChild className="w-full">
-              <a href={SOLO_CHECKOUT_URL} {...(IS_PRODUCTION ? { "data-polar-checkout": true, "data-polar-checkout-theme": "dark" } : { target: "_blank", rel: "noopener" })}>
+              <a href={soloUrl} {...(IS_PRODUCTION ? { "data-polar-checkout": true, "data-polar-checkout-theme": "dark" } : { target: "_blank", rel: "noopener" })}>
                 Subscribe
               </a>
             </Button>
@@ -168,7 +186,7 @@ const PricingSection = () => {
             </ul>
 
             <Button asChild variant="outline" className="w-full border-indigo-500/50 hover:bg-indigo-500/10">
-              <a href={TEAM_CHECKOUT_URL} target="_blank" rel="noopener">
+              <a href={teamUrl} target="_blank" rel="noopener">
                 Subscribe
               </a>
             </Button>

@@ -609,6 +609,96 @@ def _install_vexor_with_ui(ui: Any) -> bool:
         return False
 
 
+def _is_npx_package_cached(package: str) -> bool:
+    """Check if an npx package is already cached in ~/.npm/_npx/."""
+    npx_cache = Path.home() / ".npm" / "_npx"
+    if not npx_cache.exists():
+        return False
+    pkg_name = package.split("@")[0] if "@" not in package or package.startswith("@") else package
+    if package.startswith("@"):
+        pkg_name = package.rsplit("@", 1)[0] if package.count("@") > 1 else package
+    for hash_dir in npx_cache.iterdir():
+        candidate = hash_dir / "node_modules" / pkg_name
+        if candidate.is_dir():
+            return True
+    return False
+
+
+def _kill_proc(proc: subprocess.Popen[Any]) -> None:
+    """Terminate a process, escalating to kill if needed."""
+    proc.terminate()
+    try:
+        proc.wait(timeout=3)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        proc.wait(timeout=2)
+
+
+def _precache_npx_mcp_servers(_ui: Any) -> bool:
+    """Pre-cache npx-based MCP server packages so Claude Code can start them instantly.
+
+    Reads .mcp.json from the plugin directory, finds servers that use npx,
+    launches all in parallel, polls until cached, then kills them.
+    """
+    mcp_config_path = Path.home() / ".claude" / "pilot" / ".mcp.json"
+    if not mcp_config_path.exists():
+        return True
+
+    try:
+        config = json.loads(mcp_config_path.read_text())
+    except (json.JSONDecodeError, OSError):
+        return False
+
+    servers = config.get("mcpServers", {})
+    npx_packages: list[str] = []
+
+    for server_config in servers.values():
+        cmd = server_config.get("command", "")
+        args = server_config.get("args", [])
+        if cmd == "npx" and len(args) >= 2 and args[0] == "-y":
+            npx_packages.append(args[1])
+
+    uncached = [p for p in npx_packages if not _is_npx_package_cached(p)]
+    if not uncached:
+        return True
+
+    procs: list[tuple[str, subprocess.Popen[Any]]] = []
+    for package in uncached:
+        try:
+            proc = subprocess.Popen(
+                ["npx", "-y", package],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                stdin=subprocess.DEVNULL,
+            )
+            procs.append((package, proc))
+        except Exception:
+            continue
+
+    if not procs:
+        return True
+
+    max_wait = 60
+    poll_interval = 0.5
+    elapsed = 0.0
+    remaining = {pkg for pkg, _ in procs}
+
+    while remaining and elapsed < max_wait:
+        time.sleep(poll_interval)
+        elapsed += poll_interval
+        for pkg in list(remaining):
+            if _is_npx_package_cached(pkg):
+                remaining.discard(pkg)
+
+    for _, proc in procs:
+        try:
+            _kill_proc(proc)
+        except Exception:
+            pass
+
+    return True
+
+
 def _clean_mcp_servers_from_claude_config(ui: Any) -> None:
     """Remove mcpServers section from ~/.claude.json (now in plugin/.mcp.json)."""
 
@@ -681,6 +771,9 @@ class DependenciesStep(BaseStep):
         if _install_with_spinner(ui, "sx (team assets)", install_sx):
             installed.append("sx")
             _install_with_spinner(ui, "sx update", update_sx)
+
+        if _install_with_spinner(ui, "MCP server packages", _precache_npx_mcp_servers, ui):
+            installed.append("mcp_npx_cache")
 
         _clean_mcp_servers_from_claude_config(ui)
 

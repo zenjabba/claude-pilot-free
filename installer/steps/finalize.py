@@ -96,6 +96,14 @@ class FinalizeStep(BaseStep):
 
         steps.append(
             (
+                "Team Vault (Optional)",
+                "/vault → Share rules, commands, and skills via a private Git repository\n"
+                "     Run: sx install --repair --target . → Pull team assets before syncing",
+            )
+        )
+
+        steps.append(
+            (
                 "Custom MCP Servers (Optional)",
                 "Add lightweight servers to .mcp.json (instructions load into context)\n"
                 "     Add heavy servers to mcp_servers.json (zero context cost via mcp-cli)\n"
@@ -132,10 +140,6 @@ class FinalizeStep(BaseStep):
                 (
                     "Multi-Session",
                     "Run multiple pilot sessions in the same project — each session is isolated",
-                ),
-                (
-                    "Team Vault (Optional)",
-                    "/vault → Share rules, commands, and skills via a private Git repository",
                 ),
             ]
         )

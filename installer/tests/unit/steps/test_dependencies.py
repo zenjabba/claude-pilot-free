@@ -6,9 +6,6 @@ import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
-
-
 class TestDependenciesStep:
     """Test DependenciesStep class."""
 
@@ -33,6 +30,7 @@ class TestDependenciesStep:
             )
             assert step.check(ctx) is False
 
+    @patch("installer.steps.dependencies._precache_npx_mcp_servers", return_value=True)
     @patch("installer.steps.dependencies.install_vexor")
     @patch("installer.steps.dependencies._install_plugin_dependencies")
     @patch("installer.steps.dependencies._setup_pilot_memory")
@@ -45,6 +43,7 @@ class TestDependenciesStep:
         mock_setup_pilot_memory,
         mock_plugin_deps,
         mock_vexor,
+        _mock_precache,
     ):
         """DependenciesStep installs core dependencies."""
         from installer.context import InstallContext
@@ -71,6 +70,7 @@ class TestDependenciesStep:
             mock_claude.assert_called_once()
             mock_plugin_deps.assert_called_once()
 
+    @patch("installer.steps.dependencies._precache_npx_mcp_servers", return_value=True)
     @patch("installer.steps.dependencies.install_vexor")
     @patch("installer.steps.dependencies._install_plugin_dependencies")
     @patch("installer.steps.dependencies._setup_pilot_memory")
@@ -87,6 +87,7 @@ class TestDependenciesStep:
         mock_setup_pilot_memory,
         mock_plugin_deps,
         mock_vexor,
+        _mock_precache,
     ):
         """DependenciesStep installs Python tools when enabled."""
         from installer.context import InstallContext
@@ -590,3 +591,139 @@ class TestCleanMcpServersFromClaudeConfig:
 
                 config = json.loads(config_path.read_text())
                 assert config == {"theme": "dark"}
+
+
+class TestPrecacheNpxMcpServers:
+    """Test pre-caching of npx-based MCP server packages."""
+
+    def test_returns_true_when_no_mcp_json(self):
+        """Returns True when .mcp.json doesn't exist."""
+        from installer.steps.dependencies import _precache_npx_mcp_servers
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch.object(Path, "home", return_value=Path(tmpdir)):
+                assert _precache_npx_mcp_servers(None) is True
+
+    def test_returns_true_when_all_cached(self):
+        """Returns True immediately when all packages are already cached."""
+        import json
+
+        from installer.steps.dependencies import _precache_npx_mcp_servers
+
+        mcp_config = {
+            "mcpServers": {
+                "web-fetch": {"command": "npx", "args": ["-y", "fetcher-mcp"]},
+            }
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            plugin_dir = Path(tmpdir) / ".claude" / "pilot"
+            plugin_dir.mkdir(parents=True)
+            (plugin_dir / ".mcp.json").write_text(json.dumps(mcp_config))
+
+            with patch.object(Path, "home", return_value=Path(tmpdir)):
+                with patch(
+                    "installer.steps.dependencies._is_npx_package_cached",
+                    return_value=True,
+                ):
+                    assert _precache_npx_mcp_servers(None) is True
+
+    def test_extracts_npx_packages_from_mcp_json(self):
+        """Extracts only npx -y packages from .mcp.json."""
+        import json
+
+        from installer.steps.dependencies import _precache_npx_mcp_servers
+
+        mcp_config = {
+            "mcpServers": {
+                "web-fetch": {"command": "npx", "args": ["-y", "fetcher-mcp"]},
+                "context7": {"command": "npx", "args": ["-y", "@upstash/context7-mcp"]},
+                "grep": {"type": "http", "url": "https://mcp.grep.app"},
+                "mem": {"command": "sh", "args": ["-c", "bun run server.cjs"]},
+            }
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            plugin_dir = Path(tmpdir) / ".claude" / "pilot"
+            plugin_dir.mkdir(parents=True)
+            (plugin_dir / ".mcp.json").write_text(json.dumps(mcp_config))
+
+            with patch.object(Path, "home", return_value=Path(tmpdir)):
+                with patch(
+                    "installer.steps.dependencies._is_npx_package_cached",
+                    return_value=True,
+                ):
+                    assert _precache_npx_mcp_servers(None) is True
+
+    def test_launches_and_kills_uncached_packages(self):
+        """Launches npx for uncached packages and kills after caching."""
+        import json
+
+        from installer.steps.dependencies import _precache_npx_mcp_servers
+
+        mcp_config = {
+            "mcpServers": {
+                "web-fetch": {"command": "npx", "args": ["-y", "fetcher-mcp"]},
+            }
+        }
+
+        mock_proc = MagicMock()
+        mock_proc.terminate = MagicMock()
+        mock_proc.wait = MagicMock()
+
+        call_count = 0
+
+        def cache_on_second_call(_pkg):
+            nonlocal call_count
+            call_count += 1
+            return call_count > 1
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            plugin_dir = Path(tmpdir) / ".claude" / "pilot"
+            plugin_dir.mkdir(parents=True)
+            (plugin_dir / ".mcp.json").write_text(json.dumps(mcp_config))
+
+            with patch.object(Path, "home", return_value=Path(tmpdir)):
+                with patch(
+                    "installer.steps.dependencies._is_npx_package_cached",
+                    side_effect=cache_on_second_call,
+                ):
+                    with patch("installer.steps.dependencies.subprocess.Popen", return_value=mock_proc):
+                        with patch("installer.steps.dependencies.time.sleep"):
+                            result = _precache_npx_mcp_servers(None)
+
+            assert result is True
+            mock_proc.terminate.assert_called_once()
+
+    def test_is_npx_package_cached_finds_cached(self):
+        """_is_npx_package_cached returns True when package exists in npx cache."""
+        from installer.steps.dependencies import _is_npx_package_cached
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            npx_cache = Path(tmpdir) / ".npm" / "_npx" / "abc123" / "node_modules" / "fetcher-mcp"
+            npx_cache.mkdir(parents=True)
+
+            with patch.object(Path, "home", return_value=Path(tmpdir)):
+                assert _is_npx_package_cached("fetcher-mcp") is True
+
+    def test_is_npx_package_cached_returns_false_when_missing(self):
+        """_is_npx_package_cached returns False when package not in cache."""
+        from installer.steps.dependencies import _is_npx_package_cached
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            npx_cache = Path(tmpdir) / ".npm" / "_npx"
+            npx_cache.mkdir(parents=True)
+
+            with patch.object(Path, "home", return_value=Path(tmpdir)):
+                assert _is_npx_package_cached("fetcher-mcp") is False
+
+    def test_is_npx_package_cached_handles_scoped_packages(self):
+        """_is_npx_package_cached handles @scope/package names."""
+        from installer.steps.dependencies import _is_npx_package_cached
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            npx_cache = Path(tmpdir) / ".npm" / "_npx" / "abc123" / "node_modules" / "@upstash" / "context7-mcp"
+            npx_cache.mkdir(parents=True)
+
+            with patch.object(Path, "home", return_value=Path(tmpdir)):
+                assert _is_npx_package_cached("@upstash/context7-mcp") is True
