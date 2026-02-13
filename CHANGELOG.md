@@ -2,6 +2,12 @@
 
 All notable changes to Claude Pilot will be documented in this file.
 
+## [6.5.3] - 2026-02-13
+
+### Bug Fixes
+
+- Add pre-commit hook for console build artifacts and rebuild bundles
+
 ## [6.5.2] - 2026-02-13
 
 ### Bug Fixes
