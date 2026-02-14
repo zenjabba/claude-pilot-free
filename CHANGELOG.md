@@ -2,6 +2,12 @@
 
 All notable changes to Claude Pilot will be documented in this file.
 
+## [6.5.4] - 2026-02-14
+
+### Bug Fixes
+
+- Stop deleting native Claude Code binary, fix spec UI staleness, improve TDD enforcer
+
 ## [6.5.3] - 2026-02-13
 
 ### Bug Fixes
