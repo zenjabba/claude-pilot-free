@@ -1,0 +1,96 @@
+---
+name: Sync Upstream Release
+
+on:
+  schedule:
+    # Check every 6 hours
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Specific version to sync (e.g., 6.5.9). Leave empty to sync latest."
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  UPSTREAM_REPO: maxritter/claude-pilot
+
+jobs:
+  sync:
+    name: Sync Release Assets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine version to sync
+        id: version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            VERSION="${VERSION#v}"
+            echo "Using manually specified version: ${VERSION}"
+          else
+            VERSION=$(gh release view --repo "$UPSTREAM_REPO" --json tagName --jq '.tagName' | sed 's/^v//')
+            if [ -z "$VERSION" ]; then
+              echo "Failed to fetch latest upstream version"
+              exit 1
+            fi
+            echo "Latest upstream version: ${VERSION}"
+          fi
+
+          # Check if we already have this release
+          if gh release view "v${VERSION}" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            echo "Release v${VERSION} already exists, skipping"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "New release v${VERSION} needs syncing"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Download upstream assets
+        if: steps.version.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          mkdir -p /tmp/release-assets
+
+          echo "Downloading assets from ${UPSTREAM_REPO} v${VERSION}..."
+          gh release download "v${VERSION}" \
+            --repo "$UPSTREAM_REPO" \
+            --pattern "*.so" \
+            --pattern "pilot" \
+            --dir /tmp/release-assets
+
+          echo "Downloaded assets:"
+          ls -la /tmp/release-assets/
+
+      - name: Create release and upload assets
+        if: steps.version.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Get upstream release notes
+          UPSTREAM_NOTES=$(gh release view "v${VERSION}" --repo "$UPSTREAM_REPO" --json body --jq '.body' 2>/dev/null || echo "")
+
+          BODY="$(cat <<EOF
+          Synced from upstream [v${VERSION}](https://github.com/${UPSTREAM_REPO}/releases/tag/v${VERSION}).
+
+          ${UPSTREAM_NOTES}
+          EOF
+          )"
+
+          gh release create "v${VERSION}" \
+            --repo "${{ github.repository }}" \
+            --title "v${VERSION}" \
+            --notes "${BODY}" \
+            /tmp/release-assets/*
+
+          echo "Release v${VERSION} created with all assets"
