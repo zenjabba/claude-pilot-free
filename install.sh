@@ -125,7 +125,7 @@ show_macos_gatekeeper_warning() {
 	echo ""
 	echo "  ⚠️  macOS Gatekeeper is blocking the pilot binary"
 	echo ""
-	echo "  The installer requires pilot to verify your license."
+	echo "  The installer requires the pilot binary to proceed."
 	echo "  Please follow these steps to unblock it:"
 	echo ""
 	echo "    1. Open System Settings → Privacy & Security"

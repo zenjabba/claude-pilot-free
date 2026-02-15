@@ -251,55 +251,8 @@ def _handle_license_flow(
     license_info: dict | None,
     license_acknowledged: bool,
 ) -> int | None:
-    """Handle license verification flow. Returns exit code if should exit, None to continue."""
-    if license_acknowledged and license_info:
-        tier = license_info.get("tier", "unknown")
-        is_expired = license_info.get("is_expired", False)
-
-        if tier == "trial" and is_expired:
-            console.print()
-            console.print("  [bold yellow]50% off your first month:[/bold yellow] [bold white]TRIAL50OFF[/bold white]")
-            console.print("  [cyan]Subscribe at: https://claude-pilot.com[/cyan]")
-            console.print()
-            console.print("  [bold]Enter your license key to continue:[/bold]")
-            console.print()
-            if not _prompt_license_key(console, project_dir):
-                return 1
-            console.print()
-        return None
-
-    console.print()
-
-    with console.spinner("Checking trial eligibility..."):
-        trial_used, can_reactivate = _check_trial_used(project_dir, local_mode, local_repo_dir)
-    if trial_used is None:
-        trial_used = False
-
-    if trial_used and not can_reactivate:
-        console.print("  [bold yellow]Trial has expired on this machine.[/bold yellow]")
-        console.print("  [bold yellow]50% off your first month:[/bold yellow] [bold white]TRIAL50OFF[/bold white]")
-        console.print("  [cyan]Subscribe at: https://claude-pilot.com[/cyan]")
-        console.print()
-        console.print("  Please enter a license key to continue.")
-        console.print()
-        if not _prompt_license_key(console, project_dir):
-            return 1
-    else:
-        started = _start_trial(console, project_dir, local_mode, local_repo_dir)
-        if started:
-            console.print()
-            console.success("Your 7-day trial has started!")
-            console.print("  All features are unlocked for 7 days.")
-            console.print()
-            console.print("  [bold]Subscribe after trial:[/bold] [cyan]https://claude-pilot.com[/cyan]")
-            console.print()
-        else:
-            console.print()
-            console.warning("Could not start trial. Enter a license key to continue.")
-            console.print()
-            if not _prompt_license_key(console, project_dir):
-                return 1
-
+    """Handle license verification flow. License checking is disabled - always continues."""
+    _ = console, project_dir, local_mode, local_repo_dir, license_info, license_acknowledged
     return None
 
 

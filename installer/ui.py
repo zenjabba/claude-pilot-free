@@ -158,38 +158,7 @@ class Console:
         )
         self._console.print()
 
-        tier = license_info.get("tier") if license_info else None
-
-        if tier in ("solo", "team", "standard", "enterprise"):
-            tier_map = {"solo": "Solo", "standard": "Solo", "team": "Team", "enterprise": "Team"}
-            tier_display = tier_map.get(tier, tier.title())
-            email = license_info.get("email", "") if license_info else ""
-            license_text = Text()
-            license_text.append("  ✓ ", style="green")
-            license_text.append(f"{tier_display} License", style="bold green")
-            if email:
-                license_text.append(f" — {email}", style="dim white")
-            self._console.print(license_text)
-        elif tier == "trial":
-            days = license_info.get("days_remaining") if license_info else None
-            is_expired = license_info.get("is_expired", False) if license_info else False
-            license_text = Text()
-            if is_expired:
-                license_text.append("  ⚠ ", style="red")
-                license_text.append("Trial Expired", style="bold red")
-                license_text.append(" — 50% off your first month: ", style="bold yellow")
-                license_text.append("TRIAL50OFF", style="bold white")
-                license_text.append(" — ", style="dim white")
-                license_text.append("https://claude-pilot.com", style="cyan")
-            else:
-                expires_at = license_info.get("expires_at") if license_info else None
-                time_str = _get_trial_time_str(days, expires_at)
-                license_text.append("  ⏳ ", style="yellow")
-                license_text.append(f"Trial ({time_str} remaining)", style="bold yellow")
-                license_text.append(" — Subscribe: ", style="dim white")
-                license_text.append("https://claude-pilot.com", style="cyan")
-            self._console.print(license_text)
-            self._console.print()
+        _ = license_info
 
     def set_total_steps(self, total: int) -> None:
         """Set total number of installation steps."""

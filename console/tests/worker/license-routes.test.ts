@@ -1,25 +1,9 @@
 /**
  * Tests for LicenseRoutes
  *
- * Tests the /api/license endpoint with mocked spawnSync calls.
- * Covers: valid license, expired trial, no license, missing binary.
+ * License checking is disabled - routes always return valid enterprise license.
  */
-import { describe, it, expect, mock, beforeEach } from "bun:test";
-
-const mockSpawnSync = mock(() => ({
-  status: 0,
-  stdout: Buffer.from(""),
-  stderr: Buffer.from(""),
-}));
-
-mock.module("child_process", () => ({
-  spawnSync: mockSpawnSync,
-}));
-
-const mockExistsSync = mock(() => true);
-mock.module("fs", () => ({
-  existsSync: mockExistsSync,
-}));
+import { describe, it, expect, beforeEach } from "bun:test";
 
 import { LicenseRoutes } from "../../src/services/worker/http/routes/LicenseRoutes.js";
 
@@ -28,9 +12,6 @@ describe("LicenseRoutes", () => {
 
   beforeEach(() => {
     routes = new LicenseRoutes();
-    mockSpawnSync.mockReset();
-    mockExistsSync.mockReset();
-    mockExistsSync.mockReturnValue(true);
   });
 
   describe("route setup", () => {
@@ -45,182 +26,7 @@ describe("LicenseRoutes", () => {
 
       expect(registeredRoutes).toContain("GET /api/license");
     });
-  });
 
-  describe("getLicenseInfo", () => {
-    it("should return valid license for successful pilot status", () => {
-      const cliOutput = JSON.stringify({
-        success: true,
-        tier: "solo",
-        email: "user@example.com",
-        days_remaining: null,
-        created_at: "2026-01-01",
-        expires_at: null,
-      });
-
-      mockSpawnSync.mockReturnValue({
-        status: 0,
-        stdout: Buffer.from(cliOutput),
-        stderr: Buffer.from(""),
-      });
-
-      const result = routes.getLicenseInfo();
-
-      expect(result).toEqual({
-        valid: true,
-        tier: "solo",
-        email: "user@example.com",
-        daysRemaining: null,
-        isExpired: false,
-      });
-    });
-
-    it("should return expired trial info on exit code 1 with trial expired error", () => {
-      const cliOutput = JSON.stringify({
-        success: false,
-        error: "Trial expired",
-        tier: "trial",
-        email: "trial@example.com",
-        created_at: "2026-01-01",
-        expires_at: "2026-01-15",
-      });
-
-      mockSpawnSync.mockReturnValue({
-        status: 1,
-        stdout: Buffer.from(cliOutput),
-        stderr: Buffer.from(""),
-      });
-
-      const result = routes.getLicenseInfo();
-
-      expect(result).toEqual({
-        valid: false,
-        tier: "trial",
-        email: "trial@example.com",
-        daysRemaining: null,
-        isExpired: true,
-      });
-    });
-
-    it("should return null tier when no license found", () => {
-      const cliOutput = JSON.stringify({
-        success: false,
-        error: "No license found",
-      });
-
-      mockSpawnSync.mockReturnValue({
-        status: 1,
-        stdout: Buffer.from(cliOutput),
-        stderr: Buffer.from(""),
-      });
-
-      const result = routes.getLicenseInfo();
-
-      expect(result).toEqual({
-        valid: false,
-        tier: null,
-        email: null,
-        daysRemaining: null,
-        isExpired: false,
-      });
-    });
-
-    it("should return fallback when pilot binary not found", () => {
-      mockExistsSync.mockReturnValue(false);
-
-      const result = routes.getLicenseInfo();
-
-      expect(result).toEqual({
-        valid: false,
-        tier: null,
-        email: null,
-        daysRemaining: null,
-        isExpired: false,
-      });
-      expect(mockSpawnSync).not.toHaveBeenCalled();
-    });
-
-    it("should return fallback when spawnSync throws", () => {
-      mockSpawnSync.mockImplementation(() => {
-        throw new Error("Command failed");
-      });
-
-      const result = routes.getLicenseInfo();
-
-      expect(result).toEqual({
-        valid: false,
-        tier: null,
-        email: null,
-        daysRemaining: null,
-        isExpired: false,
-      });
-    });
-
-    it("should return days_remaining for trial tier", () => {
-      const cliOutput = JSON.stringify({
-        success: true,
-        tier: "trial",
-        email: "trial@example.com",
-        days_remaining: 7,
-      });
-
-      mockSpawnSync.mockReturnValue({
-        status: 0,
-        stdout: Buffer.from(cliOutput),
-        stderr: Buffer.from(""),
-      });
-
-      const result = routes.getLicenseInfo();
-
-      expect(result).toEqual({
-        valid: true,
-        tier: "trial",
-        email: "trial@example.com",
-        daysRemaining: 7,
-        isExpired: false,
-      });
-    });
-
-    it("should return fallback when stdout is empty", () => {
-      mockSpawnSync.mockReturnValue({
-        status: 0,
-        stdout: Buffer.from(""),
-        stderr: Buffer.from(""),
-      });
-
-      const result = routes.getLicenseInfo();
-
-      expect(result).toEqual({
-        valid: false,
-        tier: null,
-        email: null,
-        daysRemaining: null,
-        isExpired: false,
-      });
-    });
-
-    it("should cache results for 5 minutes", () => {
-      const cliOutput = JSON.stringify({
-        success: true,
-        tier: "solo",
-        email: "user@example.com",
-        days_remaining: null,
-      });
-
-      mockSpawnSync.mockReturnValue({
-        status: 0,
-        stdout: Buffer.from(cliOutput),
-        stderr: Buffer.from(""),
-      });
-
-      routes.getLicenseInfo();
-      routes.getLicenseInfo();
-
-      expect(mockSpawnSync).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe("route setup for activate", () => {
     it("should register POST /api/license/activate", () => {
       const registeredRoutes: string[] = [];
       const mockApp = {
@@ -234,107 +40,30 @@ describe("LicenseRoutes", () => {
     });
   });
 
-  describe("activateLicense", () => {
-    it("should return success when pilot activate succeeds", () => {
-      const cliOutput = JSON.stringify({
-        success: true,
-        tier: "solo",
-        email: "user@example.com",
-        activations_used: 1,
-        activations_limit: 3,
-      });
-
-      mockSpawnSync.mockReturnValue({
-        status: 0,
-        stdout: Buffer.from(cliOutput),
-        stderr: Buffer.from(""),
-      });
-
-      const result = routes.activateLicense("TEST-KEY-123");
+  describe("getLicenseInfo", () => {
+    it("should always return valid enterprise license", () => {
+      const result = routes.getLicenseInfo();
 
       expect(result).toEqual({
-        success: true,
-        tier: "solo",
-        email: "user@example.com",
-        error: null,
-      });
-    });
-
-    it("should return error when pilot activate fails", () => {
-      const cliOutput = JSON.stringify({
-        success: false,
-        error: "Invalid license key",
-      });
-
-      mockSpawnSync.mockReturnValue({
-        status: 1,
-        stdout: Buffer.from(cliOutput),
-        stderr: Buffer.from(""),
-      });
-
-      const result = routes.activateLicense("BAD-KEY");
-
-      expect(result).toEqual({
-        success: false,
-        tier: null,
+        valid: true,
+        tier: "enterprise",
         email: null,
-        error: "Invalid license key",
+        daysRemaining: null,
+        isExpired: false,
       });
     });
+  });
 
-    it("should return error when pilot binary not found", () => {
-      mockExistsSync.mockReturnValue(false);
-
+  describe("activateLicense", () => {
+    it("should always return success", () => {
       const result = routes.activateLicense("ANY-KEY");
 
       expect(result).toEqual({
-        success: false,
-        tier: null,
+        success: true,
+        tier: "enterprise",
         email: null,
-        error: "Pilot binary not found",
+        error: null,
       });
-    });
-
-    it("should invalidate license cache after successful activation", () => {
-      const statusOutput = JSON.stringify({
-        success: true,
-        tier: "trial",
-        email: "trial@example.com",
-        days_remaining: 3,
-      });
-      mockSpawnSync.mockReturnValue({
-        status: 0,
-        stdout: Buffer.from(statusOutput),
-        stderr: Buffer.from(""),
-      });
-      routes.getLicenseInfo();
-
-      const activateOutput = JSON.stringify({
-        success: true,
-        tier: "solo",
-        email: "user@example.com",
-      });
-      mockSpawnSync.mockReturnValue({
-        status: 0,
-        stdout: Buffer.from(activateOutput),
-        stderr: Buffer.from(""),
-      });
-      routes.activateLicense("VALID-KEY");
-
-      const newStatusOutput = JSON.stringify({
-        success: true,
-        tier: "solo",
-        email: "user@example.com",
-        days_remaining: null,
-      });
-      mockSpawnSync.mockReturnValue({
-        status: 0,
-        stdout: Buffer.from(newStatusOutput),
-        stderr: Buffer.from(""),
-      });
-      routes.getLicenseInfo();
-
-      expect(mockSpawnSync).toHaveBeenCalledTimes(3);
     });
   });
 });

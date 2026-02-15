@@ -9,9 +9,7 @@
  */
 
 import path from "path";
-import { execSync } from "child_process";
 import { existsSync } from "fs";
-import { homedir } from "os";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { getWorkerPort, getWorkerHost, getWorkerBind } from "../shared/worker-utils.js";
@@ -97,25 +95,10 @@ export function buildStatusOutput(status: "ready" | "error", message?: string): 
 
 /**
  * Verify license using the pilot binary.
- * Returns true if license is valid, false otherwise.
+ * License checking is disabled - always returns true.
  */
 export function verifyLicense(): boolean {
-  const pilotPath = `${homedir()}/.pilot/bin/pilot`;
-
-  if (!existsSync(pilotPath)) {
-    logger.warn("SYSTEM", "Pilot binary not found, skipping license check");
-    return true;
-  }
-
-  try {
-    execSync(`"${pilotPath}" verify`, {
-      stdio: "pipe",
-      timeout: 5000,
-    });
-    return true;
-  } catch {
-    return false;
-  }
+  return true;
 }
 
 export class WorkerService {
@@ -631,14 +614,6 @@ async function main() {
 
   switch (command) {
     case "start": {
-      if (!verifyLicense()) {
-        logger.error("SYSTEM", "License verification failed");
-        exitWithStatus(
-          "error",
-          "UNLICENSED: Using Claude Pilot without a valid license is not permitted. Subscribe at https://claude-pilot.com then run: pilot activate <LICENSE_KEY>",
-        );
-      }
-
       const result = await ensureWorkerDaemon(port, __filename);
       if (result.ready) {
         logger.info("SYSTEM", "Worker started successfully");
