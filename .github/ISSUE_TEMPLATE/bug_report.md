@@ -12,7 +12,7 @@ labels: bug, needs-triage
 
 <!-- Provide detailed steps to reproduce the issue -->
 
-1. Run installation: `curl -fsSL https://raw.githubusercontent.com/maxritter/claude-pilot/main/install.sh | bash`
+1. Run installation: `curl -fsSL https://raw.githubusercontent.com/zenjabba/claude-pilot-free/main/install.sh | bash`
 2. Configure: `...`
 3. Run command: `...`
 4. See error

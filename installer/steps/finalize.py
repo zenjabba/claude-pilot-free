@@ -95,7 +95,7 @@ class FinalizeStep(BaseStep):
         if not ui.quiet:
             ui.rule()
             ui.print()
-            ui.print("  [bold yellow]⭐ Star this repo:[/bold yellow] https://github.com/maxritter/claude-pilot")
+            ui.print("  [bold yellow]⭐ Star this repo:[/bold yellow] https://github.com/zenjabba/claude-pilot-free")
             ui.print()
             ui.print(f"  [dim]Installed version: {_get_pilot_version()}[/dim]")
             ui.print()

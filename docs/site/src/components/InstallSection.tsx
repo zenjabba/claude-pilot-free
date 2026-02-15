@@ -9,7 +9,7 @@ const InstallSection = () => {
   const [headerRef, headerInView] = useInView<HTMLDivElement>();
   const [codeRef, codeInView] = useInView<HTMLDivElement>();
   const installCommand =
-    "curl -fsSL https://raw.githubusercontent.com/maxritter/claude-pilot/main/install.sh | bash";
+    "curl -fsSL https://raw.githubusercontent.com/zenjabba/claude-pilot-free/main/install.sh | bash";
 
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText(installCommand);

@@ -19,7 +19,7 @@ from installer.steps.base import BaseStep
 
 SETTINGS_FILE = "settings.json"
 
-REPO_URL = "https://github.com/maxritter/claude-pilot"
+REPO_URL = "https://github.com/zenjabba/claude-pilot-free"
 
 SKIP_PATTERNS = (
     "__pycache__",

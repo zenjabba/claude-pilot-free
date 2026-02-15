@@ -2,7 +2,7 @@
 
 set -e
 
-REPO="maxritter/claude-pilot"
+REPO="zenjabba/claude-pilot-free"
 
 VERSION="${VERSION:-}"
 VERSION="${VERSION#v}"
