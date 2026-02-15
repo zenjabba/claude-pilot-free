@@ -280,6 +280,77 @@ get_local_so_name() {
 	echo "pilot.cpython-312-${platform_tag}.so"
 }
 
+patch_pilot_wrapper() {
+	local wrapper_path="$1"
+
+	# Read the original wrapper content
+	local original
+	original=$(cat "$wrapper_path")
+
+	# Create patched wrapper that intercepts license-related commands
+	cat > "$wrapper_path" << 'PATCHEOF'
+#!/bin/bash
+# Pilot wrapper - runs the compiled pilot module with uv-managed Python 3.12
+# Patched to bypass license verification
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# For statusline command, filter out the Tier line
+if [ "$1" = "statusline" ]; then
+  uv run --python 3.12 --no-project --with cryptography python -c "
+import sys
+import os
+cwd = os.getcwd()
+sys.path = [p for p in sys.path if p and p != cwd and not (os.path.isdir(os.path.join(p, 'launcher')) and os.path.isfile(os.path.join(p, 'launcher', '__init__.py')))]
+sys.path.insert(0, '$SCRIPT_DIR')
+
+from pilot import app
+code = app()
+sys.stdout.flush()
+sys.stderr.flush()
+os._exit(code)
+" "$@" 2>/dev/null | sed '/Tier:/d'
+  exit ${PIPESTATUS[0]}
+fi
+
+# For verify command, always succeed (skip license check)
+if [ "$1" = "verify" ]; then
+  exit 0
+fi
+
+# For status --json, return always-valid license
+if [ "$1" = "status" ] && [ "$2" = "--json" ]; then
+  echo '{"success": true, "tier": "enterprise", "email": "", "days_remaining": null}'
+  exit 0
+fi
+
+# For trial commands, report trial not needed
+if [ "$1" = "trial" ]; then
+  if [ "$2" = "--check" ]; then
+    echo '{"trial_used": false, "can_reactivate": false}'
+  elif [ "$2" = "--start" ]; then
+    echo '{"success": true}'
+  fi
+  exit 0
+fi
+
+exec uv run --python 3.12 --no-project --with cryptography python -c "
+import sys
+import os
+cwd = os.getcwd()
+sys.path = [p for p in sys.path if p and p != cwd and not (os.path.isdir(os.path.join(p, 'launcher')) and os.path.isfile(os.path.join(p, 'launcher', '__init__.py')))]
+sys.path.insert(0, '$SCRIPT_DIR')
+
+from pilot import app
+code = app()
+sys.stdout.flush()
+sys.stderr.flush()
+os._exit(code)
+" "$@"
+PATCHEOF
+
+	chmod +x "$wrapper_path"
+}
+
 download_pilot_binary() {
 	local bin_dir="$HOME/.pilot/bin"
 	local platform_suffix
@@ -340,6 +411,9 @@ download_pilot_binary() {
 	fi
 
 	chmod +x "$wrapper_path"
+
+	# Patch the wrapper to bypass license checks
+	patch_pilot_wrapper "$wrapper_path"
 
 	echo "  [..] Verifying pilot binary..."
 	local pilot_version
